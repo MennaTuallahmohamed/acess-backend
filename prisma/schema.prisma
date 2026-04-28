@@ -1,0 +1,409 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./ERD.png"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+}
+
+model User {
+  id                       Int                             @id @default(autoincrement())
+  fullName                 String?
+  username                 String?                         @unique
+  passwordHash             String
+  phone                    String?
+  isActive                 Boolean                         @default(true)
+  status                   UserStatus                      @default(ACTIVE)
+  roleId                   Int
+  createdAt                DateTime                        @default(now())
+  updatedAt                DateTime                        @updatedAt
+  email                    String?                         @unique
+  firstName                String?
+  jobTitle                 String?
+  lastName                 String?
+  notes                    String?
+  officeNumber             String?
+  region                   String?
+  auditLogs                AuditLog[]
+  movements                DeviceMovement[]
+  statusChanges            DeviceStatusHistory[]
+  inspections              Inspection[]
+  reportedInspectionIssues InspectionIssue[]               @relation("InspectionIssueReportedBy")
+  issueSolutionActions     InspectionIssueSolutionAction[] @relation("IssueSolutionActionBy")
+  assignedTasks            InspectionTask[]                @relation("TaskAssignedTo")
+  createdTasks             InspectionTask[]                @relation("TaskCreatedBy")
+  maintenanceLogs          MaintenanceLog[]
+  role                     Role                            @relation(fields: [roleId], references: [id])
+
+  @@index([roleId])
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  building  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cluster   String
+  direction String?
+  excelId   String   @unique
+  lane      String?
+  type      String?
+  zone      String?
+  devices   Device[]
+
+  @@index([cluster])
+  @@index([building])
+}
+
+model DeviceType {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  devices     Device[]
+  issues      Issue[]
+}
+
+model Device {
+  id               Int                 @id @default(autoincrement())
+  deviceCode       String              @unique
+  deviceName       String
+  barcode          String              @unique
+  serialNumber     String?             @unique
+  manufacturer     String?
+  modelNumber      String?
+  currentStatus    DeviceCurrentStatus @default(OK)
+  installDate      DateTime?
+  lastInspectionAt DateTime?
+  deviceTypeId     Int
+  locationId       Int
+  notes            String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  excelDate        String?
+  excelStatus      String?
+  firmware         String?
+  ipAddress        String?
+
+  secretCode String? @unique
+
+  deviceType      DeviceType            @relation(fields: [deviceTypeId], references: [id])
+  location        Location              @relation(fields: [locationId], references: [id])
+  movements       DeviceMovement[]
+  statusHistory   DeviceStatusHistory[]
+  inspections     Inspection[]
+  tasks           InspectionTask[]
+  maintenanceLogs MaintenanceLog[]
+
+  @@index([deviceTypeId])
+  @@index([locationId])
+  @@index([barcode])
+  @@index([secretCode])
+}
+
+model InspectionTask {
+  id            Int          @id @default(autoincrement())
+  deviceId      Int
+  assignedToId  Int?
+  createdById   Int
+  scheduledDate DateTime
+  frequency     String?
+  status        TaskStatus   @default(PENDING)
+  notes         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  inspections   Inspection[]
+  assignedTo    User?        @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
+  createdBy     User         @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  device        Device       @relation(fields: [deviceId], references: [id])
+
+  @@index([deviceId])
+  @@index([assignedToId])
+  @@index([createdById])
+}
+
+model Inspection {
+  id               Int                             @id @default(autoincrement())
+  deviceId         Int
+  technicianId     Int
+  taskId           Int?
+  inspectionStatus InspectionStatus
+  issueReason      String?
+  notes            String?
+  latitude         Float?
+  longitude        Float?
+  locationText     String?
+  inspectedAt      DateTime                        @default(now())
+  createdAt        DateTime                        @default(now())
+  updatedAt        DateTime                        @updatedAt
+  device           Device                          @relation(fields: [deviceId], references: [id])
+  task             InspectionTask?                 @relation(fields: [taskId], references: [id])
+  technician       User                            @relation(fields: [technicianId], references: [id])
+  images           InspectionImage[]
+  inspectionIssues InspectionIssue[]
+  solutionActions  InspectionIssueSolutionAction[]
+
+  @@index([deviceId])
+  @@index([technicianId])
+  @@index([taskId])
+}
+
+model InspectionImage {
+  id           Int        @id @default(autoincrement())
+  inspectionId Int
+  imageUrl     String
+  imageType    String?
+  createdAt    DateTime   @default(now())
+  inspection   Inspection @relation(fields: [inspectionId], references: [id])
+}
+
+model MaintenanceLog {
+  id               Int               @id @default(autoincrement())
+  deviceId         Int
+  createdById      Int
+  status           MaintenanceStatus @default(OPEN)
+  issueReason      String?
+  notes            String?
+  sentOut          Boolean           @default(false)
+  maintenancePlace String?
+  externalVendor   String?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  createdBy        User              @relation(fields: [createdById], references: [id])
+  device           Device            @relation(fields: [deviceId], references: [id])
+
+  @@index([deviceId])
+  @@index([createdById])
+}
+
+model DeviceMovement {
+  id             Int          @id @default(autoincrement())
+  deviceId       Int
+  movedById      Int
+  movementType   MovementType
+  fromLocationId Int?
+  toLocationId   Int?
+  fromText       String?
+  toText         String?
+  reason         String?
+  movedAt        DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+  device         Device       @relation(fields: [deviceId], references: [id])
+  movedBy        User         @relation(fields: [movedById], references: [id])
+
+  @@index([deviceId])
+  @@index([movedById])
+}
+
+model DeviceStatusHistory {
+  id          Int                  @id @default(autoincrement())
+  deviceId    Int
+  oldStatus   DeviceCurrentStatus?
+  newStatus   DeviceCurrentStatus
+  changedById Int
+  note        String?
+  changedAt   DateTime             @default(now())
+  changedBy   User                 @relation(fields: [changedById], references: [id])
+  device      Device               @relation(fields: [deviceId], references: [id])
+
+  @@index([deviceId])
+  @@index([changedById])
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  action     String
+  entityType String
+  entityId   Int?
+  details    String?
+  createdAt  DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model IssueCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  code        String?  @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  issues      Issue[]
+}
+
+model Issue {
+  id              Int               @id @default(autoincrement())
+  issueCode       String            @unique
+  title           String
+  description     String?
+  severity        IssueSeverity     @default(MEDIUM)
+  status          IssueStatus       @default(ACTIVE)
+  categoryId      Int
+  deviceTypeId    Int
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  inspectionItems InspectionIssue[]
+  category        IssueCategory     @relation(fields: [categoryId], references: [id])
+  deviceType      DeviceType        @relation(fields: [deviceTypeId], references: [id])
+  solutions       IssueSolution[]
+
+  @@index([categoryId])
+  @@index([deviceTypeId])
+  @@index([status])
+  @@index([title])
+}
+
+model IssueSolution {
+  id           Int                             @id @default(autoincrement())
+  solutionCode String?                         @unique
+  issueId      Int
+  title        String
+  description  String?
+  stepOrder    Int
+  isRequired   Boolean                         @default(true)
+  status       SolutionStatus                  @default(ACTIVE)
+  createdAt    DateTime                        @default(now())
+  updatedAt    DateTime                        @updatedAt
+  actions      InspectionIssueSolutionAction[]
+  issue        Issue                           @relation(fields: [issueId], references: [id], onDelete: Cascade)
+
+  @@unique([issueId, stepOrder])
+  @@index([issueId])
+  @@index([stepOrder])
+}
+
+model InspectionIssue {
+  id               Int                             @id @default(autoincrement())
+  inspectionId     Int
+  issueId          Int
+  reportedById     Int
+  status           InspectionIssueStatus           @default(OPEN)
+  notes            String?
+  resolvedAt       DateTime?
+  unresolvedReason String?
+  createdAt        DateTime                        @default(now())
+  updatedAt        DateTime                        @updatedAt
+  inspection       Inspection                      @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  issue            Issue                           @relation(fields: [issueId], references: [id])
+  reportedBy       User                            @relation("InspectionIssueReportedBy", fields: [reportedById], references: [id])
+  actions          InspectionIssueSolutionAction[]
+
+  @@index([inspectionId])
+  @@index([issueId])
+  @@index([reportedById])
+}
+
+model InspectionIssueSolutionAction {
+  id                Int                   @id @default(autoincrement())
+  inspectionId      Int
+  inspectionIssueId Int
+  solutionId        Int
+  technicianId      Int
+  status            ActionExecutionStatus @default(PENDING)
+  note              String?
+  doneAt            DateTime?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  inspection        Inspection            @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  inspectionIssue   InspectionIssue       @relation(fields: [inspectionIssueId], references: [id], onDelete: Cascade)
+  solution          IssueSolution         @relation(fields: [solutionId], references: [id])
+  technician        User                  @relation("IssueSolutionActionBy", fields: [technicianId], references: [id])
+
+  @@unique([inspectionIssueId, solutionId])
+  @@index([inspectionId])
+  @@index([inspectionIssueId])
+  @@index([solutionId])
+  @@index([technicianId])
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum DeviceCurrentStatus {
+  OK
+  NEEDS_MAINTENANCE
+  UNDER_MAINTENANCE
+  OUT_OF_SERVICE
+}
+
+enum InspectionStatus {
+  OK
+  NOT_OK
+  PARTIAL
+  NOT_REACHABLE
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum MaintenanceStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  SENT_OUT
+  RETURNED
+}
+
+enum MovementType {
+  TRANSFER
+  SENT_TO_MAINTENANCE
+  RETURNED_FROM_MAINTENANCE
+  RELOCATED
+}
+
+enum IssueSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IssueStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum SolutionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum InspectionIssueStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  UNRESOLVED
+  SKIPPED
+}
+
+enum ActionExecutionStatus {
+  PENDING
+  DONE
+  FAILED
+  SKIPPED
+}
