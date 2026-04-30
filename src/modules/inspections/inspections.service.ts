@@ -92,14 +92,22 @@ export class InspectionsService {
       throw new NotFoundException('Device not found');
     }
 
-    const technician = await this.prisma.user.findUnique({
+    const technician = await this.prisma.user.findFirst({
       where: {
         id: parsedTechnicianId,
+        role: {
+          name: 'TECHNICIAN',
+        },
+      },
+      include: {
+        role: true,
       },
     });
 
     if (!technician) {
-      throw new NotFoundException('Technician not found');
+      throw new NotFoundException(
+        'Technician not found or this user is not TECHNICIAN',
+      );
     }
 
     if (parsedTaskId !== undefined) {
@@ -195,7 +203,7 @@ export class InspectionsService {
 
         ...(locationText ? { locationText } : {}),
       },
-      include: this.baseInclude(),
+      include: this.baseIncludeWithoutTechnician(),
     });
 
     console.log('CREATED INSPECTION ID:', createdInspection.id);
@@ -266,30 +274,46 @@ export class InspectionsService {
 
   async findAll() {
     const inspections = await this.prisma.inspection.findMany({
-      include: this.fullInclude(),
+      include: this.fullIncludeWithoutTechnician(),
       orderBy: {
         id: 'desc' as const,
       },
     });
 
+    const inspectionsWithTechnicians =
+      await this.attachTechniciansToInspections(inspections);
+
     return Promise.all(
-      inspections.map((inspection) => this.enrichInspection(inspection)),
+      inspectionsWithTechnicians.map((inspection) =>
+        this.enrichInspection(inspection),
+      ),
     );
   }
 
   async findByTechnician(technicianId: number) {
+    const parsedTechnicianId = Number(technicianId);
+
+    if (!parsedTechnicianId || Number.isNaN(parsedTechnicianId)) {
+      throw new BadRequestException('technicianId is required');
+    }
+
     const inspections = await this.prisma.inspection.findMany({
       where: {
-        technicianId,
+        technicianId: parsedTechnicianId,
       },
-      include: this.fullInclude(),
+      include: this.fullIncludeWithoutTechnician(),
       orderBy: {
         id: 'desc' as const,
       },
     });
 
+    const inspectionsWithTechnicians =
+      await this.attachTechniciansToInspections(inspections);
+
     return Promise.all(
-      inspections.map((inspection) => this.enrichInspection(inspection)),
+      inspectionsWithTechnicians.map((inspection) =>
+        this.enrichInspection(inspection),
+      ),
     );
   }
 
@@ -302,14 +326,17 @@ export class InspectionsService {
       where: {
         id,
       },
-      include: this.baseInclude(),
+      include: this.baseIncludeWithoutTechnician(),
     });
 
     if (!inspection) {
       throw new NotFoundException('Inspection not found');
     }
 
-    return this.enrichInspection(inspection);
+    const [inspectionWithTechnician] =
+      await this.attachTechniciansToInspections([inspection]);
+
+    return this.enrichInspection(inspectionWithTechnician);
   }
 
   async findOneFull(id: number) {
@@ -321,14 +348,17 @@ export class InspectionsService {
       where: {
         id,
       },
-      include: this.fullInclude(),
+      include: this.fullIncludeWithoutTechnician(),
     });
 
     if (!inspection) {
       throw new NotFoundException('Inspection not found');
     }
 
-    return this.enrichInspection(inspection);
+    const [inspectionWithTechnician] =
+      await this.attachTechniciansToInspections([inspection]);
+
+    return this.enrichInspection(inspectionWithTechnician);
   }
 
   async update(id: number, updateInspectionDto: UpdateInspectionDto) {
@@ -341,10 +371,13 @@ export class InspectionsService {
       data: {
         ...updateInspectionDto,
       },
-      include: this.baseInclude(),
+      include: this.baseIncludeWithoutTechnician(),
     });
 
-    return this.enrichInspection(updated);
+    const [updatedWithTechnician] =
+      await this.attachTechniciansToInspections([updated]);
+
+    return this.enrichInspection(updatedWithTechnician);
   }
 
   async remove(id: number) {
@@ -355,6 +388,45 @@ export class InspectionsService {
         id,
       },
     });
+  }
+
+  private async attachTechniciansToInspections<T extends { technicianId: number }>(
+    inspections: T[],
+  ) {
+    const technicianIds = [
+      ...new Set(
+        inspections
+          .map((inspection) => inspection.technicianId)
+          .filter((id) => typeof id === 'number' && !Number.isNaN(id)),
+      ),
+    ];
+
+    if (technicianIds.length === 0) {
+      return inspections.map((inspection) => ({
+        ...inspection,
+        technician: null,
+      }));
+    }
+
+    const technicians = await this.prisma.user.findMany({
+      where: {
+        id: {
+          in: technicianIds,
+        },
+      },
+      include: {
+        role: true,
+      },
+    });
+
+    const technicianMap = new Map(
+      technicians.map((technician) => [technician.id, technician]),
+    );
+
+    return inspections.map((inspection) => ({
+      ...inspection,
+      technician: technicianMap.get(inspection.technicianId) || null,
+    }));
   }
 
   private async enrichInspection(inspection: any) {
@@ -636,7 +708,7 @@ export class InspectionsService {
     return map[scanCodeType] || scanCodeType;
   }
 
-  private baseInclude(): Prisma.InspectionInclude {
+  private baseIncludeWithoutTechnician(): Prisma.InspectionInclude {
     return {
       device: {
         include: {
@@ -657,12 +729,6 @@ export class InspectionsService {
               changedAt: 'asc' as const,
             },
           },
-        },
-      },
-
-      technician: {
-        include: {
-          role: true,
         },
       },
 
@@ -676,7 +742,7 @@ export class InspectionsService {
     };
   }
 
-  private fullInclude(): Prisma.InspectionInclude {
+  private fullIncludeWithoutTechnician(): Prisma.InspectionInclude {
     return {
       device: {
         include: {
@@ -698,12 +764,6 @@ export class InspectionsService {
               changedAt: 'asc' as const,
             },
           },
-        },
-      },
-
-      technician: {
-        include: {
-          role: true,
         },
       },
 
@@ -760,14 +820,6 @@ export class InspectionsService {
           actions: {
             include: {
               solution: true,
-              technician: {
-                select: {
-                  id: true,
-                  fullName: true,
-                  username: true,
-                  email: true,
-                },
-              },
             },
             orderBy: {
               createdAt: 'asc' as const,
@@ -782,15 +834,6 @@ export class InspectionsService {
       solutionActions: {
         include: {
           solution: true,
-
-          technician: {
-            select: {
-              id: true,
-              fullName: true,
-              username: true,
-              email: true,
-            },
-          },
 
           inspectionIssue: {
             include: {
