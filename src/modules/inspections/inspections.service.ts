@@ -16,14 +16,12 @@ import { UpdateInspectionDto } from './dto/update-inspection.dto';
 type InspectionSystemMeta = {
   beforeDeviceStatus: string | null;
   afterDeviceStatus: string | null;
-
   scanned: boolean;
   scanMethod: string | null;
   scanCodeType: string | null;
   scanCodeValueMasked: string | null;
   qrAttempts: number;
   manualFallbackUsed: boolean;
-
   savedAt: string;
 };
 
@@ -47,7 +45,6 @@ export class InspectionsService {
       latitude,
       longitude,
       locationText,
-
       scanned,
       scanMethod,
       scanCodeType,
@@ -79,9 +76,7 @@ export class InspectionsService {
     }
 
     const device = await this.prisma.device.findUnique({
-      where: {
-        id: parsedDeviceId,
-      },
+      where: { id: parsedDeviceId },
       include: {
         location: true,
         deviceType: true,
@@ -113,9 +108,7 @@ export class InspectionsService {
 
     if (parsedTaskId !== undefined) {
       const task = await this.prisma.inspectionTask.findUnique({
-        where: {
-          id: parsedTaskId,
-        },
+        where: { id: parsedTaskId },
       });
 
       if (!task) {
@@ -139,7 +132,6 @@ export class InspectionsService {
     const systemMeta: InspectionSystemMeta = {
       beforeDeviceStatus: oldDeviceStatus || null,
       afterDeviceStatus: newDeviceStatus || null,
-
       scanned: scanned === true,
       scanMethod: scanMethod?.trim() || null,
       scanCodeType: scanCodeType?.trim() || null,
@@ -151,7 +143,6 @@ export class InspectionsService {
           ? Number(qrAttempts)
           : 0,
       manualFallbackUsed: manualFallbackUsed === true,
-
       savedAt: new Date().toISOString(),
     };
 
@@ -189,43 +180,38 @@ export class InspectionsService {
         ...(latitude !== undefined &&
         latitude !== null &&
         String(latitude) !== ''
-          ? {
-              latitude: Number(latitude),
-            }
+          ? { latitude: Number(latitude) }
           : {}),
 
         ...(longitude !== undefined &&
         longitude !== null &&
         String(longitude) !== ''
-          ? {
-              longitude: Number(longitude),
-            }
+          ? { longitude: Number(longitude) }
           : {}),
 
         ...(locationText ? { locationText } : {}),
       },
-      include: this.baseIncludeWithoutTechnician(),
+      include: {
+        device: {
+          include: {
+            location: true,
+            deviceType: true,
+          },
+        },
+        images: true,
+      },
     });
-
-    console.log('CREATED INSPECTION ID:', createdInspection.id);
-    console.log('RECEIVED FILE IN SERVICE:', file);
 
     if (file?.filename) {
       const imageUrl = `uploads/${file.filename}`;
 
-      const savedImage = await this.prisma.inspectionImage.create({
+      await this.prisma.inspectionImage.create({
         data: {
           inspectionId: createdInspection.id,
           imageUrl,
           imageType: 'general',
         },
       });
-
-      console.log('IMAGE SAVED SUCCESSFULLY:', savedImage);
-    } else {
-      console.log(
-        'NO IMAGE RECEIVED. Flutter did not send field name "image".',
-      );
     }
 
     if (oldDeviceStatus !== newDeviceStatus) {
@@ -247,9 +233,7 @@ export class InspectionsService {
     }
 
     await this.prisma.device.update({
-      where: {
-        id: parsedDeviceId,
-      },
+      where: { id: parsedDeviceId },
       data: {
         currentStatus: newDeviceStatus,
         lastInspectionAt: new Date(),
@@ -258,9 +242,7 @@ export class InspectionsService {
 
     if (parsedTaskId !== undefined) {
       await this.prisma.inspectionTask.update({
-        where: {
-          id: parsedTaskId,
-        },
+        where: { id: parsedTaskId },
         data: {
           status:
             inspectionStatus === 'OK'
@@ -274,14 +256,7 @@ export class InspectionsService {
   }
 
   async findAll() {
-    const inspections = await this.prisma.inspection.findMany({
-      include: this.safeListIncludeWithoutTechnician(),
-      orderBy: {
-        id: 'desc' as const,
-      },
-    });
-
-    return this.attachTechniciansToInspections(inspections);
+    return this.findInspectionsBySql();
   }
 
   async findByTechnician(technicianId: number) {
@@ -291,232 +266,220 @@ export class InspectionsService {
       throw new BadRequestException('technicianId is required');
     }
 
-    const inspections = await this.prisma.inspection.findMany({
-      where: {
-        technicianId: parsedTechnicianId,
-      },
-      include: this.safeListIncludeWithoutTechnician(),
-      orderBy: {
-        id: 'desc' as const,
-      },
-    });
-
-    return this.attachTechniciansToInspections(inspections);
+    return this.findInspectionsBySql(parsedTechnicianId);
   }
 
   async findOne(id: number) {
-    if (id === undefined || id === null || Number.isNaN(id)) {
+    const parsedId = Number(id);
+
+    if (!parsedId || Number.isNaN(parsedId)) {
       throw new NotFoundException('Inspection id is missing');
     }
 
-    const inspection = await this.prisma.inspection.findUnique({
-      where: {
-        id,
-      },
-      include: this.safeDetailIncludeWithoutTechnician(),
-    });
+    const inspections = await this.findInspectionsBySql(undefined, parsedId);
 
-    if (!inspection) {
+    if (!inspections.length) {
       throw new NotFoundException('Inspection not found');
     }
 
-    const [inspectionWithTechnician] =
-      await this.attachTechniciansToInspections([inspection]);
-
-    return this.enrichInspection(inspectionWithTechnician);
+    return inspections[0];
   }
 
   async findOneFull(id: number) {
-    if (id === undefined || id === null || Number.isNaN(id)) {
-      throw new NotFoundException('Inspection id is missing');
-    }
-
-    const inspection = await this.prisma.inspection.findUnique({
-      where: {
-        id,
-      },
-      include: this.safeDetailIncludeWithoutTechnician(),
-    });
-
-    if (!inspection) {
-      throw new NotFoundException('Inspection not found');
-    }
-
-    const [inspectionWithTechnician] =
-      await this.attachTechniciansToInspections([inspection]);
-
-    return this.enrichInspection(inspectionWithTechnician);
+    return this.findOne(id);
   }
 
   async update(id: number, updateInspectionDto: UpdateInspectionDto) {
-    await this.findOne(id);
+    const parsedId = Number(id);
 
-    const updated = await this.prisma.inspection.update({
-      where: {
-        id,
-      },
+    if (!parsedId || Number.isNaN(parsedId)) {
+      throw new NotFoundException('Inspection id is missing');
+    }
+
+    await this.findOne(parsedId);
+
+    await this.prisma.inspection.update({
+      where: { id: parsedId },
       data: {
         ...updateInspectionDto,
       },
-      include: this.safeDetailIncludeWithoutTechnician(),
     });
 
-    const [updatedWithTechnician] =
-      await this.attachTechniciansToInspections([updated]);
-
-    return this.enrichInspection(updatedWithTechnician);
+    return this.findOneFull(parsedId);
   }
 
   async remove(id: number) {
-    await this.findOne(id);
+    const parsedId = Number(id);
+
+    if (!parsedId || Number.isNaN(parsedId)) {
+      throw new NotFoundException('Inspection id is missing');
+    }
+
+    await this.findOne(parsedId);
 
     return this.prisma.inspection.delete({
-      where: {
-        id,
-      },
+      where: { id: parsedId },
     });
   }
 
-  private async attachTechniciansToInspections<T extends { technicianId: number }>(
-    inspections: T[],
-  ) {
-    const technicianIds = [
-      ...new Set(
-        inspections
-          .map((inspection) => inspection.technicianId)
-          .filter((id) => typeof id === 'number' && !Number.isNaN(id)),
-      ),
-    ];
+  private async findInspectionsBySql(technicianId?: number, inspectionId?: number) {
+    const whereParts: string[] = [];
 
-    const technicians =
-      technicianIds.length > 0
-        ? await this.prisma.user.findMany({
-            where: {
-              id: {
-                in: technicianIds,
-              },
-            },
-            include: {
-              role: true,
-            },
-          })
-        : [];
+    if (technicianId !== undefined) {
+      whereParts.push(`i."technicianId" = ${Number(technicianId)}`);
+    }
 
-    const technicianMap = new Map(
-      technicians.map((technician) => [technician.id, technician]),
-    );
+    if (inspectionId !== undefined) {
+      whereParts.push(`i."id" = ${Number(inspectionId)}`);
+    }
 
-    return inspections.map((inspection) => ({
-      ...inspection,
-      technician: technicianMap.get(inspection.technicianId) || null,
-    }));
+    const whereSql = whereParts.length ? `WHERE ${whereParts.join(' AND ')}` : '';
+
+    const inspections = await this.prisma.$queryRawUnsafe<any[]>(`
+      SELECT
+        i."id",
+        i."deviceId",
+        i."technicianId",
+        i."taskId",
+        i."inspectionStatus",
+        i."issueReason",
+        i."notes",
+        i."latitude",
+        i."longitude",
+        i."locationText",
+        i."inspectedAt",
+        i."createdAt",
+        i."updatedAt",
+
+        CASE
+          WHEN d."id" IS NULL THEN NULL
+          ELSE jsonb_build_object(
+            'id', d."id",
+            'deviceCode', d."deviceCode",
+            'deviceName', d."deviceName",
+            'barcode', d."barcode",
+            'serialNumber', d."serialNumber",
+            'currentStatus', d."currentStatus",
+            'lastInspectionAt', d."lastInspectionAt",
+            'location', CASE
+              WHEN l."id" IS NULL THEN NULL
+              ELSE jsonb_build_object(
+                'id', l."id",
+                'cluster', l."cluster",
+                'building', l."building",
+                'zone', l."zone",
+                'lane', l."lane",
+                'direction', l."direction"
+              )
+            END,
+            'deviceType', CASE
+              WHEN dt."id" IS NULL THEN NULL
+              ELSE jsonb_build_object(
+                'id', dt."id",
+                'name', dt."name"
+              )
+            END
+          )
+        END AS "device",
+
+        CASE
+          WHEN u."id" IS NULL THEN NULL
+          ELSE jsonb_build_object(
+            'id', u."id",
+            'firstName', u."firstName",
+            'lastName', u."lastName",
+            'fullName', u."fullName",
+            'email', u."email",
+            'username', u."username",
+            'jobTitle', u."jobTitle",
+            'status', u."status",
+            'roleId', u."roleId",
+            'role', CASE
+              WHEN r."id" IS NULL THEN NULL
+              ELSE jsonb_build_object(
+                'id', r."id",
+                'name', r."name"
+              )
+            END
+          )
+        END AS "technician",
+
+        CASE
+          WHEN t."id" IS NULL THEN NULL
+          ELSE jsonb_build_object(
+            'id', t."id",
+            'status', t."status",
+            'priority', t."priority",
+            'scheduledAt', t."scheduledAt",
+            'createdAt', t."createdAt",
+            'updatedAt', t."updatedAt"
+          )
+        END AS "task",
+
+        COALESCE(
+          (
+            SELECT jsonb_agg(
+              jsonb_build_object(
+                'id', img."id",
+                'inspectionId', img."inspectionId",
+                'imageUrl', img."imageUrl",
+                'imageType', img."imageType",
+                'createdAt', img."createdAt"
+              )
+              ORDER BY img."createdAt" ASC
+            )
+            FROM "InspectionImage" img
+            WHERE img."inspectionId" = i."id"
+          ),
+          '[]'::jsonb
+        ) AS "images"
+
+      FROM "Inspection" i
+
+      LEFT JOIN "Device" d
+        ON d."id" = i."deviceId"
+
+      LEFT JOIN "Location" l
+        ON l."id" = d."locationId"
+
+      LEFT JOIN "DeviceType" dt
+        ON dt."id" = d."deviceTypeId"
+
+      LEFT JOIN "User" u
+        ON u."id" = i."technicianId"
+
+      LEFT JOIN "Role" r
+        ON r."id" = u."roleId"
+
+      LEFT JOIN "InspectionTask" t
+        ON t."id" = i."taskId"
+
+      ${whereSql}
+
+      ORDER BY i."id" DESC;
+    `);
+
+    return inspections.map((inspection) => this.formatSqlInspection(inspection));
   }
 
-  private async enrichInspection(inspection: any) {
-    const inspectedAt = inspection.inspectedAt || inspection.createdAt;
-
+  private formatSqlInspection(inspection: any) {
     const parsedNotes = this.extractMetaFromNotes(inspection.notes);
     const cleanNotes = parsedNotes.userNotes;
     const meta = parsedNotes.meta;
 
-    const history = inspection.deviceId
-      ? await this.prisma.deviceStatusHistory.findMany({
-          where: {
-            deviceId: inspection.deviceId,
-          },
-          include: {
-            changedBy: {
-              select: {
-                id: true,
-                fullName: true,
-                username: true,
-                email: true,
-              },
-            },
-          },
-          orderBy: {
-            changedAt: 'asc' as const,
-          },
-        })
-      : [];
-
-    const beforeRecord = [...history]
-      .filter((item) => new Date(item.changedAt) <= new Date(inspectedAt))
-      .sort(
-        (a, b) =>
-          new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime(),
-      )[0];
-
-    const afterRecord = [...history]
-      .filter((item) => new Date(item.changedAt) >= new Date(inspectedAt))
-      .sort(
-        (a, b) =>
-          new Date(a.changedAt).getTime() - new Date(b.changedAt).getTime(),
-      )[0];
-
-    const statusBeforeInspection =
-      meta?.beforeDeviceStatus ||
-      beforeRecord?.oldStatus ||
-      beforeRecord?.newStatus ||
-      null;
-
+    const statusBeforeInspection = meta?.beforeDeviceStatus || null;
     const statusAfterInspection =
-      meta?.afterDeviceStatus ||
-      afterRecord?.newStatus ||
-      inspection.device?.currentStatus ||
-      null;
+      meta?.afterDeviceStatus || inspection.device?.currentStatus || null;
 
-    const totalSolutionActions = Array.isArray(inspection.solutionActions)
-      ? inspection.solutionActions.length
-      : 0;
-
-    const doneSolutionActions = Array.isArray(inspection.solutionActions)
-      ? inspection.solutionActions.filter((action) => action.status === 'DONE')
-          .length
-      : 0;
-
-    const failedSolutionActions = Array.isArray(inspection.solutionActions)
-      ? inspection.solutionActions.filter(
-          (action) => action.status === 'FAILED',
-        ).length
-      : 0;
-
-    const pendingSolutionActions = Array.isArray(inspection.solutionActions)
-      ? inspection.solutionActions.filter(
-          (action) => action.status === 'PENDING',
-        ).length
-      : 0;
-
-    const skippedSolutionActions = Array.isArray(inspection.solutionActions)
-      ? inspection.solutionActions.filter(
-          (action) => action.status === 'SKIPPED',
-        ).length
-      : 0;
-
-    const scanInfo = {
-      scanned: meta?.scanned ?? false,
-      scannedLabel: meta?.scanned ? 'تم عمل Scan' : 'لم يتم عمل Scan',
-
-      scanMethod: meta?.scanMethod ?? null,
-      scanMethodLabel: this.scanMethodToArabic(meta?.scanMethod ?? null),
-
-      scanCodeType: meta?.scanCodeType ?? null,
-      scanCodeTypeLabel: this.scanCodeTypeToArabic(
-        meta?.scanCodeType ?? null,
-      ),
-
-      scanCodeValueMasked: meta?.scanCodeValueMasked ?? null,
-
-      qrAttempts: meta?.qrAttempts ?? 0,
-
-      manualFallbackUsed: meta?.manualFallbackUsed ?? false,
-      manualFallbackUsedLabel: meta?.manualFallbackUsed
-        ? 'تم فتح البحث اليدوي'
-        : 'لم يتم فتح البحث اليدوي',
-    };
+    const images = Array.isArray(inspection.images) ? inspection.images : [];
 
     return {
       ...inspection,
+
+      device: inspection.device ?? null,
+      technician: inspection.technician ?? null,
+      task: inspection.task ?? null,
+      images,
 
       notes: cleanNotes,
 
@@ -537,20 +500,31 @@ export class InspectionsService {
         inspection.device?.currentStatus || null,
       ),
 
-      scanInfo,
+      scanInfo: {
+        scanned: meta?.scanned ?? false,
+        scannedLabel: meta?.scanned ? 'تم عمل Scan' : 'لم يتم عمل Scan',
+        scanMethod: meta?.scanMethod ?? null,
+        scanMethodLabel: this.scanMethodToArabic(meta?.scanMethod ?? null),
+        scanCodeType: meta?.scanCodeType ?? null,
+        scanCodeTypeLabel: this.scanCodeTypeToArabic(
+          meta?.scanCodeType ?? null,
+        ),
+        scanCodeValueMasked: meta?.scanCodeValueMasked ?? null,
+        qrAttempts: meta?.qrAttempts ?? 0,
+        manualFallbackUsed: meta?.manualFallbackUsed ?? false,
+        manualFallbackUsedLabel: meta?.manualFallbackUsed
+          ? 'تم فتح البحث اليدوي'
+          : 'لم يتم فتح البحث اليدوي',
+      },
 
       summary: {
-        imagesCount: Array.isArray(inspection.images)
-          ? inspection.images.length
-          : 0,
-        issuesCount: Array.isArray(inspection.inspectionIssues)
-          ? inspection.inspectionIssues.length
-          : 0,
-        totalSolutionActions,
-        doneSolutionActions,
-        failedSolutionActions,
-        pendingSolutionActions,
-        skippedSolutionActions,
+        imagesCount: images.length,
+        issuesCount: 0,
+        totalSolutionActions: 0,
+        doneSolutionActions: 0,
+        failedSolutionActions: 0,
+        pendingSolutionActions: 0,
+        skippedSolutionActions: 0,
       },
     };
   }
@@ -591,7 +565,6 @@ export class InspectionsService {
     meta: InspectionSystemMeta | null;
   } {
     const rawNotes = notes || '';
-
     const markerIndex = rawNotes.indexOf(this.META_MARKER);
 
     if (markerIndex === -1) {
@@ -689,107 +662,5 @@ export class InspectionsService {
     };
 
     return map[scanCodeType] || scanCodeType;
-  }
-
-  private safeListIncludeWithoutTechnician(): Prisma.InspectionInclude {
-    return {
-      device: {
-        include: {
-          location: true,
-          deviceType: true,
-        },
-      },
-
-      images: {
-        orderBy: {
-          createdAt: 'asc' as const,
-        },
-      },
-    };
-  }
-
-  private safeDetailIncludeWithoutTechnician(): Prisma.InspectionInclude {
-    return {
-      device: {
-        include: {
-          location: true,
-          deviceType: true,
-          statusHistory: {
-            include: {
-              changedBy: {
-                select: {
-                  id: true,
-                  fullName: true,
-                  username: true,
-                  email: true,
-                },
-              },
-            },
-            orderBy: {
-              changedAt: 'asc' as const,
-            },
-          },
-        },
-      },
-
-      task: true,
-
-      images: {
-        orderBy: {
-          createdAt: 'asc' as const,
-        },
-      },
-
-      inspectionIssues: {
-        include: {
-          issue: {
-            include: {
-              category: true,
-              deviceType: true,
-              solutions: {
-                orderBy: {
-                  stepOrder: 'asc' as const,
-                },
-              },
-            },
-          },
-
-          actions: {
-            include: {
-              solution: true,
-            },
-            orderBy: {
-              createdAt: 'asc' as const,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: 'asc' as const,
-        },
-      },
-
-      solutionActions: {
-        include: {
-          solution: true,
-
-          inspectionIssue: {
-            include: {
-              issue: {
-                include: {
-                  category: true,
-                },
-              },
-            },
-          },
-        },
-        orderBy: {
-          createdAt: 'asc' as const,
-        },
-      },
-    };
-  }
-
-  private baseIncludeWithoutTechnician(): Prisma.InspectionInclude {
-    return this.safeDetailIncludeWithoutTechnician();
   }
 }
