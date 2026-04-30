@@ -1,4 +1,4 @@
-import {
+﻿import {
   BadRequestException,
   Injectable,
   NotFoundException,
@@ -507,7 +507,7 @@ export class InspectionsService {
 
       scanInfo: {
         scanned: meta?.scanned ?? false,
-        scannedLabel: meta?.scanned ? 'تم عمل Scan' : 'لم يتم عمل Scan',
+        scannedLabel: meta?.scanned ? 'ØªÙ… Ø¹Ù…Ù„ Scan' : 'Ù„Ù… ÙŠØªÙ… Ø¹Ù…Ù„ Scan',
 
         scanMethod: meta?.scanMethod ?? null,
         scanMethodLabel: this.scanMethodToArabic(meta?.scanMethod ?? null),
@@ -523,8 +523,8 @@ export class InspectionsService {
 
         manualFallbackUsed: meta?.manualFallbackUsed ?? false,
         manualFallbackUsedLabel: meta?.manualFallbackUsed
-          ? 'تم فتح البحث اليدوي'
-          : 'لم يتم فتح البحث اليدوي',
+          ? 'ØªÙ… ÙØªØ­ Ø§Ù„Ø¨Ø­Ø« Ø§Ù„ÙŠØ¯ÙˆÙŠ'
+          : 'Ù„Ù… ÙŠØªÙ… ÙØªØ­ Ø§Ù„Ø¨Ø­Ø« Ø§Ù„ÙŠØ¯ÙˆÙŠ',
       },
 
       summary: {
@@ -620,54 +620,54 @@ export class InspectionsService {
   }
 
   private statusToArabic(status?: string | null) {
-    if (!status) return '—';
+    if (!status) return 'â€”';
 
     const map: Record<string, string> = {
-      OK: 'سليم',
-      NOT_OK: 'غير سليم',
-      PARTIAL: 'جزئي',
-      NOT_REACHABLE: 'غير متاح',
+      OK: 'Ø³Ù„ÙŠÙ…',
+      NOT_OK: 'ØºÙŠØ± Ø³Ù„ÙŠÙ…',
+      PARTIAL: 'Ø¬Ø²Ø¦ÙŠ',
+      NOT_REACHABLE: 'ØºÙŠØ± Ù…ØªØ§Ø­',
 
-      NEEDS_MAINTENANCE: 'يحتاج صيانة',
-      UNDER_MAINTENANCE: 'تحت الصيانة',
-      OUT_OF_SERVICE: 'خارج الخدمة',
+      NEEDS_MAINTENANCE: 'ÙŠØ­ØªØ§Ø¬ ØµÙŠØ§Ù†Ø©',
+      UNDER_MAINTENANCE: 'ØªØ­Øª Ø§Ù„ØµÙŠØ§Ù†Ø©',
+      OUT_OF_SERVICE: 'Ø®Ø§Ø±Ø¬ Ø§Ù„Ø®Ø¯Ù…Ø©',
 
-      PENDING: 'معلق',
-      DONE: 'تم',
-      FAILED: 'فشل',
-      SKIPPED: 'تم تخطيه',
+      PENDING: 'Ù…Ø¹Ù„Ù‚',
+      DONE: 'ØªÙ…',
+      FAILED: 'ÙØ´Ù„',
+      SKIPPED: 'ØªÙ… ØªØ®Ø·ÙŠÙ‡',
 
-      OPEN: 'مفتوح',
-      IN_PROGRESS: 'قيد التنفيذ',
-      RESOLVED: 'تم الحل',
-      UNRESOLVED: 'لم يتم الحل',
+      OPEN: 'Ù…ÙØªÙˆØ­',
+      IN_PROGRESS: 'Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°',
+      RESOLVED: 'ØªÙ… Ø§Ù„Ø­Ù„',
+      UNRESOLVED: 'Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø­Ù„',
 
-      COMPLETED: 'مكتمل',
-      CANCELLED: 'ملغي',
+      COMPLETED: 'Ù…ÙƒØªÙ…Ù„',
+      CANCELLED: 'Ù…Ù„ØºÙŠ',
     };
 
     return map[status] || status;
   }
 
   private scanMethodToArabic(scanMethod?: string | null) {
-    if (!scanMethod) return '—';
+    if (!scanMethod) return 'â€”';
 
     const map: Record<string, string> = {
       QR: 'QR',
-      MANUAL: 'إدخال يدوي',
+      MANUAL: 'Ø¥Ø¯Ø®Ø§Ù„ ÙŠØ¯ÙˆÙŠ',
     };
 
     return map[scanMethod] || scanMethod;
   }
 
   private scanCodeTypeToArabic(scanCodeType?: string | null) {
-    if (!scanCodeType) return '—';
+    if (!scanCodeType) return 'â€”';
 
     const map: Record<string, string> = {
-      SECRET_QR: 'QR السري',
-      DEVICE_CODE: 'كود الجهاز',
-      SERIAL_NUMBER: 'الرقم التسلسلي',
-      BARCODE: 'الباركود',
+      SECRET_QR: 'QR Ø§Ù„Ø³Ø±ÙŠ',
+      DEVICE_CODE: 'ÙƒÙˆØ¯ Ø§Ù„Ø¬Ù‡Ø§Ø²',
+      SERIAL_NUMBER: 'Ø§Ù„Ø±Ù‚Ù… Ø§Ù„ØªØ³Ù„Ø³Ù„ÙŠ',
+      BARCODE: 'Ø§Ù„Ø¨Ø§Ø±ÙƒÙˆØ¯',
       IP: 'IP',
     };
 
