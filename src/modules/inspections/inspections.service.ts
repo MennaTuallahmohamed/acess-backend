@@ -98,6 +98,7 @@ export class InspectionsService {
         role: {
           name: 'TECHNICIAN',
         },
+        status: 'ACTIVE',
       },
       include: {
         role: true,
@@ -106,7 +107,7 @@ export class InspectionsService {
 
     if (!technician) {
       throw new NotFoundException(
-        'Technician not found or this user is not TECHNICIAN',
+        'Technician not found or this user is not ACTIVE TECHNICIAN',
       );
     }
 
@@ -274,20 +275,13 @@ export class InspectionsService {
 
   async findAll() {
     const inspections = await this.prisma.inspection.findMany({
-      include: this.fullIncludeWithoutTechnician(),
+      include: this.safeListIncludeWithoutTechnician(),
       orderBy: {
         id: 'desc' as const,
       },
     });
 
-    const inspectionsWithTechnicians =
-      await this.attachTechniciansToInspections(inspections);
-
-    return Promise.all(
-      inspectionsWithTechnicians.map((inspection) =>
-        this.enrichInspection(inspection),
-      ),
-    );
+    return this.attachTechniciansToInspections(inspections);
   }
 
   async findByTechnician(technicianId: number) {
@@ -301,20 +295,13 @@ export class InspectionsService {
       where: {
         technicianId: parsedTechnicianId,
       },
-      include: this.fullIncludeWithoutTechnician(),
+      include: this.safeListIncludeWithoutTechnician(),
       orderBy: {
         id: 'desc' as const,
       },
     });
 
-    const inspectionsWithTechnicians =
-      await this.attachTechniciansToInspections(inspections);
-
-    return Promise.all(
-      inspectionsWithTechnicians.map((inspection) =>
-        this.enrichInspection(inspection),
-      ),
-    );
+    return this.attachTechniciansToInspections(inspections);
   }
 
   async findOne(id: number) {
@@ -326,7 +313,7 @@ export class InspectionsService {
       where: {
         id,
       },
-      include: this.baseIncludeWithoutTechnician(),
+      include: this.safeDetailIncludeWithoutTechnician(),
     });
 
     if (!inspection) {
@@ -348,7 +335,7 @@ export class InspectionsService {
       where: {
         id,
       },
-      include: this.fullIncludeWithoutTechnician(),
+      include: this.safeDetailIncludeWithoutTechnician(),
     });
 
     if (!inspection) {
@@ -371,7 +358,7 @@ export class InspectionsService {
       data: {
         ...updateInspectionDto,
       },
-      include: this.baseIncludeWithoutTechnician(),
+      include: this.safeDetailIncludeWithoutTechnician(),
     });
 
     const [updatedWithTechnician] =
@@ -401,23 +388,19 @@ export class InspectionsService {
       ),
     ];
 
-    if (technicianIds.length === 0) {
-      return inspections.map((inspection) => ({
-        ...inspection,
-        technician: null,
-      }));
-    }
-
-    const technicians = await this.prisma.user.findMany({
-      where: {
-        id: {
-          in: technicianIds,
-        },
-      },
-      include: {
-        role: true,
-      },
-    });
+    const technicians =
+      technicianIds.length > 0
+        ? await this.prisma.user.findMany({
+            where: {
+              id: {
+                in: technicianIds,
+              },
+            },
+            include: {
+              role: true,
+            },
+          })
+        : [];
 
     const technicianMap = new Map(
       technicians.map((technician) => [technician.id, technician]),
@@ -708,7 +691,24 @@ export class InspectionsService {
     return map[scanCodeType] || scanCodeType;
   }
 
-  private baseIncludeWithoutTechnician(): Prisma.InspectionInclude {
+  private safeListIncludeWithoutTechnician(): Prisma.InspectionInclude {
+    return {
+      device: {
+        include: {
+          location: true,
+          deviceType: true,
+        },
+      },
+
+      images: {
+        orderBy: {
+          createdAt: 'asc' as const,
+        },
+      },
+    };
+  }
+
+  private safeDetailIncludeWithoutTechnician(): Prisma.InspectionInclude {
     return {
       device: {
         include: {
@@ -739,60 +739,6 @@ export class InspectionsService {
           createdAt: 'asc' as const,
         },
       },
-    };
-  }
-
-  private fullIncludeWithoutTechnician(): Prisma.InspectionInclude {
-    return {
-      device: {
-        include: {
-          location: true,
-          deviceType: true,
-
-          statusHistory: {
-            include: {
-              changedBy: {
-                select: {
-                  id: true,
-                  fullName: true,
-                  username: true,
-                  email: true,
-                },
-              },
-            },
-            orderBy: {
-              changedAt: 'asc' as const,
-            },
-          },
-        },
-      },
-
-      task: {
-        include: {
-          assignedTo: {
-            select: {
-              id: true,
-              fullName: true,
-              username: true,
-              email: true,
-            },
-          },
-          createdBy: {
-            select: {
-              id: true,
-              fullName: true,
-              username: true,
-              email: true,
-            },
-          },
-        },
-      },
-
-      images: {
-        orderBy: {
-          createdAt: 'asc' as const,
-        },
-      },
 
       inspectionIssues: {
         include: {
@@ -805,15 +751,6 @@ export class InspectionsService {
                   stepOrder: 'asc' as const,
                 },
               },
-            },
-          },
-
-          reportedBy: {
-            select: {
-              id: true,
-              fullName: true,
-              username: true,
-              email: true,
             },
           },
 
@@ -850,5 +787,9 @@ export class InspectionsService {
         },
       },
     };
+  }
+
+  private baseIncludeWithoutTechnician(): Prisma.InspectionInclude {
+    return this.safeDetailIncludeWithoutTechnician();
   }
 }
