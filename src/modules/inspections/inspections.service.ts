@@ -3,11 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  DeviceCurrentStatus,
-  Prisma,
-  TaskStatus,
-} from '@prisma/client';
+import { DeviceCurrentStatus, TaskStatus } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 
 import { CreateInspectionDto } from './dto/create-inspection.dto';
@@ -175,6 +171,7 @@ export class InspectionsService {
           : {}),
 
         ...(issueReason ? { issueReason } : {}),
+
         notes: notesWithMeta,
 
         ...(latitude !== undefined &&
@@ -202,6 +199,8 @@ export class InspectionsService {
       },
     });
 
+    console.log('CREATED INSPECTION ID:', createdInspection.id);
+
     if (file?.filename) {
       const imageUrl = `uploads/${file.filename}`;
 
@@ -212,6 +211,10 @@ export class InspectionsService {
           imageType: 'general',
         },
       });
+
+      console.log('IMAGE SAVED:', imageUrl);
+    } else {
+      console.log('NO IMAGE RECEIVED WITH FIELD NAME image');
     }
 
     if (oldDeviceStatus !== newDeviceStatus) {
@@ -322,7 +325,10 @@ export class InspectionsService {
     });
   }
 
-  private async findInspectionsBySql(technicianId?: number, inspectionId?: number) {
+  private async findInspectionsBySql(
+    technicianId?: number,
+    inspectionId?: number,
+  ) {
     const whereParts: string[] = [];
 
     if (technicianId !== undefined) {
@@ -333,7 +339,9 @@ export class InspectionsService {
       whereParts.push(`i."id" = ${Number(inspectionId)}`);
     }
 
-    const whereSql = whereParts.length ? `WHERE ${whereParts.join(' AND ')}` : '';
+    const whereSql = whereParts.length
+      ? `WHERE ${whereParts.join(' AND ')}`
+      : '';
 
     const inspections = await this.prisma.$queryRawUnsafe<any[]>(`
       SELECT
@@ -359,8 +367,10 @@ export class InspectionsService {
             'deviceName', d."deviceName",
             'barcode', d."barcode",
             'serialNumber', d."serialNumber",
+            'firmware', d."firmware",
             'currentStatus', d."currentStatus",
             'lastInspectionAt', d."lastInspectionAt",
+
             'location', CASE
               WHEN l."id" IS NULL THEN NULL
               ELSE jsonb_build_object(
@@ -372,6 +382,7 @@ export class InspectionsService {
                 'direction', l."direction"
               )
             END,
+
             'deviceType', CASE
               WHEN dt."id" IS NULL THEN NULL
               ELSE jsonb_build_object(
@@ -406,14 +417,7 @@ export class InspectionsService {
 
         CASE
           WHEN t."id" IS NULL THEN NULL
-          ELSE jsonb_build_object(
-            'id', t."id",
-            'status', t."status",
-            'priority', t."priority",
-            'scheduledAt', t."scheduledAt",
-            'createdAt', t."createdAt",
-            'updatedAt', t."updatedAt"
-          )
+          ELSE to_jsonb(t)
         END AS "task",
 
         COALESCE(
@@ -468,6 +472,7 @@ export class InspectionsService {
     const meta = parsedNotes.meta;
 
     const statusBeforeInspection = meta?.beforeDeviceStatus || null;
+
     const statusAfterInspection =
       meta?.afterDeviceStatus || inspection.device?.currentStatus || null;
 
@@ -503,14 +508,19 @@ export class InspectionsService {
       scanInfo: {
         scanned: meta?.scanned ?? false,
         scannedLabel: meta?.scanned ? 'تم عمل Scan' : 'لم يتم عمل Scan',
+
         scanMethod: meta?.scanMethod ?? null,
         scanMethodLabel: this.scanMethodToArabic(meta?.scanMethod ?? null),
+
         scanCodeType: meta?.scanCodeType ?? null,
         scanCodeTypeLabel: this.scanCodeTypeToArabic(
           meta?.scanCodeType ?? null,
         ),
+
         scanCodeValueMasked: meta?.scanCodeValueMasked ?? null,
+
         qrAttempts: meta?.qrAttempts ?? 0,
+
         manualFallbackUsed: meta?.manualFallbackUsed ?? false,
         manualFallbackUsedLabel: meta?.manualFallbackUsed
           ? 'تم فتح البحث اليدوي'
