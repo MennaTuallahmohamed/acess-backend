@@ -5,7 +5,12 @@ import { PrismaService } from 'src/database/prisma/prisma.service';
 export class DevicesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  private readonly includeOptions = {
+  private readonly basicIncludeOptions = {
+    location: true,
+    deviceType: true,
+  };
+
+  private readonly detailsIncludeOptions = {
     location: true,
     deviceType: true,
 
@@ -25,21 +30,6 @@ export class DevicesRepository {
           },
         },
         images: true,
-        inspectionIssues: {
-          include: {
-            issue: {
-              include: {
-                category: true,
-                deviceType: true,
-              },
-            },
-          },
-        },
-        solutionActions: {
-          include: {
-            solution: true,
-          },
-        },
       },
     },
 
@@ -123,7 +113,7 @@ export class DevicesRepository {
 
   async findAll() {
     return this.prisma.device.findMany({
-      include: this.includeOptions,
+      include: this.basicIncludeOptions,
       orderBy: {
         id: 'asc',
       },
@@ -135,7 +125,7 @@ export class DevicesRepository {
       where: {
         id,
       },
-      include: this.includeOptions,
+      include: this.detailsIncludeOptions,
     });
   }
 
@@ -159,7 +149,7 @@ export class DevicesRepository {
           },
         ],
       },
-      include: this.includeOptions,
+      include: this.detailsIncludeOptions,
     });
   }
 
@@ -170,7 +160,7 @@ export class DevicesRepository {
       where: {
         secretCode: cleanSecretCode,
       },
-      include: this.includeOptions,
+      include: this.detailsIncludeOptions,
     });
   }
 
