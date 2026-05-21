@@ -98,6 +98,74 @@ export class InspectionsController {
     return this.inspectionsService.findByTechnician(parsedId);
   }
 
+  // مهم جدًا:
+  // ده هيعرفنا كل فني عامل كام تفتيش
+  // لازم يكون قبل @Get(':id')
+  @Get('debug/technicians-count')
+  getTechniciansInspectionCount() {
+    return this.inspectionsService.getTechniciansInspectionCount();
+  }
+
+  // إحصائيات فني واحد
+  @Get('technician/:technicianId/stats')
+  getTechnicianStats(@Param('technicianId') technicianId: string) {
+    const parsedId = Number(technicianId);
+
+    if (!technicianId || Number.isNaN(parsedId)) {
+      throw new BadRequestException(
+        'technicianId param is required and must be a valid number',
+      );
+    }
+
+    return this.inspectionsService.getTechnicianStats(parsedId);
+  }
+
+  // History فني واحد
+  @Get('technician/:technicianId/history')
+  getTechnicianHistory(
+    @Param('technicianId') technicianId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const parsedId = Number(technicianId);
+    const parsedPage = Number(page || 1);
+    const parsedLimit = Number(limit || 20);
+
+    if (!technicianId || Number.isNaN(parsedId)) {
+      throw new BadRequestException(
+        'technicianId param is required and must be a valid number',
+      );
+    }
+
+    return this.inspectionsService.getTechnicianHistory(
+      parsedId,
+      Number.isNaN(parsedPage) ? 1 : parsedPage,
+      Number.isNaN(parsedLimit) ? 20 : parsedLimit,
+    );
+  }
+
+  // أهم endpoint للموبايل
+  // بيرجع stats + آخر التفتيشات
+  @Get('technician/:technicianId/home')
+  getTechnicianHome(
+    @Param('technicianId') technicianId: string,
+    @Query('limit') limit?: string,
+  ) {
+    const parsedId = Number(technicianId);
+    const parsedLimit = Number(limit || 10);
+
+    if (!technicianId || Number.isNaN(parsedId)) {
+      throw new BadRequestException(
+        'technicianId param is required and must be a valid number',
+      );
+    }
+
+    return this.inspectionsService.getTechnicianHome(
+      parsedId,
+      Number.isNaN(parsedLimit) ? 10 : parsedLimit,
+    );
+  }
+
   @Get('full/:id')
   findOneFull(@Param('id') id: string) {
     const parsedId = Number(id);

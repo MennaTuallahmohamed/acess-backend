@@ -3,108 +3,296 @@
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { DeviceCurrentStatus, TaskStatus } from '@prisma/client';
-import { PrismaService } from 'src/database/prisma/prisma.service';
+import {
+  DeviceCurrentStatus,
+  InspectionIssueStatus,
+  InspectionStatus,
+  Prisma,
+  TaskStatus,
+} from '@prisma/client';
 
+import { PrismaService } from '../../prisma/prisma.service';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
 import { UpdateInspectionDto } from './dto/update-inspection.dto';
-
-type InspectionSystemMeta = {
-  beforeDeviceStatus: string | null;
-  afterDeviceStatus: string | null;
-  scanned: boolean;
-  scanMethod: string | null;
-  scanCodeType: string | null;
-  scanCodeValueMasked: string | null;
-  qrAttempts: number;
-  manualFallbackUsed: boolean;
-  savedAt: string;
-};
 
 @Injectable()
 export class InspectionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private readonly META_MARKER = '[[INSPECTION_SYSTEM_META]]';
+  private toNumber(
+    value: any,
+    fieldName: string,
+    required = true,
+  ): number | null {
+    if (value === undefined || value === null || value === '') {
+      if (required) {
+        throw new BadRequestException(`${fieldName} is required`);
+      }
+
+      return null;
+    }
+
+    const parsed = Number(value);
+
+    if (Number.isNaN(parsed)) {
+      throw new BadRequestException(`${fieldName} must be a valid number`);
+    }
+
+    return parsed;
+  }
+
+  private toFloat(value: any): number | null {
+    if (value === undefined || value === null || value === '') {
+      return null;
+    }
+
+    const parsed = Number(value);
+
+    if (Number.isNaN(parsed)) {
+      return null;
+    }
+
+    return parsed;
+  }
+
+  private normalizeInspectionStatus(value: any): InspectionStatus {
+    const raw = String(value || '').trim().toUpperCase();
+
+    if (raw === 'OK' || raw === 'GOOD' || raw === 'سليم') {
+      return InspectionStatus.OK;
+    }
+
+    if (
+      raw === 'NOT_OK' ||
+      raw === 'NOT OK' ||
+      raw === 'FAULTY' ||
+      raw === 'MAINTENANCE' ||
+      raw === 'NEEDS_MAINTENANCE' ||
+      raw === 'NEEDS MAINTENANCE' ||
+      raw === 'يحتاج صيانة'
+    ) {
+      return InspectionStatus.NOT_OK;
+    }
+
+    if (raw === 'PARTIAL' || raw === 'MINOR' || raw === 'جزئي') {
+      return InspectionStatus.PARTIAL;
+    }
+
+    if (
+      raw === 'NOT_REACHABLE' ||
+      raw === 'NOT REACHABLE' ||
+      raw === 'UNDER_REVIEW' ||
+      raw === 'UNDER REVIEW' ||
+      raw === 'REVIEW' ||
+      raw === 'تحت المراجعة'
+    ) {
+      return InspectionStatus.NOT_REACHABLE;
+    }
+
+    if (!raw) {
+      return InspectionStatus.OK;
+    }
+
+    if (Object.values(InspectionStatus).includes(raw as InspectionStatus)) {
+      return raw as InspectionStatus;
+    }
+
+    return InspectionStatus.OK;
+  }
+
+  private mapInspectionStatusToDeviceStatus(
+    status: InspectionStatus,
+  ): DeviceCurrentStatus {
+    if (status === InspectionStatus.OK) {
+      return DeviceCurrentStatus.OK;
+    }
+
+    if (
+      status === InspectionStatus.NOT_OK ||
+      status === InspectionStatus.PARTIAL
+    ) {
+      return DeviceCurrentStatus.NEEDS_MAINTENANCE;
+    }
+
+    if (status === InspectionStatus.NOT_REACHABLE) {
+      return DeviceCurrentStatus.OUT_OF_SERVICE;
+    }
+
+    return DeviceCurrentStatus.OK;
+  }
+
+  private parseIssueIds(value: any): number[] {
+    if (!value) return [];
+
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => Number(item))
+        .filter((item) => !Number.isNaN(item));
+    }
+
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+
+        if (Array.isArray(parsed)) {
+          return parsed
+            .map((item) => Number(item))
+            .filter((item) => !Number.isNaN(item));
+        }
+      } catch (_) {}
+
+      return value
+        .split(',')
+        .map((item) => Number(item.trim()))
+        .filter((item) => !Number.isNaN(item));
+    }
+
+    return [];
+  }
+
+  private inspectionToReportModel(inspection: any) {
+    const device = inspection.device;
+    const location = device?.location;
+    const technician = inspection.technician;
+
+    const locationText =
+      inspection.locationText ||
+      [
+        location?.cluster,
+        location?.building,
+        location?.zone,
+        location?.lane,
+        location?.direction,
+      ]
+        .filter(Boolean)
+        .join(' - ');
+
+    return {
+      id: inspection.id,
+      reportNumber: `RPT-${inspection.id}`,
+
+      deviceId: inspection.deviceId,
+      technicianId: inspection.technicianId,
+      taskId: inspection.taskId,
+
+      inspectionStatus: inspection.inspectionStatus,
+      result: inspection.inspectionStatus,
+
+      issueReason: inspection.issueReason,
+      notes: inspection.notes,
+
+      latitude: inspection.latitude,
+      longitude: inspection.longitude,
+      locationText,
+
+      inspectedAt: inspection.inspectedAt,
+      createdAt: inspection.createdAt,
+      updatedAt: inspection.updatedAt,
+
+      deviceName: device?.deviceName || '',
+      deviceType: device?.deviceType?.name || '',
+      deviceCode: device?.deviceCode || '',
+      barcode: device?.barcode || '',
+      serialNumber: device?.serialNumber || '',
+      currentStatus: device?.currentStatus || '',
+
+      technician: technician
+        ? {
+            id: technician.id,
+            fullName: technician.fullName,
+            username: technician.username,
+            email: technician.email,
+          }
+        : null,
+
+      device: device
+        ? {
+            id: device.id,
+            deviceCode: device.deviceCode,
+            deviceName: device.deviceName,
+            barcode: device.barcode,
+            serialNumber: device.serialNumber,
+            manufacturer: device.manufacturer,
+            modelNumber: device.modelNumber,
+            currentStatus: device.currentStatus,
+            deviceType: device.deviceType,
+            location,
+          }
+        : null,
+
+      issues: inspection.inspectionIssues
+        ? inspection.inspectionIssues.map((item) => ({
+            id: item.id,
+            issueId: item.issueId,
+            title: item.issue?.title || '',
+            severity: item.issue?.severity || '',
+            status: item.status,
+            notes: item.notes,
+            createdAt: item.createdAt,
+          }))
+        : [],
+
+      images: inspection.images
+        ? inspection.images.map((image) => ({
+            id: image.id,
+            imageUrl: image.imageUrl,
+            imageType: image.imageType,
+            createdAt: image.createdAt,
+          }))
+        : [],
+    };
+  }
 
   async createInspection(
     createInspectionDto: CreateInspectionDto,
     file?: Express.Multer.File,
   ) {
-    const {
-      deviceId,
-      technicianId,
-      taskId,
-      inspectionStatus,
-      issueReason,
-      notes,
-      latitude,
-      longitude,
-      locationText,
-      scanned,
-      scanMethod,
-      scanCodeType,
-      scanCodeValue,
-      qrAttempts,
-      manualFallbackUsed,
-    } = createInspectionDto;
+    const deviceId = this.toNumber(
+      (createInspectionDto as any).deviceId,
+      'deviceId',
+    ) as number;
 
-    const parsedDeviceId = Number(deviceId);
-    const parsedTechnicianId = Number(technicianId);
+    const technicianId = this.toNumber(
+      (createInspectionDto as any).technicianId,
+      'technicianId',
+    ) as number;
 
-    const parsedTaskId =
-      taskId !== undefined && taskId !== null && String(taskId) !== ''
-        ? Number(taskId)
-        : undefined;
+    const taskId = this.toNumber(
+      (createInspectionDto as any).taskId,
+      'taskId',
+      false,
+    );
 
-    if (deviceId === undefined || Number.isNaN(parsedDeviceId)) {
-      throw new BadRequestException('deviceId is required and must be a number');
-    }
+    const inspectionStatus = this.normalizeInspectionStatus(
+      (createInspectionDto as any).inspectionStatus ||
+        (createInspectionDto as any).status ||
+        (createInspectionDto as any).result,
+    );
 
-    if (technicianId === undefined || Number.isNaN(parsedTechnicianId)) {
-      throw new BadRequestException(
-        'technicianId is required and must be a number',
-      );
-    }
-
-    if (!inspectionStatus) {
-      throw new BadRequestException('inspectionStatus is required');
-    }
+    const issueIds = this.parseIssueIds(
+      (createInspectionDto as any).issueIds ||
+        (createInspectionDto as any).issues,
+    );
 
     const device = await this.prisma.device.findUnique({
-      where: { id: parsedDeviceId },
-      include: {
-        location: true,
-        deviceType: true,
-      },
+      where: { id: deviceId },
     });
 
     if (!device) {
       throw new NotFoundException('Device not found');
     }
 
-    const technician = await this.prisma.user.findFirst({
-      where: {
-        id: parsedTechnicianId,
-        role: {
-          name: 'TECHNICIAN',
-        },
-        status: 'ACTIVE',
-      },
-      include: {
-        role: true,
-      },
+    const technician = await this.prisma.user.findUnique({
+      where: { id: technicianId },
     });
 
     if (!technician) {
-      throw new NotFoundException(
-        'Technician not found or this user is not ACTIVE TECHNICIAN',
-      );
+      throw new NotFoundException('Technician not found');
     }
 
-    if (parsedTaskId !== undefined) {
+    if (taskId) {
       const task = await this.prisma.inspectionTask.findUnique({
-        where: { id: parsedTaskId },
+        where: { id: taskId },
       });
 
       if (!task) {
@@ -112,565 +300,515 @@ export class InspectionsService {
       }
     }
 
-    const oldDeviceStatus = device.currentStatus;
+    const deviceStatus =
+      this.mapInspectionStatusToDeviceStatus(inspectionStatus);
 
-    const newDeviceStatus: DeviceCurrentStatus =
-      inspectionStatus === 'OK'
-        ? DeviceCurrentStatus.OK
-        : inspectionStatus === 'NOT_OK'
-          ? DeviceCurrentStatus.NEEDS_MAINTENANCE
-          : inspectionStatus === 'PARTIAL'
-            ? DeviceCurrentStatus.NEEDS_MAINTENANCE
-            : inspectionStatus === 'NOT_REACHABLE'
-              ? DeviceCurrentStatus.OUT_OF_SERVICE
-              : oldDeviceStatus;
+    const result = await this.prisma.$transaction(async (tx) => {
+      const inspection = await tx.inspection.create({
+        data: {
+          deviceId,
+          technicianId,
+          taskId: taskId || null,
+          inspectionStatus,
+          issueReason: (createInspectionDto as any).issueReason || null,
+          notes: (createInspectionDto as any).notes || null,
+          latitude: this.toFloat((createInspectionDto as any).latitude),
+          longitude: this.toFloat((createInspectionDto as any).longitude),
+          locationText: (createInspectionDto as any).locationText || null,
 
-    const systemMeta: InspectionSystemMeta = {
-      beforeDeviceStatus: oldDeviceStatus || null,
-      afterDeviceStatus: newDeviceStatus || null,
-      scanned: scanned === true,
-      scanMethod: scanMethod?.trim() || null,
-      scanCodeType: scanCodeType?.trim() || null,
-      scanCodeValueMasked: this.maskScanValue(scanCodeValue),
-      qrAttempts:
-        qrAttempts !== undefined &&
-        qrAttempts !== null &&
-        !Number.isNaN(Number(qrAttempts))
-          ? Number(qrAttempts)
-          : 0,
-      manualFallbackUsed: manualFallbackUsed === true,
-      savedAt: new Date().toISOString(),
-    };
+          inspectionIssues:
+            issueIds.length > 0
+              ? {
+                  create: issueIds.map((issueId) => ({
+                    issueId,
+                    reportedById: technicianId,
+                    status: InspectionIssueStatus.OPEN,
+                    notes: null,
+                  })),
+                }
+              : undefined,
 
-    const notesWithMeta = this.buildNotesWithMeta(notes, systemMeta);
-
-    const createdInspection = await this.prisma.inspection.create({
-      data: {
-        inspectionStatus,
-
-        device: {
-          connect: {
-            id: parsedDeviceId,
-          },
-        },
-
-        technician: {
-          connect: {
-            id: parsedTechnicianId,
-          },
-        },
-
-        ...(parsedTaskId !== undefined
-          ? {
-              task: {
-                connect: {
-                  id: parsedTaskId,
+          images: file
+            ? {
+                create: {
+                  imageUrl: `/uploads/${file.filename}`,
+                  imageType: file.mimetype,
                 },
-              },
-            }
-          : {}),
-
-        ...(issueReason ? { issueReason } : {}),
-
-        notes: notesWithMeta,
-
-        ...(latitude !== undefined &&
-        latitude !== null &&
-        String(latitude) !== ''
-          ? { latitude: Number(latitude) }
-          : {}),
-
-        ...(longitude !== undefined &&
-        longitude !== null &&
-        String(longitude) !== ''
-          ? { longitude: Number(longitude) }
-          : {}),
-
-        ...(locationText ? { locationText } : {}),
-      },
-      include: {
-        device: {
-          include: {
-            location: true,
-            deviceType: true,
+              }
+            : undefined,
+        },
+        include: {
+          device: {
+            include: {
+              deviceType: true,
+              location: true,
+            },
           },
+          technician: true,
+          images: true,
+          inspectionIssues: {
+            include: {
+              issue: true,
+            },
+          },
+          task: true,
         },
-        images: true,
-      },
+      });
+
+      await tx.device.update({
+        where: { id: deviceId },
+        data: {
+          lastInspectionAt: inspection.inspectedAt,
+          currentStatus: deviceStatus,
+        },
+      });
+
+      await tx.deviceStatusHistory.create({
+        data: {
+          deviceId,
+          oldStatus: device.currentStatus,
+          newStatus: deviceStatus,
+          changedById: technicianId,
+          note: `Inspection ${inspection.id} created`,
+        },
+      });
+
+      if (taskId) {
+        await tx.inspectionTask.update({
+          where: { id: taskId },
+          data: {
+            status: TaskStatus.COMPLETED,
+          },
+        });
+      }
+
+      return inspection;
     });
 
-    console.log('CREATED INSPECTION ID:', createdInspection.id);
-
-    if (file?.filename) {
-      const imageUrl = `uploads/${file.filename}`;
-
-      await this.prisma.inspectionImage.create({
-        data: {
-          inspectionId: createdInspection.id,
-          imageUrl,
-          imageType: 'general',
-        },
-      });
-
-      console.log('IMAGE SAVED:', imageUrl);
-    } else {
-      console.log('NO IMAGE RECEIVED WITH FIELD NAME image');
-    }
-
-    if (oldDeviceStatus !== newDeviceStatus) {
-      await this.prisma.deviceStatusHistory.create({
-        data: {
-          deviceId: parsedDeviceId,
-          oldStatus: oldDeviceStatus,
-          newStatus: newDeviceStatus,
-          changedById: parsedTechnicianId,
-          note: this.buildStatusHistoryNote({
-            inspectionId: createdInspection.id,
-            inspectionStatus,
-            scanMethod: systemMeta.scanMethod,
-            qrAttempts: systemMeta.qrAttempts,
-            manualFallbackUsed: systemMeta.manualFallbackUsed,
-          }),
-        },
-      });
-    }
-
-    await this.prisma.device.update({
-      where: { id: parsedDeviceId },
-      data: {
-        currentStatus: newDeviceStatus,
-        lastInspectionAt: new Date(),
-      },
-    });
-
-    if (parsedTaskId !== undefined) {
-      await this.prisma.inspectionTask.update({
-        where: { id: parsedTaskId },
-        data: {
-          status:
-            inspectionStatus === 'OK'
-              ? TaskStatus.COMPLETED
-              : TaskStatus.IN_PROGRESS,
-        },
-      });
-    }
-
-    return this.findOneFull(createdInspection.id);
+    return this.inspectionToReportModel(result);
   }
 
   async findAll() {
-    return this.findInspectionsBySql();
+    const inspections = await this.prisma.inspection.findMany({
+      orderBy: {
+        inspectedAt: 'desc',
+      },
+      take: 100,
+      include: {
+        device: {
+          include: {
+            deviceType: true,
+            location: true,
+          },
+        },
+        technician: true,
+        images: true,
+        inspectionIssues: {
+          include: {
+            issue: true,
+          },
+        },
+        task: true,
+      },
+    });
+
+    return inspections.map((inspection) =>
+      this.inspectionToReportModel(inspection),
+    );
   }
 
   async findByTechnician(technicianId: number) {
-    const parsedTechnicianId = Number(technicianId);
+    const inspections = await this.prisma.inspection.findMany({
+      where: {
+        technicianId,
+      },
+      orderBy: {
+        inspectedAt: 'desc',
+      },
+      take: 100,
+      include: {
+        device: {
+          include: {
+            deviceType: true,
+            location: true,
+          },
+        },
+        technician: true,
+        images: true,
+        inspectionIssues: {
+          include: {
+            issue: true,
+          },
+        },
+        task: true,
+      },
+    });
 
-    if (!parsedTechnicianId || Number.isNaN(parsedTechnicianId)) {
-      throw new BadRequestException('technicianId is required');
-    }
-
-    return this.findInspectionsBySql(parsedTechnicianId);
+    return inspections.map((inspection) =>
+      this.inspectionToReportModel(inspection),
+    );
   }
 
   async findOne(id: number) {
-    const parsedId = Number(id);
+    const inspection = await this.prisma.inspection.findUnique({
+      where: { id },
+      include: {
+        device: {
+          include: {
+            deviceType: true,
+            location: true,
+          },
+        },
+        technician: true,
+        images: true,
+        inspectionIssues: {
+          include: {
+            issue: true,
+          },
+        },
+        task: true,
+      },
+    });
 
-    if (!parsedId || Number.isNaN(parsedId)) {
-      throw new NotFoundException('Inspection id is missing');
-    }
-
-    const inspections = await this.findInspectionsBySql(undefined, parsedId);
-
-    if (!inspections.length) {
+    if (!inspection) {
       throw new NotFoundException('Inspection not found');
     }
 
-    return inspections[0];
+    return this.inspectionToReportModel(inspection);
   }
 
   async findOneFull(id: number) {
-    return this.findOne(id);
+    const inspection = await this.prisma.inspection.findUnique({
+      where: { id },
+      include: {
+        device: {
+          include: {
+            deviceType: true,
+            location: true,
+            movements: true,
+            statusHistory: true,
+            maintenanceLogs: true,
+          },
+        },
+        technician: {
+          include: {
+            role: true,
+          },
+        },
+        images: true,
+        inspectionIssues: {
+          include: {
+            issue: {
+              include: {
+                category: true,
+                deviceType: true,
+                solutions: true,
+              },
+            },
+            actions: {
+              include: {
+                solution: true,
+                technician: true,
+              },
+            },
+          },
+        },
+        solutionActions: {
+          include: {
+            solution: true,
+            inspectionIssue: true,
+            technician: true,
+          },
+        },
+        task: true,
+      },
+    });
+
+    if (!inspection) {
+      throw new NotFoundException('Inspection not found');
+    }
+
+    return inspection;
   }
 
   async update(id: number, updateInspectionDto: UpdateInspectionDto) {
-    const parsedId = Number(id);
+    const oldInspection = await this.prisma.inspection.findUnique({
+      where: { id },
+    });
 
-    if (!parsedId || Number.isNaN(parsedId)) {
-      throw new NotFoundException('Inspection id is missing');
+    if (!oldInspection) {
+      throw new NotFoundException('Inspection not found');
     }
 
-    await this.findOne(parsedId);
+    const data: Prisma.InspectionUpdateInput = {};
 
-    await this.prisma.inspection.update({
-      where: { id: parsedId },
-      data: {
-        ...updateInspectionDto,
+    if ((updateInspectionDto as any).inspectionStatus !== undefined) {
+      data.inspectionStatus = this.normalizeInspectionStatus(
+        (updateInspectionDto as any).inspectionStatus,
+      );
+    }
+
+    if ((updateInspectionDto as any).status !== undefined) {
+      data.inspectionStatus = this.normalizeInspectionStatus(
+        (updateInspectionDto as any).status,
+      );
+    }
+
+    if ((updateInspectionDto as any).result !== undefined) {
+      data.inspectionStatus = this.normalizeInspectionStatus(
+        (updateInspectionDto as any).result,
+      );
+    }
+
+    if ((updateInspectionDto as any).issueReason !== undefined) {
+      data.issueReason = (updateInspectionDto as any).issueReason || null;
+    }
+
+    if ((updateInspectionDto as any).notes !== undefined) {
+      data.notes = (updateInspectionDto as any).notes || null;
+    }
+
+    if ((updateInspectionDto as any).latitude !== undefined) {
+      data.latitude = this.toFloat((updateInspectionDto as any).latitude);
+    }
+
+    if ((updateInspectionDto as any).longitude !== undefined) {
+      data.longitude = this.toFloat((updateInspectionDto as any).longitude);
+    }
+
+    if ((updateInspectionDto as any).locationText !== undefined) {
+      data.locationText = (updateInspectionDto as any).locationText || null;
+    }
+
+    const updated = await this.prisma.inspection.update({
+      where: { id },
+      data,
+      include: {
+        device: {
+          include: {
+            deviceType: true,
+            location: true,
+          },
+        },
+        technician: true,
+        images: true,
+        inspectionIssues: {
+          include: {
+            issue: true,
+          },
+        },
+        task: true,
       },
     });
 
-    return this.findOneFull(parsedId);
+    if (data.inspectionStatus) {
+      const newDeviceStatus = this.mapInspectionStatusToDeviceStatus(
+        updated.inspectionStatus,
+      );
+
+      await this.prisma.device.update({
+        where: { id: updated.deviceId },
+        data: {
+          currentStatus: newDeviceStatus,
+          lastInspectionAt: updated.inspectedAt,
+        },
+      });
+    }
+
+    return this.inspectionToReportModel(updated);
   }
 
   async remove(id: number) {
-    const parsedId = Number(id);
-
-    if (!parsedId || Number.isNaN(parsedId)) {
-      throw new NotFoundException('Inspection id is missing');
-    }
-
-    await this.findOne(parsedId);
-
-    return this.prisma.inspection.delete({
-      where: { id: parsedId },
+    const inspection = await this.prisma.inspection.findUnique({
+      where: { id },
     });
-  }
 
-  private async findInspectionsBySql(
-    technicianId?: number,
-    inspectionId?: number,
-  ) {
-    const whereParts: string[] = [];
-
-    if (technicianId !== undefined) {
-      whereParts.push(`i."technicianId" = ${Number(technicianId)}`);
+    if (!inspection) {
+      throw new NotFoundException('Inspection not found');
     }
 
-    if (inspectionId !== undefined) {
-      whereParts.push(`i."id" = ${Number(inspectionId)}`);
-    }
-
-    const whereSql = whereParts.length
-      ? `WHERE ${whereParts.join(' AND ')}`
-      : '';
-
-    const inspections = await this.prisma.$queryRawUnsafe<any[]>(`
-      SELECT
-        i."id",
-        i."deviceId",
-        i."technicianId",
-        i."taskId",
-        i."inspectionStatus",
-        i."issueReason",
-        i."notes",
-        i."latitude",
-        i."longitude",
-        i."locationText",
-        i."inspectedAt",
-        i."createdAt",
-        i."updatedAt",
-
-        CASE
-          WHEN d."id" IS NULL THEN NULL
-          ELSE jsonb_build_object(
-            'id', d."id",
-            'deviceCode', d."deviceCode",
-            'deviceName', d."deviceName",
-            'barcode', d."barcode",
-            'serialNumber', d."serialNumber",
-            'firmware', d."firmware",
-            'currentStatus', d."currentStatus",
-            'lastInspectionAt', d."lastInspectionAt",
-
-            'location', CASE
-              WHEN l."id" IS NULL THEN NULL
-              ELSE jsonb_build_object(
-                'id', l."id",
-                'cluster', l."cluster",
-                'building', l."building",
-                'zone', l."zone",
-                'lane', l."lane",
-                'direction', l."direction"
-              )
-            END,
-
-            'deviceType', CASE
-              WHEN dt."id" IS NULL THEN NULL
-              ELSE jsonb_build_object(
-                'id', dt."id",
-                'name', dt."name"
-              )
-            END
-          )
-        END AS "device",
-
-        CASE
-          WHEN u."id" IS NULL THEN NULL
-          ELSE jsonb_build_object(
-            'id', u."id",
-            'firstName', u."firstName",
-            'lastName', u."lastName",
-            'fullName', u."fullName",
-            'email', u."email",
-            'username', u."username",
-            'jobTitle', u."jobTitle",
-            'status', u."status",
-            'roleId', u."roleId",
-            'role', CASE
-              WHEN r."id" IS NULL THEN NULL
-              ELSE jsonb_build_object(
-                'id', r."id",
-                'name', r."name"
-              )
-            END
-          )
-        END AS "technician",
-
-        CASE
-          WHEN t."id" IS NULL THEN NULL
-          ELSE to_jsonb(t)
-        END AS "task",
-
-        COALESCE(
-          (
-            SELECT jsonb_agg(
-              jsonb_build_object(
-                'id', img."id",
-                'inspectionId', img."inspectionId",
-                'imageUrl', img."imageUrl",
-                'imageType', img."imageType",
-                'createdAt', img."createdAt"
-              )
-              ORDER BY img."createdAt" ASC
-            )
-            FROM "InspectionImage" img
-            WHERE img."inspectionId" = i."id"
-          ),
-          '[]'::jsonb
-        ) AS "images"
-
-      FROM "Inspection" i
-
-      LEFT JOIN "Device" d
-        ON d."id" = i."deviceId"
-
-      LEFT JOIN "Location" l
-        ON l."id" = d."locationId"
-
-      LEFT JOIN "DeviceType" dt
-        ON dt."id" = d."deviceTypeId"
-
-      LEFT JOIN "User" u
-        ON u."id" = i."technicianId"
-
-      LEFT JOIN "Role" r
-        ON r."id" = u."roleId"
-
-      LEFT JOIN "InspectionTask" t
-        ON t."id" = i."taskId"
-
-      ${whereSql}
-
-      ORDER BY i."id" DESC;
-    `);
-
-    return inspections.map((inspection) => this.formatSqlInspection(inspection));
-  }
-
-  private formatSqlInspection(inspection: any) {
-    const parsedNotes = this.extractMetaFromNotes(inspection.notes);
-    const cleanNotes = parsedNotes.userNotes;
-    const meta = parsedNotes.meta;
-
-    const statusBeforeInspection = meta?.beforeDeviceStatus || null;
-
-    const statusAfterInspection =
-      meta?.afterDeviceStatus || inspection.device?.currentStatus || null;
-
-    const images = Array.isArray(inspection.images) ? inspection.images : [];
+    await this.prisma.inspection.delete({
+      where: { id },
+    });
 
     return {
-      ...inspection,
-
-      device: inspection.device ?? null,
-      technician: inspection.technician ?? null,
-      task: inspection.task ?? null,
-      images,
-
-      notes: cleanNotes,
-
-      statusBeforeInspection,
-      statusBeforeInspectionLabel: this.statusToArabic(statusBeforeInspection),
-
-      statusAfterInspection,
-      statusAfterInspectionLabel: this.statusToArabic(statusAfterInspection),
-
-      beforeDeviceStatus: statusBeforeInspection,
-      beforeDeviceStatusLabel: this.statusToArabic(statusBeforeInspection),
-
-      afterDeviceStatus: statusAfterInspection,
-      afterDeviceStatusLabel: this.statusToArabic(statusAfterInspection),
-
-      currentDeviceStatus: inspection.device?.currentStatus || null,
-      currentDeviceStatusLabel: this.statusToArabic(
-        inspection.device?.currentStatus || null,
-      ),
-
-      scanInfo: {
-        scanned: meta?.scanned ?? false,
-        scannedLabel: meta?.scanned ? 'ØªÙ… Ø¹Ù…Ù„ Scan' : 'Ù„Ù… ÙŠØªÙ… Ø¹Ù…Ù„ Scan',
-
-        scanMethod: meta?.scanMethod ?? null,
-        scanMethodLabel: this.scanMethodToArabic(meta?.scanMethod ?? null),
-
-        scanCodeType: meta?.scanCodeType ?? null,
-        scanCodeTypeLabel: this.scanCodeTypeToArabic(
-          meta?.scanCodeType ?? null,
-        ),
-
-        scanCodeValueMasked: meta?.scanCodeValueMasked ?? null,
-
-        qrAttempts: meta?.qrAttempts ?? 0,
-
-        manualFallbackUsed: meta?.manualFallbackUsed ?? false,
-        manualFallbackUsedLabel: meta?.manualFallbackUsed
-          ? 'ØªÙ… ÙØªØ­ Ø§Ù„Ø¨Ø­Ø« Ø§Ù„ÙŠØ¯ÙˆÙŠ'
-          : 'Ù„Ù… ÙŠØªÙ… ÙØªØ­ Ø§Ù„Ø¨Ø­Ø« Ø§Ù„ÙŠØ¯ÙˆÙŠ',
-      },
-
-      summary: {
-        imagesCount: images.length,
-        issuesCount: 0,
-        totalSolutionActions: 0,
-        doneSolutionActions: 0,
-        failedSolutionActions: 0,
-        pendingSolutionActions: 0,
-        skippedSolutionActions: 0,
-      },
+      success: true,
+      message: 'Inspection deleted successfully',
+      id,
     };
   }
 
-  private buildStatusHistoryNote(params: {
-    inspectionId: number;
-    inspectionStatus: string;
-    scanMethod: string | null;
-    qrAttempts: number;
-    manualFallbackUsed: boolean;
-  }) {
-    const lines = [
-      `Changed automatically from inspection #${params.inspectionId} with status ${params.inspectionStatus}`,
-      params.scanMethod ? `Scan Method: ${params.scanMethod}` : '',
-      `QR Attempts: ${params.qrAttempts}`,
-      params.manualFallbackUsed ? 'Manual fallback used after QR attempts' : '',
-    ];
+  async getTechnicianStats(technicianId: number) {
+    const [
+      totalInspected,
+      good,
+      needsMaintenance,
+      notReachable,
+      openIssues,
+    ] = await Promise.all([
+      this.prisma.inspection.count({
+        where: {
+          technicianId,
+        },
+      }),
 
-    return lines.filter(Boolean).join(' | ');
+      this.prisma.inspection.count({
+        where: {
+          technicianId,
+          inspectionStatus: InspectionStatus.OK,
+        },
+      }),
+
+      this.prisma.inspection.count({
+        where: {
+          technicianId,
+          inspectionStatus: {
+            in: [InspectionStatus.NOT_OK, InspectionStatus.PARTIAL],
+          },
+        },
+      }),
+
+      this.prisma.inspection.count({
+        where: {
+          technicianId,
+          inspectionStatus: InspectionStatus.NOT_REACHABLE,
+        },
+      }),
+
+      this.prisma.inspection.count({
+        where: {
+          technicianId,
+          inspectionIssues: {
+            some: {
+              status: {
+                in: [
+                  InspectionIssueStatus.OPEN,
+                  InspectionIssueStatus.IN_PROGRESS,
+                  InspectionIssueStatus.UNRESOLVED,
+                ],
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    return {
+      totalInspected,
+      good,
+      needsMaintenance,
+      underReview: notReachable + openIssues,
+    };
   }
 
-  private buildNotesWithMeta(
-    notes: string | undefined,
-    meta: InspectionSystemMeta,
+  async getTechnicianHistory(
+    technicianId: number,
+    page = 1,
+    limit = 20,
   ) {
-    const userNotes = notes?.trim() || '';
-    const metaText = JSON.stringify(meta);
+    const safePage = page < 1 ? 1 : page;
+    const safeLimit = limit < 1 ? 20 : limit > 100 ? 100 : limit;
+    const skip = (safePage - 1) * safeLimit;
 
-    if (!userNotes) {
-      return `${this.META_MARKER}${metaText}`;
-    }
+    const [total, inspections] = await Promise.all([
+      this.prisma.inspection.count({
+        where: {
+          technicianId,
+        },
+      }),
 
-    return `${userNotes}\n\n${this.META_MARKER}${metaText}`;
-  }
+      this.prisma.inspection.findMany({
+        where: {
+          technicianId,
+        },
+        orderBy: {
+          inspectedAt: 'desc',
+        },
+        skip,
+        take: safeLimit,
+        include: {
+          device: {
+            include: {
+              deviceType: true,
+              location: true,
+            },
+          },
+          technician: true,
+          inspectionIssues: {
+            include: {
+              issue: true,
+            },
+          },
+          images: true,
+          task: true,
+        },
+      }),
+    ]);
 
-  private extractMetaFromNotes(notes?: string | null): {
-    userNotes: string;
-    meta: InspectionSystemMeta | null;
-  } {
-    const rawNotes = notes || '';
-    const markerIndex = rawNotes.indexOf(this.META_MARKER);
-
-    if (markerIndex === -1) {
-      return {
-        userNotes: rawNotes,
-        meta: null,
-      };
-    }
-
-    const userNotes = rawNotes.slice(0, markerIndex).trim();
-    const metaText = rawNotes.slice(markerIndex + this.META_MARKER.length);
-
-    try {
-      const parsed = JSON.parse(metaText.trim()) as InspectionSystemMeta;
-
-      return {
-        userNotes,
-        meta: parsed,
-      };
-    } catch (error) {
-      return {
-        userNotes: rawNotes,
-        meta: null,
-      };
-    }
-  }
-
-  private maskScanValue(value?: string | null) {
-    if (!value) return null;
-
-    const clean = String(value).trim();
-
-    if (!clean) return null;
-
-    if (clean.length <= 4) {
-      return '****';
-    }
-
-    const first = clean.slice(0, 2);
-    const last = clean.slice(-2);
-
-    return `${first}****${last}`;
-  }
-
-  private statusToArabic(status?: string | null) {
-    if (!status) return 'â€”';
-
-    const map: Record<string, string> = {
-      OK: 'Ø³Ù„ÙŠÙ…',
-      NOT_OK: 'ØºÙŠØ± Ø³Ù„ÙŠÙ…',
-      PARTIAL: 'Ø¬Ø²Ø¦ÙŠ',
-      NOT_REACHABLE: 'ØºÙŠØ± Ù…ØªØ§Ø­',
-
-      NEEDS_MAINTENANCE: 'ÙŠØ­ØªØ§Ø¬ ØµÙŠØ§Ù†Ø©',
-      UNDER_MAINTENANCE: 'ØªØ­Øª Ø§Ù„ØµÙŠØ§Ù†Ø©',
-      OUT_OF_SERVICE: 'Ø®Ø§Ø±Ø¬ Ø§Ù„Ø®Ø¯Ù…Ø©',
-
-      PENDING: 'Ù…Ø¹Ù„Ù‚',
-      DONE: 'ØªÙ…',
-      FAILED: 'ÙØ´Ù„',
-      SKIPPED: 'ØªÙ… ØªØ®Ø·ÙŠÙ‡',
-
-      OPEN: 'Ù…ÙØªÙˆØ­',
-      IN_PROGRESS: 'Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°',
-      RESOLVED: 'ØªÙ… Ø§Ù„Ø­Ù„',
-      UNRESOLVED: 'Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø­Ù„',
-
-      COMPLETED: 'Ù…ÙƒØªÙ…Ù„',
-      CANCELLED: 'Ù…Ù„ØºÙŠ',
+    return {
+      page: safePage,
+      limit: safeLimit,
+      total,
+      totalPages: Math.ceil(total / safeLimit),
+      data: inspections.map((inspection) =>
+        this.inspectionToReportModel(inspection),
+      ),
     };
-
-    return map[status] || status;
   }
 
-  private scanMethodToArabic(scanMethod?: string | null) {
-    if (!scanMethod) return 'â€”';
+  async getTechnicianHome(technicianId: number, limit = 10) {
+    const safeLimit = limit < 1 ? 10 : limit > 50 ? 50 : limit;
 
-    const map: Record<string, string> = {
-      QR: 'QR',
-      MANUAL: 'Ø¥Ø¯Ø®Ø§Ù„ ÙŠØ¯ÙˆÙŠ',
+    const [stats, history] = await Promise.all([
+      this.getTechnicianStats(technicianId),
+      this.getTechnicianHistory(technicianId, 1, safeLimit),
+    ]);
+
+    return {
+      stats,
+      recentReports: history.data,
+      totalHistory: history.total,
     };
-
-    return map[scanMethod] || scanMethod;
   }
 
-  private scanCodeTypeToArabic(scanCodeType?: string | null) {
-    if (!scanCodeType) return 'â€”';
+  async getTechniciansInspectionCount() {
+    const grouped = await this.prisma.inspection.groupBy({
+      by: ['technicianId'],
+      _count: {
+        technicianId: true,
+      },
+      orderBy: {
+        _count: {
+          technicianId: 'desc',
+        },
+      },
+    });
 
-    const map: Record<string, string> = {
-      SECRET_QR: 'QR Ø§Ù„Ø³Ø±ÙŠ',
-      DEVICE_CODE: 'ÙƒÙˆØ¯ Ø§Ù„Ø¬Ù‡Ø§Ø²',
-      SERIAL_NUMBER: 'Ø§Ù„Ø±Ù‚Ù… Ø§Ù„ØªØ³Ù„Ø³Ù„ÙŠ',
-      BARCODE: 'Ø§Ù„Ø¨Ø§Ø±ÙƒÙˆØ¯',
-      IP: 'IP',
-    };
+    const technicianIds = grouped.map((item) => item.technicianId);
 
-    return map[scanCodeType] || scanCodeType;
+    const users = await this.prisma.user.findMany({
+      where: {
+        id: {
+          in: technicianIds,
+        },
+      },
+      select: {
+        id: true,
+        fullName: true,
+        username: true,
+        email: true,
+      },
+    });
+
+    return grouped.map((item) => {
+      const user = users.find((u) => u.id === item.technicianId);
+
+      return {
+        technicianId: item.technicianId,
+        technicianName:
+          user?.fullName || user?.username || user?.email || 'Unknown',
+        totalInspections: item._count.technicianId,
+      };
+    });
   }
 }
