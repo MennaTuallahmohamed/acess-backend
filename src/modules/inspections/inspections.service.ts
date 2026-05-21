@@ -202,23 +202,23 @@ export class InspectionsService {
             fullName: technician.fullName,
             username: technician.username,
             email: technician.email,
+            phone: technician.phone,
+            jobTitle: technician.jobTitle,
+            role: technician.role,
           }
         : null,
 
       device: device
         ? {
-            id: device.id,
-            deviceCode: device.deviceCode,
-            deviceName: device.deviceName,
-            barcode: device.barcode,
-            serialNumber: device.serialNumber,
-            manufacturer: device.manufacturer,
-            modelNumber: device.modelNumber,
-            currentStatus: device.currentStatus,
+            ...device,
             deviceType: device.deviceType,
             location,
           }
         : null,
+
+      task: inspection.task || null,
+
+      inspectionIssues: inspection.inspectionIssues || [],
 
       issues: inspection.inspectionIssues
         ? inspection.inspectionIssues.map((item) => ({
@@ -229,8 +229,12 @@ export class InspectionsService {
             status: item.status,
             notes: item.notes,
             createdAt: item.createdAt,
+            issue: item.issue || null,
+            actions: item.actions || [],
           }))
         : [],
+
+      solutionActions: inspection.solutionActions || [],
 
       images: inspection.images
         ? inspection.images.map((image) => ({
@@ -241,6 +245,289 @@ export class InspectionsService {
           }))
         : [],
     };
+  }
+
+  private async buildSafeInspectionReports(
+    inspections: any[],
+    options?: {
+      includeDeviceHistory?: boolean;
+      includeDeviceMovements?: boolean;
+      includeMaintenanceLogs?: boolean;
+      includeTechnicianRole?: boolean;
+    },
+  ) {
+    const inspectionIds = inspections.map((item) => item.id);
+    const deviceIds = [...new Set(inspections.map((item) => item.deviceId))];
+    const technicianIds = [
+      ...new Set(inspections.map((item) => item.technicianId)),
+    ];
+    const taskIds = [
+      ...new Set(
+        inspections
+          .map((item) => item.taskId)
+          .filter((id) => id !== null && id !== undefined),
+      ),
+    ];
+
+    const [
+      devices,
+      technicians,
+      tasks,
+      images,
+      inspectionIssues,
+      solutionActions,
+    ] = await Promise.all([
+      deviceIds.length
+        ? this.prisma.device.findMany({
+            where: {
+              id: {
+                in: deviceIds,
+              },
+            },
+            include: {
+              deviceType: true,
+              location: true,
+              movements: options?.includeDeviceMovements || false,
+              statusHistory: options?.includeDeviceHistory || false,
+              maintenanceLogs: options?.includeMaintenanceLogs || false,
+            },
+          })
+        : [],
+
+      technicianIds.length
+        ? this.prisma.user.findMany({
+            where: {
+              id: {
+                in: technicianIds,
+              },
+            },
+            include: {
+              role: options?.includeTechnicianRole || false,
+            },
+          })
+        : [],
+
+      taskIds.length
+        ? this.prisma.inspectionTask.findMany({
+            where: {
+              id: {
+                in: taskIds,
+              },
+            },
+          })
+        : [],
+
+      inspectionIds.length
+        ? this.prisma.inspectionImage.findMany({
+            where: {
+              inspectionId: {
+                in: inspectionIds,
+              },
+            },
+            orderBy: {
+              createdAt: 'desc',
+            },
+          })
+        : [],
+
+      inspectionIds.length
+        ? this.prisma.inspectionIssue.findMany({
+            where: {
+              inspectionId: {
+                in: inspectionIds,
+              },
+            },
+            orderBy: {
+              createdAt: 'asc',
+            },
+          })
+        : [],
+
+      inspectionIds.length
+        ? this.prisma.inspectionIssueSolutionAction.findMany({
+            where: {
+              inspectionId: {
+                in: inspectionIds,
+              },
+            },
+            orderBy: {
+              createdAt: 'asc',
+            },
+          })
+        : [],
+    ]);
+
+    const issueIds = [
+      ...new Set(
+        inspectionIssues
+          .map((item) => item.issueId)
+          .filter((id) => id !== null && id !== undefined),
+      ),
+    ];
+
+    const solutionIds = [
+      ...new Set(
+        solutionActions
+          .map((item) => item.solutionId)
+          .filter((id) => id !== null && id !== undefined),
+      ),
+    ];
+
+    const actionTechnicianIds = [
+      ...new Set(
+        solutionActions
+          .map((item) => item.technicianId)
+          .filter((id) => id !== null && id !== undefined),
+      ),
+    ];
+
+    const [issues, issueSolutions, actionSolutions, actionTechnicians] =
+      await Promise.all([
+        issueIds.length
+          ? this.prisma.issue.findMany({
+              where: {
+                id: {
+                  in: issueIds,
+                },
+              },
+            })
+          : [],
+
+        issueIds.length
+          ? this.prisma.issueSolution.findMany({
+              where: {
+                issueId: {
+                  in: issueIds,
+                },
+              },
+              orderBy: {
+                stepOrder: 'asc',
+              },
+            })
+          : [],
+
+        solutionIds.length
+          ? this.prisma.issueSolution.findMany({
+              where: {
+                id: {
+                  in: solutionIds,
+                },
+              },
+            })
+          : [],
+
+        actionTechnicianIds.length
+          ? this.prisma.user.findMany({
+              where: {
+                id: {
+                  in: actionTechnicianIds,
+                },
+              },
+              select: {
+                id: true,
+                fullName: true,
+                username: true,
+                email: true,
+              },
+            })
+          : [],
+      ]);
+
+    const deviceMap = new Map<number, any>(
+      devices.map((item) => [item.id, item] as [number, any]),
+    );
+
+    const technicianMap = new Map<number, any>(
+      technicians.map((item) => [item.id, item] as [number, any]),
+    );
+
+    const taskMap = new Map<number, any>(
+      tasks.map((item) => [item.id, item] as [number, any]),
+    );
+
+    const issueMap = new Map<number, any>(
+      issues.map((item) => [item.id, item] as [number, any]),
+    );
+
+    const actionSolutionMap = new Map<number, any>(
+      actionSolutions.map((item) => [item.id, item] as [number, any]),
+    );
+
+    const actionTechnicianMap = new Map<number, any>(
+      actionTechnicians.map((item) => [item.id, item] as [number, any]),
+    );
+
+    const imagesMap = new Map<number, any[]>();
+    for (const image of images) {
+      const list = imagesMap.get(image.inspectionId) || [];
+      list.push(image);
+      imagesMap.set(image.inspectionId, list);
+    }
+
+    const solutionsByIssueMap = new Map<number, any[]>();
+    for (const solution of issueSolutions) {
+      const list = solutionsByIssueMap.get(solution.issueId) || [];
+      list.push(solution);
+      solutionsByIssueMap.set(solution.issueId, list);
+    }
+
+    const actionsByInspectionIssueMap = new Map<number, any[]>();
+    const actionsByInspectionMap = new Map<number, any[]>();
+
+    for (const action of solutionActions) {
+      const solution = actionSolutionMap.get(action.solutionId) || null;
+      const technician = actionTechnicianMap.get(action.technicianId) || null;
+
+      const fullAction = {
+        ...action,
+        solution,
+        technician,
+      };
+
+      const issueActions =
+        actionsByInspectionIssueMap.get(action.inspectionIssueId) || [];
+      issueActions.push(fullAction);
+      actionsByInspectionIssueMap.set(action.inspectionIssueId, issueActions);
+
+      const inspectionActions = actionsByInspectionMap.get(action.inspectionId) || [];
+      inspectionActions.push(fullAction);
+      actionsByInspectionMap.set(action.inspectionId, inspectionActions);
+    }
+
+    const issuesMap = new Map<number, any[]>();
+
+    for (const inspectionIssue of inspectionIssues) {
+      const baseIssue = issueMap.get(inspectionIssue.issueId) || null;
+
+      const fullIssue = baseIssue
+        ? {
+            ...baseIssue,
+            solutions: solutionsByIssueMap.get(baseIssue.id) || [],
+          }
+        : null;
+
+      const fullInspectionIssue = {
+        ...inspectionIssue,
+        issue: fullIssue,
+        actions: actionsByInspectionIssueMap.get(inspectionIssue.id) || [],
+      };
+
+      const list = issuesMap.get(inspectionIssue.inspectionId) || [];
+      list.push(fullInspectionIssue);
+      issuesMap.set(inspectionIssue.inspectionId, list);
+    }
+
+    return inspections.map((inspection) => {
+      return this.inspectionToReportModel({
+        ...inspection,
+        device: deviceMap.get(inspection.deviceId) || null,
+        technician: technicianMap.get(inspection.technicianId) || null,
+        task: inspection.taskId ? taskMap.get(inspection.taskId) || null : null,
+        images: imagesMap.get(inspection.id) || [],
+        inspectionIssues: issuesMap.get(inspection.id) || [],
+        solutionActions: actionsByInspectionMap.get(inspection.id) || [],
+      });
+    });
   }
 
   async createInspection(
@@ -303,8 +590,8 @@ export class InspectionsService {
     const deviceStatus =
       this.mapInspectionStatusToDeviceStatus(inspectionStatus);
 
-    const result = await this.prisma.$transaction(async (tx) => {
-      const inspection = await tx.inspection.create({
+    const inspection = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.inspection.create({
         data: {
           deviceId,
           technicianId,
@@ -337,28 +624,12 @@ export class InspectionsService {
               }
             : undefined,
         },
-        include: {
-          device: {
-            include: {
-              deviceType: true,
-              location: true,
-            },
-          },
-          technician: true,
-          images: true,
-          inspectionIssues: {
-            include: {
-              issue: true,
-            },
-          },
-          task: true,
-        },
       });
 
       await tx.device.update({
         where: { id: deviceId },
         data: {
-          lastInspectionAt: inspection.inspectedAt,
+          lastInspectionAt: created.inspectedAt,
           currentStatus: deviceStatus,
         },
       });
@@ -369,7 +640,7 @@ export class InspectionsService {
           oldStatus: device.currentStatus,
           newStatus: deviceStatus,
           changedById: technicianId,
-          note: `Inspection ${inspection.id} created`,
+          note: `Inspection ${created.id} created`,
         },
       });
 
@@ -382,10 +653,10 @@ export class InspectionsService {
         });
       }
 
-      return inspection;
+      return created;
     });
 
-    return this.inspectionToReportModel(result);
+    return this.findOne(inspection.id);
   }
 
   async findAll() {
@@ -395,136 +666,7 @@ export class InspectionsService {
       },
     });
 
-    const inspectionIds = inspections.map((item) => item.id);
-    const deviceIds = [...new Set(inspections.map((item) => item.deviceId))];
-    const technicianIds = [
-      ...new Set(inspections.map((item) => item.technicianId)),
-    ];
-
-    const [devices, technicians, images, inspectionIssues] =
-      await Promise.all([
-        deviceIds.length
-          ? this.prisma.device.findMany({
-              where: {
-                id: {
-                  in: deviceIds,
-                },
-              },
-              include: {
-                deviceType: true,
-                location: true,
-              },
-            })
-          : [],
-
-        technicianIds.length
-          ? this.prisma.user.findMany({
-              where: {
-                id: {
-                  in: technicianIds,
-                },
-              },
-              select: {
-                id: true,
-                fullName: true,
-                username: true,
-                email: true,
-              },
-            })
-          : [],
-
-        inspectionIds.length
-          ? this.prisma.inspectionImage.findMany({
-              where: {
-                inspectionId: {
-                  in: inspectionIds,
-                },
-              },
-              orderBy: {
-                createdAt: 'desc',
-              },
-            })
-          : [],
-
-        inspectionIds.length
-          ? this.prisma.inspectionIssue.findMany({
-              where: {
-                inspectionId: {
-                  in: inspectionIds,
-                },
-              },
-            })
-          : [],
-      ]);
-
-    const issueIds = [
-      ...new Set(
-        inspectionIssues
-          .map((item) => item.issueId)
-          .filter((id) => id !== null && id !== undefined),
-      ),
-    ];
-
-    const issues = issueIds.length
-      ? await this.prisma.issue.findMany({
-          where: {
-            id: {
-              in: issueIds,
-            },
-          },
-          select: {
-            id: true,
-            issueCode: true,
-            title: true,
-            severity: true,
-            status: true,
-            description: true,
-            categoryId: true,
-            deviceTypeId: true,
-            createdAt: true,
-            updatedAt: true,
-          },
-        })
-      : [];
-
-    const deviceMap = new Map<number, any>(devices.map((item) => [item.id, item] as [number, any]));
-    const technicianMap = new Map<number, any>(technicians.map((item) => [item.id, item] as [number, any]));
-    const issueMap = new Map<number, any>(issues.map((item) => [item.id, item] as [number, any]));
-
-    const imagesMap = new Map<number, any[]>();
-    for (const image of images) {
-      const list = imagesMap.get(image.inspectionId) || [];
-      list.push(image);
-      imagesMap.set(image.inspectionId, list);
-    }
-
-    const issuesMap = new Map<number, any[]>();
-    for (const issueItem of inspectionIssues) {
-      const issue = issueMap.get(issueItem.issueId) || null;
-
-      const list = issuesMap.get(issueItem.inspectionId) || [];
-      list.push({
-        ...issueItem,
-        issue,
-      });
-      issuesMap.set(issueItem.inspectionId, list);
-    }
-
-    return inspections.map((inspection) => {
-      const device = deviceMap.get(inspection.deviceId) || null;
-      const technician = technicianMap.get(inspection.technicianId) || null;
-      const inspectionImages = imagesMap.get(inspection.id) || [];
-      const issuesForInspection = issuesMap.get(inspection.id) || [];
-
-      return this.inspectionToReportModel({
-        ...inspection,
-        device,
-        technician,
-        images: inspectionImages,
-        inspectionIssues: issuesForInspection,
-        task: null,
-      });
-    });
+    return this.buildSafeInspectionReports(inspections);
   }
 
   async findByTechnician(technicianId: number) {
@@ -535,109 +677,42 @@ export class InspectionsService {
       orderBy: {
         inspectedAt: 'desc',
       },
-      include: {
-        device: {
-          include: {
-            deviceType: true,
-            location: true,
-          },
-        },
-        technician: true,
-        images: true,
-        inspectionIssues: {
-          include: {
-            issue: true,
-          },
-        },
-        task: true,
-      },
     });
 
-    return inspections.map((inspection) =>
-      this.inspectionToReportModel(inspection),
-    );
+    return this.buildSafeInspectionReports(inspections);
   }
 
   async findOne(id: number) {
     const inspection = await this.prisma.inspection.findUnique({
       where: { id },
-      include: {
-        device: {
-          include: {
-            deviceType: true,
-            location: true,
-          },
-        },
-        technician: true,
-        images: true,
-        inspectionIssues: {
-          include: {
-            issue: true,
-          },
-        },
-        task: true,
-      },
     });
 
     if (!inspection) {
       throw new NotFoundException('Inspection not found');
     }
 
-    return this.inspectionToReportModel(inspection);
+    const reports = await this.buildSafeInspectionReports([inspection]);
+
+    return reports[0];
   }
 
   async findOneFull(id: number) {
     const inspection = await this.prisma.inspection.findUnique({
       where: { id },
-      include: {
-        device: {
-          include: {
-            deviceType: true,
-            location: true,
-            movements: true,
-            statusHistory: true,
-            maintenanceLogs: true,
-          },
-        },
-        technician: {
-          include: {
-            role: true,
-          },
-        },
-        images: true,
-        inspectionIssues: {
-          include: {
-            issue: {
-              include: {
-                category: true,
-                deviceType: true,
-                solutions: true,
-              },
-            },
-            actions: {
-              include: {
-                solution: true,
-                technician: true,
-              },
-            },
-          },
-        },
-        solutionActions: {
-          include: {
-            solution: true,
-            inspectionIssue: true,
-            technician: true,
-          },
-        },
-        task: true,
-      },
     });
 
     if (!inspection) {
       throw new NotFoundException('Inspection not found');
     }
 
-    return inspection;
+    const reports = await this.buildSafeInspectionReports([inspection], {
+      includeDeviceHistory: true,
+      includeDeviceMovements: true,
+      includeMaintenanceLogs: true,
+      includeTechnicianRole: true,
+    });
+
+    return reports[0];
   }
 
   async update(id: number, updateInspectionDto: UpdateInspectionDto) {
@@ -692,22 +767,6 @@ export class InspectionsService {
     const updated = await this.prisma.inspection.update({
       where: { id },
       data,
-      include: {
-        device: {
-          include: {
-            deviceType: true,
-            location: true,
-          },
-        },
-        technician: true,
-        images: true,
-        inspectionIssues: {
-          include: {
-            issue: true,
-          },
-        },
-        task: true,
-      },
     });
 
     if (data.inspectionStatus) {
@@ -724,7 +783,7 @@ export class InspectionsService {
       });
     }
 
-    return this.inspectionToReportModel(updated);
+    return this.findOne(updated.id);
   }
 
   async remove(id: number) {
@@ -835,33 +894,17 @@ export class InspectionsService {
         },
         skip,
         take: safeLimit,
-        include: {
-          device: {
-            include: {
-              deviceType: true,
-              location: true,
-            },
-          },
-          technician: true,
-          inspectionIssues: {
-            include: {
-              issue: true,
-            },
-          },
-          images: true,
-          task: true,
-        },
       }),
     ]);
+
+    const data = await this.buildSafeInspectionReports(inspections);
 
     return {
       page: safePage,
       limit: safeLimit,
       total,
       totalPages: Math.ceil(total / safeLimit),
-      data: inspections.map((inspection) =>
-        this.inspectionToReportModel(inspection),
-      ),
+      data,
     };
   }
 
