@@ -388,12 +388,12 @@ export class InspectionsService {
     return this.inspectionToReportModel(result);
   }
 
+  // Admin inspections page: يرجع كل التفتيشات من الباك إند بدون static limit
   async findAll() {
     const inspections = await this.prisma.inspection.findMany({
       orderBy: {
         inspectedAt: 'desc',
       },
-      take: 100,
       include: {
         device: {
           include: {
@@ -417,6 +417,7 @@ export class InspectionsService {
     );
   }
 
+  // Technician history: يرجع كل تقارير الفني، والموبايل Home يستخدم pagination endpoint تحت
   async findByTechnician(technicianId: number) {
     const inspections = await this.prisma.inspection.findMany({
       where: {
@@ -425,7 +426,6 @@ export class InspectionsService {
       orderBy: {
         inspectedAt: 'desc',
       },
-      take: 100,
       include: {
         device: {
           include: {
@@ -638,6 +638,7 @@ export class InspectionsService {
     };
   }
 
+  // Mobile: stats لفني واحد فقط
   async getTechnicianStats(technicianId: number) {
     const [
       totalInspected,
@@ -701,6 +702,7 @@ export class InspectionsService {
     };
   }
 
+  // Mobile: history بفني واحد مع pagination
   async getTechnicianHistory(
     technicianId: number,
     page = 1,
@@ -756,6 +758,7 @@ export class InspectionsService {
     };
   }
 
+  // Mobile: Home الفني فقط
   async getTechnicianHome(technicianId: number, limit = 10) {
     const safeLimit = limit < 1 ? 10 : limit > 50 ? 50 : limit;
 
@@ -771,6 +774,82 @@ export class InspectionsService {
     };
   }
 
+  // Web Admin: إجمالي كل السيستم من الباك إند
+  async getAdminOverview() {
+    const [
+      totalInspections,
+      totalDevices,
+      activeTechnicians,
+      goodInspections,
+      needsMaintenance,
+      underReview,
+      pendingTasks,
+      completedTasks,
+    ] = await Promise.all([
+      this.prisma.inspection.count(),
+
+      this.prisma.device.count(),
+
+      this.prisma.user.count({
+        where: {
+          isActive: true,
+          role: {
+            name: 'TECHNICIAN',
+          },
+        },
+      }),
+
+      this.prisma.inspection.count({
+        where: {
+          inspectionStatus: InspectionStatus.OK,
+        },
+      }),
+
+      this.prisma.inspection.count({
+        where: {
+          inspectionStatus: {
+            in: [InspectionStatus.NOT_OK, InspectionStatus.PARTIAL],
+          },
+        },
+      }),
+
+      this.prisma.inspection.count({
+        where: {
+          inspectionStatus: InspectionStatus.NOT_REACHABLE,
+        },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: {
+          status: {
+            in: [TaskStatus.PENDING, TaskStatus.IN_PROGRESS],
+          },
+        },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: {
+          status: TaskStatus.COMPLETED,
+        },
+      }),
+    ]);
+
+    const emergencyAlerts = underReview + needsMaintenance;
+
+    return {
+      activeTechnicians,
+      totalDevices,
+      totalInspections,
+      goodInspections,
+      needsMaintenance,
+      underReview,
+      pendingTasks,
+      completedTasks,
+      emergencyAlerts,
+    };
+  }
+
+  // Debug فقط، قراءة من الباك إند
   async getTechniciansInspectionCount() {
     const grouped = await this.prisma.inspection.groupBy({
       by: ['technicianId'],

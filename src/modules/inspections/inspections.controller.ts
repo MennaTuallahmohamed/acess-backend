@@ -98,15 +98,21 @@ export class InspectionsController {
     return this.inspectionsService.findByTechnician(parsedId);
   }
 
-  // مهم جدًا:
-  // ده هيعرفنا كل فني عامل كام تفتيش
+  // للويب الأدمن: إجمالي كل التفتيشات لكل الفنيين
+  // لازم يكون قبل @Get(':id')
+  @Get('admin/overview')
+  getAdminOverview() {
+    return this.inspectionsService.getAdminOverview();
+  }
+
+  // للتأكد إن التفتيشات موجودة ومتوزعة على أنهي فني
   // لازم يكون قبل @Get(':id')
   @Get('debug/technicians-count')
   getTechniciansInspectionCount() {
     return this.inspectionsService.getTechniciansInspectionCount();
   }
 
-  // إحصائيات فني واحد
+  // للموبايل: إحصائيات فني واحد فقط
   @Get('technician/:technicianId/stats')
   getTechnicianStats(@Param('technicianId') technicianId: string) {
     const parsedId = Number(technicianId);
@@ -120,7 +126,7 @@ export class InspectionsController {
     return this.inspectionsService.getTechnicianStats(parsedId);
   }
 
-  // History فني واحد
+  // للموبايل: History فني واحد فقط
   @Get('technician/:technicianId/history')
   getTechnicianHistory(
     @Param('technicianId') technicianId: string,
@@ -145,7 +151,7 @@ export class InspectionsController {
   }
 
   // أهم endpoint للموبايل
-  // بيرجع stats + آخر التفتيشات
+  // بيرجع stats للفني فقط + آخر 10 تفتيشات
   @Get('technician/:technicianId/home')
   getTechnicianHome(
     @Param('technicianId') technicianId: string,
