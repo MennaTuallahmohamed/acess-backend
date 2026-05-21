@@ -388,36 +388,145 @@ export class InspectionsService {
     return this.inspectionToReportModel(result);
   }
 
-  // Admin inspections page: يرجع كل التفتيشات من الباك إند بدون static limit
   async findAll() {
     const inspections = await this.prisma.inspection.findMany({
       orderBy: {
         inspectedAt: 'desc',
       },
-      include: {
-        device: {
-          include: {
-            deviceType: true,
-            location: true,
-          },
-        },
-        technician: true,
-        images: true,
-        inspectionIssues: {
-          include: {
-            issue: true,
-          },
-        },
-        task: true,
-      },
     });
 
-    return inspections.map((inspection) =>
-      this.inspectionToReportModel(inspection),
-    );
+    const inspectionIds = inspections.map((item) => item.id);
+    const deviceIds = [...new Set(inspections.map((item) => item.deviceId))];
+    const technicianIds = [
+      ...new Set(inspections.map((item) => item.technicianId)),
+    ];
+
+    const [devices, technicians, images, inspectionIssues] =
+      await Promise.all([
+        deviceIds.length
+          ? this.prisma.device.findMany({
+              where: {
+                id: {
+                  in: deviceIds,
+                },
+              },
+              include: {
+                deviceType: true,
+                location: true,
+              },
+            })
+          : [],
+
+        technicianIds.length
+          ? this.prisma.user.findMany({
+              where: {
+                id: {
+                  in: technicianIds,
+                },
+              },
+              select: {
+                id: true,
+                fullName: true,
+                username: true,
+                email: true,
+              },
+            })
+          : [],
+
+        inspectionIds.length
+          ? this.prisma.inspectionImage.findMany({
+              where: {
+                inspectionId: {
+                  in: inspectionIds,
+                },
+              },
+              orderBy: {
+                createdAt: 'desc',
+              },
+            })
+          : [],
+
+        inspectionIds.length
+          ? this.prisma.inspectionIssue.findMany({
+              where: {
+                inspectionId: {
+                  in: inspectionIds,
+                },
+              },
+            })
+          : [],
+      ]);
+
+    const issueIds = [
+      ...new Set(
+        inspectionIssues
+          .map((item) => item.issueId)
+          .filter((id) => id !== null && id !== undefined),
+      ),
+    ];
+
+    const issues = issueIds.length
+      ? await this.prisma.issue.findMany({
+          where: {
+            id: {
+              in: issueIds,
+            },
+          },
+          select: {
+            id: true,
+            issueCode: true,
+            title: true,
+            severity: true,
+            status: true,
+            description: true,
+            categoryId: true,
+            deviceTypeId: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        })
+      : [];
+
+    const deviceMap = new Map<number, any>(devices.map((item) => [item.id, item] as [number, any]));
+    const technicianMap = new Map<number, any>(technicians.map((item) => [item.id, item] as [number, any]));
+    const issueMap = new Map<number, any>(issues.map((item) => [item.id, item] as [number, any]));
+
+    const imagesMap = new Map<number, any[]>();
+    for (const image of images) {
+      const list = imagesMap.get(image.inspectionId) || [];
+      list.push(image);
+      imagesMap.set(image.inspectionId, list);
+    }
+
+    const issuesMap = new Map<number, any[]>();
+    for (const issueItem of inspectionIssues) {
+      const issue = issueMap.get(issueItem.issueId) || null;
+
+      const list = issuesMap.get(issueItem.inspectionId) || [];
+      list.push({
+        ...issueItem,
+        issue,
+      });
+      issuesMap.set(issueItem.inspectionId, list);
+    }
+
+    return inspections.map((inspection) => {
+      const device = deviceMap.get(inspection.deviceId) || null;
+      const technician = technicianMap.get(inspection.technicianId) || null;
+      const inspectionImages = imagesMap.get(inspection.id) || [];
+      const issuesForInspection = issuesMap.get(inspection.id) || [];
+
+      return this.inspectionToReportModel({
+        ...inspection,
+        device,
+        technician,
+        images: inspectionImages,
+        inspectionIssues: issuesForInspection,
+        task: null,
+      });
+    });
   }
 
-  // Technician history: يرجع كل تقارير الفني، والموبايل Home يستخدم pagination endpoint تحت
   async findByTechnician(technicianId: number) {
     const inspections = await this.prisma.inspection.findMany({
       where: {
@@ -638,7 +747,6 @@ export class InspectionsService {
     };
   }
 
-  // Mobile: stats لفني واحد فقط
   async getTechnicianStats(technicianId: number) {
     const [
       totalInspected,
@@ -702,7 +810,6 @@ export class InspectionsService {
     };
   }
 
-  // Mobile: history بفني واحد مع pagination
   async getTechnicianHistory(
     technicianId: number,
     page = 1,
@@ -758,7 +865,6 @@ export class InspectionsService {
     };
   }
 
-  // Mobile: Home الفني فقط
   async getTechnicianHome(technicianId: number, limit = 10) {
     const safeLimit = limit < 1 ? 10 : limit > 50 ? 50 : limit;
 
@@ -774,7 +880,6 @@ export class InspectionsService {
     };
   }
 
-  // Web Admin: إجمالي كل السيستم من الباك إند
   async getAdminOverview() {
     const [
       totalInspections,
@@ -849,7 +954,6 @@ export class InspectionsService {
     };
   }
 
-  // Debug فقط، قراءة من الباك إند
   async getTechniciansInspectionCount() {
     const grouped = await this.prisma.inspection.groupBy({
       by: ['technicianId'],
@@ -889,5 +993,54 @@ export class InspectionsService {
         totalInspections: item._count.technicianId,
       };
     });
+  }
+
+  async getBrokenInspectionIssues() {
+    const inspectionIssues = await this.prisma.inspectionIssue.findMany({
+      select: {
+        id: true,
+        inspectionId: true,
+        issueId: true,
+        reportedById: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    const issueIds = [
+      ...new Set(
+        inspectionIssues
+          .map((item) => item.issueId)
+          .filter((id) => id !== null && id !== undefined),
+      ),
+    ];
+
+    const existingIssues = issueIds.length
+      ? await this.prisma.issue.findMany({
+          where: {
+            id: {
+              in: issueIds,
+            },
+          },
+          select: {
+            id: true,
+            issueCode: true,
+            title: true,
+          },
+        })
+      : [];
+
+    const existingIssueIds = new Set(existingIssues.map((item) => item.id));
+
+    const broken = inspectionIssues.filter(
+      (item) => !existingIssueIds.has(item.issueId),
+    );
+
+    return {
+      totalInspectionIssues: inspectionIssues.length,
+      totalExistingIssues: existingIssues.length,
+      brokenCount: broken.length,
+      broken,
+    };
   }
 }
