@@ -9,39 +9,36 @@ import {
 } from '@nestjs/common';
 import { LocationsService } from './location.service';
 
-
-@Controller('locations')
+@Controller()
 export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
 
-  // مهم جدا: لازم ده يكون قبل @Get(':id')
-  @Get('scan-summary')
+  @Get('locations-scan-summary')
   getLocationsScanSummary() {
     return this.locationsService.getLocationsScanSummary();
   }
 
-  @Get()
+  @Get('locations')
   findAll() {
     return this.locationsService.findAll();
   }
 
-  @Post()
+  @Post('locations')
   create(@Body() body: any) {
     return this.locationsService.create(body);
   }
 
-  // مهم: أي route ثابت لازم يبقى فوق :id
-  @Get(':id')
+  @Get('locations/:id')
   findOne(@Param('id') id: string) {
     return this.locationsService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('locations/:id')
   update(@Param('id') id: string, @Body() body: any) {
     return this.locationsService.update(id, body);
   }
 
-  @Delete(':id')
+  @Delete('locations/:id')
   remove(@Param('id') id: string) {
     return this.locationsService.remove(id);
   }
