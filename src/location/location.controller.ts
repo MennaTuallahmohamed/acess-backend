@@ -13,6 +13,8 @@ import { LocationsService } from './location.service';
 @Controller('locations')
 export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
+
+  // مهم جدا: لازم ده يكون قبل @Get(':id')
   @Get('scan-summary')
   getLocationsScanSummary() {
     return this.locationsService.getLocationsScanSummary();
@@ -23,14 +25,15 @@ export class LocationsController {
     return this.locationsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.locationsService.findOne(id);
-  }
-
   @Post()
   create(@Body() body: any) {
     return this.locationsService.create(body);
+  }
+
+  // مهم: أي route ثابت لازم يبقى فوق :id
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.locationsService.findOne(id);
   }
 
   @Patch(':id')
