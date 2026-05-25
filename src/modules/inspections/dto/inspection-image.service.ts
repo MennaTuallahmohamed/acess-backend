@@ -3,13 +3,27 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { existsSync } from 'fs';
+import { join, resolve } from 'path';
+
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateInspectionImageDto } from './create-inspection-image.dto';
-
 
 @Injectable()
 export class InspectionImageService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private getUploadsPath() {
+    const uploadsPath = process.env.UPLOAD_DIR
+      ? resolve(process.env.UPLOAD_DIR)
+      : join(process.cwd(), 'uploads');
+
+    return uploadsPath;
+  }
+
+  private getImageUrl(filename: string) {
+    return `/uploads/${filename}`;
+  }
 
   async uploadImage(
     dto: CreateInspectionImageDto,
@@ -37,13 +51,30 @@ export class InspectionImageService {
       throw new NotFoundException('Inspection not found');
     }
 
-    const imageUrl = `uploads/${file.filename}`;
+    const uploadsPath = this.getUploadsPath();
+    const filePath = join(uploadsPath, file.filename);
+    const fileExists = existsSync(filePath);
+
+    if (!fileExists) {
+      console.error('IMAGE FILE NOT FOUND AFTER UPLOAD:', {
+        uploadsPath,
+        filename: file.filename,
+        filePath,
+        multerPath: file.path,
+      });
+
+      throw new BadRequestException(
+        'Image file was uploaded but not found on server disk',
+      );
+    }
+
+    const imageUrl = this.getImageUrl(file.filename);
 
     const createdImage = await this.prisma.inspectionImage.create({
       data: {
         inspectionId,
         imageUrl,
-        imageType: dto.imageType || 'general',
+        imageType: dto.imageType || file.mimetype || 'general',
       },
       include: {
         inspection: {
@@ -64,11 +95,16 @@ export class InspectionImageService {
       },
     });
 
-    console.log('INSPECTION IMAGE SAVED:', {
+    console.log('============== INSPECTION IMAGE SAVED ==============');
+    console.log({
       imageId: createdImage.id,
       inspectionId,
       imageUrl,
+      uploadsPath,
+      filePath,
+      fileExists,
     });
+    console.log('====================================================');
 
     return createdImage;
   }

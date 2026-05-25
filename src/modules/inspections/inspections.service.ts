@@ -15,6 +15,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateInspectionDto } from './dto/create-inspection.dto';
 import { UpdateInspectionDto } from './dto/update-inspection.dto';
 
+type UploadedInspectionFile = Express.Multer.File;
+
 @Injectable()
 export class InspectionsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -148,6 +150,18 @@ export class InspectionsService {
     }
 
     return [];
+  }
+
+  private normalizeUploadedFiles(
+    fileOrFiles?: UploadedInspectionFile | UploadedInspectionFile[],
+  ): UploadedInspectionFile[] {
+    if (!fileOrFiles) return [];
+
+    if (Array.isArray(fileOrFiles)) {
+      return fileOrFiles.filter((file) => Boolean(file?.filename));
+    }
+
+    return fileOrFiles?.filename ? [fileOrFiles] : [];
   }
 
   private inspectionToReportModel(inspection: any) {
@@ -487,11 +501,16 @@ export class InspectionsService {
       const issueActions =
         actionsByInspectionIssueMap.get(action.inspectionIssueId) || [];
       issueActions.push(fullAction);
-      actionsByInspectionIssueMap.set(action.inspectionIssueId, issueActions);
+      actionsByInspectionIssueMap.set(inspectionIssueIdSafe(action), issueActions);
 
-      const inspectionActions = actionsByInspectionMap.get(action.inspectionId) || [];
+      const inspectionActions =
+        actionsByInspectionMap.get(action.inspectionId) || [];
       inspectionActions.push(fullAction);
       actionsByInspectionMap.set(action.inspectionId, inspectionActions);
+    }
+
+    function inspectionIssueIdSafe(action: any) {
+      return action.inspectionIssueId;
     }
 
     const issuesMap = new Map<number, any[]>();
@@ -532,8 +551,10 @@ export class InspectionsService {
 
   async createInspection(
     createInspectionDto: CreateInspectionDto,
-    file?: Express.Multer.File,
+    fileOrFiles?: UploadedInspectionFile | UploadedInspectionFile[],
   ) {
+    const files = this.normalizeUploadedFiles(fileOrFiles);
+
     const deviceId = this.toNumber(
       (createInspectionDto as any).deviceId,
       'deviceId',
@@ -615,14 +636,15 @@ export class InspectionsService {
                 }
               : undefined,
 
-          images: file
-            ? {
-                create: {
-                  imageUrl: `/uploads/${file.filename}`,
-                  imageType: file.mimetype,
-                },
-              }
-            : undefined,
+          images:
+            files.length > 0
+              ? {
+                  create: files.map((file) => ({
+                    imageUrl: `/uploads/${file.filename}`,
+                    imageType: file.mimetype || 'image',
+                  })),
+                }
+              : undefined,
         },
       });
 

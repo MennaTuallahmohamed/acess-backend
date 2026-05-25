@@ -9,14 +9,8 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  /*
-    مهم لو شغالين على Railway / Render / Proxy
-  */
   app.set('trust proxy', 1);
 
-  /*
-    CORS عشان الويب يقدر يقرأ الصور والـ API
-  */
   app.enableCors({
     origin: true,
     credentials: true,
@@ -30,11 +24,6 @@ async function bootstrap() {
     ],
   });
 
-  /*
-    Uploads folder
-    لو عندك Railway Volume خلي UPLOAD_DIR = /data/uploads
-    لو مفيش Volume هيستخدم فولدر uploads العادي
-  */
   const uploadsPath = process.env.UPLOAD_DIR
     ? resolve(process.env.UPLOAD_DIR)
     : join(process.cwd(), 'uploads');
@@ -43,14 +32,6 @@ async function bootstrap() {
     mkdirSync(uploadsPath, { recursive: true });
   }
 
-  /*
-    Serve uploaded images
-    أي صورة محفوظة مثل:
-    /uploads/1779357689448-680806114.jpg
-
-    هتفتح من:
-    https://your-backend.up.railway.app/uploads/1779357689448-680806114.jpg
-  */
   app.useStaticAssets(uploadsPath, {
     prefix: '/uploads/',
     maxAge: '30d',
@@ -62,9 +43,6 @@ async function bootstrap() {
     },
   });
 
-  /*
-    Validation
-  */
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
