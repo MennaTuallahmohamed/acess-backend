@@ -15,6 +15,8 @@ import { DevicesModule } from './modules/devices/devices.module';
 import { IssuesModule } from './issues/issues.module';
 import { InspectionImageModule } from './modules/inspections/dto/inspection-image.module';
 
+import { ReportsModule } from './modules/reports/reports.module';
+
 @Module({
   imports: [
     PrismaModule,
@@ -32,6 +34,8 @@ import { InspectionImageModule } from './modules/inspections/dto/inspection-imag
 
     DashboardModule,
     IssuesModule,
+
+    ReportsModule,
   ],
 })
 export class AppModule {}
