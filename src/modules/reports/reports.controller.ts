@@ -1,14 +1,43 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ReportsService } from './reports.service';
-// import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
+  @Get('health')
+  health() {
+    return {
+      success: true,
+      ok: true,
+      module: 'reports',
+      message: 'Reports module is running',
+      time: new Date().toISOString(),
+    };
+  }
+
+  @Get('inspections-summary')
+  getInspectionsSummary() {
+    return this.reportsService.getInspectionsSummary();
+  }
+
   @Get('locations-scan-summary')
-  // @UseGuards(JwtAuthGuard)
-  async getLocationsScanSummary() {
+  getLocationsScanSummary() {
     return this.reportsService.getLocationsScanSummary();
+  }
+
+  @Get('not-inspected-devices')
+  getNotInspectedDevices() {
+    return this.reportsService.getNotInspectedDevices();
+  }
+
+  @Get('devices-scan-summary')
+  getDevicesScanSummary() {
+    return this.reportsService.getDevicesScanSummary();
+  }
+
+  @Get('latest-inspections')
+  getLatestInspections() {
+    return this.reportsService.getLatestInspections();
   }
 }
