@@ -16,14 +16,14 @@ export class ReportsController {
     };
   }
 
-  @Get('inspections-summary')
-  getInspectionsSummary() {
-    return this.reportsService.getInspectionsSummary();
+  @Get('devices-scan-report')
+  getDevicesScanReport() {
+    return this.reportsService.getDevicesScanReport();
   }
 
   @Get('locations-scan-summary')
   getLocationsScanSummary() {
-    return this.reportsService.getLocationsScanSummary();
+    return this.reportsService.getDevicesScanReport();
   }
 
   @Get('not-inspected-devices')
@@ -39,5 +39,10 @@ export class ReportsController {
   @Get('latest-inspections')
   getLatestInspections() {
     return this.reportsService.getLatestInspections();
+  }
+
+  @Get('inspections-summary')
+  getInspectionsSummary() {
+    return this.reportsService.getInspectionsSummary();
   }
 }
