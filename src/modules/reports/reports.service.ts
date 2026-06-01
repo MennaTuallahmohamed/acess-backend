@@ -5,18 +5,6 @@ import { PrismaService } from '../../database/prisma/prisma.service';
 export class ReportsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private getInspectionDate(inspection: any) {
-    return inspection?.inspectedAt || inspection?.createdAt || null;
-  }
-
-  private sortInspectionsDesc(inspections: any[]) {
-    return inspections.slice().sort((a, b) => {
-      const dateA = new Date(this.getInspectionDate(a) || 0).getTime();
-      const dateB = new Date(this.getInspectionDate(b) || 0).getTime();
-      return dateB - dateA;
-    });
-  }
-
   private mapLocation(location: any) {
     if (!location) {
       return {
@@ -82,58 +70,37 @@ export class ReportsService {
     }));
   }
 
-  private mapInspectionIssues(inspectionIssues: any[]) {
-    if (!Array.isArray(inspectionIssues)) return [];
-
-    return inspectionIssues.map((item) => ({
-      id: item.id,
-      inspectionId: item.inspectionId,
-      issueId: item.issueId,
-      status: item.status,
-      notes: item.notes,
-      unresolvedReason: item.unresolvedReason,
-      resolvedAt: item.resolvedAt,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-      issue: item.issue
-        ? {
-            id: item.issue.id,
-            title: item.issue.title,
-            name: item.issue.name,
-            description: item.issue.description,
-          }
-        : null,
-    }));
-  }
-
   private mapInspection(inspection: any, deviceForInspection?: any) {
     if (!inspection) return null;
 
     const images = this.mapImages(inspection.images || []);
-    const inspectionIssues = this.mapInspectionIssues(
-      inspection.inspectionIssues || [],
-    );
 
     return {
       id: inspection.id,
       deviceId: inspection.deviceId,
       technicianId: inspection.technicianId,
       taskId: inspection.taskId,
+
       inspectionStatus: inspection.inspectionStatus,
       issueReason: inspection.issueReason,
       notes: inspection.notes,
+
       latitude: inspection.latitude,
       longitude: inspection.longitude,
       locationText: inspection.locationText,
+
       inspectedAt: inspection.inspectedAt,
       createdAt: inspection.createdAt,
       updatedAt: inspection.updatedAt,
 
       technician: this.mapTechnician(inspection.technician),
+
       images,
       imagesCount: images.length,
-      inspectionIssues,
-      issuesCount: inspectionIssues.length,
+
+      // مؤقتًا صفر عشان نتجنب كراش InspectionIssue المكسور
+      inspectionIssues: [],
+      issuesCount: 0,
 
       device: deviceForInspection || null,
     };
@@ -142,7 +109,11 @@ export class ReportsService {
   private mapDevice(device: any) {
     const location = this.mapLocation(device.location);
     const deviceType = this.mapDeviceType(device.deviceType);
-    const latestInspectionRaw = device.inspections?.[0] || null;
+
+    const latestInspectionRaw =
+      Array.isArray(device.inspections) && device.inspections.length > 0
+        ? device.inspections[0]
+        : null;
 
     const deviceBasics = {
       id: device.id,
@@ -150,23 +121,28 @@ export class ReportsService {
       deviceName: device.deviceName,
       barcode: device.barcode,
       serialNumber: device.serialNumber,
+
       manufacturer: device.manufacturer,
       modelNumber: device.modelNumber,
       currentStatus: device.currentStatus,
+
       installDate: device.installDate,
       lastInspectionAt: device.lastInspectionAt,
       notes: device.notes,
+
       excelDate: device.excelDate,
       excelStatus: device.excelStatus,
       firmware: device.firmware,
       ipAddress: device.ipAddress,
+
       createdAt: device.createdAt,
       updatedAt: device.updatedAt,
 
       deviceType,
+      deviceTypeId: device.deviceTypeId,
+
       location,
       locationId: location?.id || device.locationId,
-      deviceTypeId: device.deviceTypeId,
     };
 
     const latestInspection = latestInspectionRaw
@@ -182,6 +158,7 @@ export class ReportsService {
       scanStatus: isInspected ? 'SCANNED' : 'NOT_SCANNED',
 
       latestInspection,
+
       lastInspectionAt:
         latestInspection?.inspectedAt ||
         latestInspection?.createdAt ||
@@ -189,13 +166,22 @@ export class ReportsService {
         null,
 
       lastTechnician: latestInspection?.technician || null,
+
       imagesCount: latestInspection?.imagesCount || 0,
-      issuesCount: latestInspection?.issuesCount || 0,
+      issuesCount: 0,
 
       reason: isInspected
         ? null
         : 'No inspection record found for this exact deviceId',
     };
+  }
+
+  private sortInspectionsDesc(inspections: any[]) {
+    return inspections.slice().sort((a, b) => {
+      const aDate = new Date(a?.inspectedAt || a?.createdAt || 0).getTime();
+      const bDate = new Date(b?.inspectedAt || b?.createdAt || 0).getTime();
+      return bDate - aDate;
+    });
   }
 
   async getDevicesScanReport() {
@@ -206,6 +192,7 @@ export class ReportsService {
       include: {
         deviceType: true,
         location: true,
+
         inspections: {
           orderBy: [
             {
@@ -227,6 +214,7 @@ export class ReportsService {
                 jobTitle: true,
               },
             },
+
             images: {
               select: {
                 id: true,
@@ -234,11 +222,6 @@ export class ReportsService {
                 imageUrl: true,
                 imageType: true,
                 createdAt: true,
-              },
-            },
-            inspectionIssues: {
-              include: {
-                issue: true,
               },
             },
           },
@@ -358,11 +341,6 @@ export class ReportsService {
       0,
     );
 
-    const totalIssues = mappedDevices.reduce(
-      (sum, device) => sum + Number(device.issuesCount || 0),
-      0,
-    );
-
     const okInspections = mappedDevices.filter(
       (device) => device.latestInspection?.inspectionStatus === 'OK',
     ).length;
@@ -381,7 +359,7 @@ export class ReportsService {
 
     return {
       success: true,
-      source: 'backend-prisma-device-source-of-truth',
+      source: 'backend-prisma-device-source-of-truth-safe',
       rule:
         'Device is SCANNED only when this exact device.id has at least one Inspection record using the same deviceId',
 
@@ -390,12 +368,13 @@ export class ReportsService {
         totalDevices,
         inspectedDevices,
         notInspectedDevices,
+
         locationsWithMissingDevices: locations.filter(
           (location) => location.counts.notInspectedDevices > 0,
         ).length,
 
         totalImages,
-        totalIssues,
+        totalIssues: 0,
 
         inspectionsByStatus: {
           OK: okInspections,
@@ -410,6 +389,10 @@ export class ReportsService {
     };
   }
 
+  async getLocationsScanSummary() {
+    return this.getDevicesScanReport();
+  }
+
   async getNotInspectedDevices() {
     const report = await this.getDevicesScanReport();
 
@@ -419,7 +402,7 @@ export class ReportsService {
 
     return {
       success: true,
-      source: 'backend-prisma-device-source-of-truth',
+      source: 'backend-prisma-device-source-of-truth-safe',
       rule:
         'Device is NOT_SCANNED only when this exact device.id has zero Inspection records',
       count: devices.length,
@@ -461,12 +444,14 @@ export class ReportsService {
             jobTitle: true,
           },
         },
+
         device: {
           include: {
             deviceType: true,
             location: true,
           },
         },
+
         images: {
           select: {
             id: true,
@@ -474,11 +459,6 @@ export class ReportsService {
             imageUrl: true,
             imageType: true,
             createdAt: true,
-          },
-        },
-        inspectionIssues: {
-          include: {
-            issue: true,
           },
         },
       },
@@ -504,7 +484,7 @@ export class ReportsService {
 
     return {
       success: true,
-      source: 'backend-prisma',
+      source: 'backend-prisma-safe',
       count: mapped.length,
       inspections: mapped,
     };
