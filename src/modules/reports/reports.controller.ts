@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
@@ -9,7 +9,6 @@ export class ReportsController {
   health() {
     return {
       success: true,
-      ok: true,
       module: 'reports',
       message: 'Reports module is running',
       time: new Date().toISOString(),
@@ -17,32 +16,21 @@ export class ReportsController {
   }
 
   @Get('devices-scan-report')
-  getDevicesScanReport() {
-    return this.reportsService.getDevicesScanReport();
+  async devicesScanReport(
+    @Query('mode') mode?: 'all' | 'eligible',
+    @Query('debug') debug?: string,
+  ) {
+    return this.reportsService.devicesScanReport({
+      mode: mode || 'eligible',
+      debug: debug === 'true',
+    });
   }
 
-  @Get('locations-scan-summary')
-  getLocationsScanSummary() {
-    return this.reportsService.getDevicesScanReport();
-  }
-
-  @Get('not-inspected-devices')
-  getNotInspectedDevices() {
-    return this.reportsService.getNotInspectedDevices();
-  }
-
-  @Get('devices-scan-summary')
-  getDevicesScanSummary() {
-    return this.reportsService.getDevicesScanSummary();
-  }
-
-  @Get('latest-inspections')
-  getLatestInspections() {
-    return this.reportsService.getLatestInspections();
-  }
-
-  @Get('inspections-summary')
-  getInspectionsSummary() {
-    return this.reportsService.getInspectionsSummary();
+  @Get('devices-scan-debug')
+  async devicesScanDebug() {
+    return this.reportsService.devicesScanReport({
+      mode: 'eligible',
+      debug: true,
+    });
   }
 }

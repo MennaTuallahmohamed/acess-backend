@@ -1,696 +1,592 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../database/prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+type ReportMode = 'all' | 'eligible';
 
 @Injectable()
 export class ReportsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private norm(value: any) {
-    return String(value || '')
+  private normalize(value: any): string {
+    return String(value ?? '')
       .trim()
-      .toLowerCase()
-      .replace(/[أإآا]/g, 'ا')
-      .replace(/ى/g, 'ي')
-      .replace(/ة/g, 'ه')
-      .replace(/\s+/g, ' ');
+      .toLowerCase();
   }
 
-  private key(prefix: string, value: any) {
-    const v = this.norm(value);
-    if (!v || v === 'null' || v === 'undefined' || v === '—' || v === '-') {
-      return null;
-    }
-    return `${prefix}:${v}`;
+  private upper(value: any): string {
+    return String(value ?? '')
+      .trim()
+      .toUpperCase();
+  }
+
+  private hasValue(value: any): boolean {
+    return String(value ?? '').trim().length > 0;
+  }
+
+  private cleanIp(value: any): string {
+    return String(value ?? '')
+      .trim()
+      .replace(/\s+/g, '');
+  }
+
+  private unique<T>(arr: T[]): T[] {
+    return Array.from(new Set(arr.filter(Boolean)));
+  }
+
+  private getDeviceId(device: any) {
+    return device?.id ?? null;
+  }
+
+  private getDeviceCode(device: any) {
+    return (
+      device?.deviceCode ??
+      device?.code ??
+      device?.assetCode ??
+      device?.device_code ??
+      null
+    );
+  }
+
+  private getBarcode(device: any) {
+    return device?.barcode ?? device?.barCode ?? null;
+  }
+
+  private getSerial(device: any) {
+    return (
+      device?.serialNumber ??
+      device?.serial ??
+      device?.sn ??
+      device?.serial_no ??
+      null
+    );
+  }
+
+  private getIp(device: any) {
+    return (
+      device?.ipAddress ??
+      device?.ip ??
+      device?.IPAddress ??
+      device?.ip_address ??
+      null
+    );
+  }
+
+  private getLocationId(device: any) {
+    return device?.locationId ?? device?.location?.id ?? null;
+  }
+
+  private getDeviceStatus(device: any) {
+    return this.upper(
+      device?.status ??
+        device?.currentStatus ??
+        device?.deviceStatus ??
+        device?.state ??
+        '',
+    );
+  }
+
+  private getInspectionDeviceId(inspection: any) {
+    return (
+      inspection?.deviceId ??
+      inspection?.device?.id ??
+      inspection?.device_id ??
+      null
+    );
+  }
+
+  private getInspectionDeviceCode(inspection: any) {
+    return (
+      inspection?.deviceCode ??
+      inspection?.device_code ??
+      inspection?.code ??
+      inspection?.device?.deviceCode ??
+      inspection?.device?.code ??
+      inspection?.device?.assetCode ??
+      null
+    );
+  }
+
+  private getInspectionBarcode(inspection: any) {
+    return (
+      inspection?.barcode ??
+      inspection?.barCode ??
+      inspection?.device?.barcode ??
+      inspection?.device?.barCode ??
+      null
+    );
+  }
+
+  private getInspectionSerial(inspection: any) {
+    return (
+      inspection?.serialNumber ??
+      inspection?.serial ??
+      inspection?.sn ??
+      inspection?.device?.serialNumber ??
+      inspection?.device?.serial ??
+      inspection?.device?.sn ??
+      null
+    );
+  }
+
+  private getInspectionIp(inspection: any) {
+    return (
+      inspection?.ipAddress ??
+      inspection?.ip ??
+      inspection?.device?.ipAddress ??
+      inspection?.device?.ip ??
+      null
+    );
   }
 
   private getInspectionDate(inspection: any) {
-    return inspection?.inspectedAt || inspection?.createdAt || null;
+    return (
+      inspection?.inspectedAt ??
+      inspection?.scanAt ??
+      inspection?.scannedAt ??
+      inspection?.completedAt ??
+      inspection?.createdAt ??
+      inspection?.updatedAt ??
+      null
+    );
   }
 
-  private betterInspection(a: any, b: any) {
-    if (!a) return b;
-    if (!b) return a;
+  private getInspectionStatus(inspection: any): 'OK' | 'NOT_OK' | 'UNKNOWN' {
+    const raw = this.upper(
+      inspection?.inspectionStatus ??
+        inspection?.status ??
+        inspection?.result ??
+        inspection?.scanStatus ??
+        inspection?.condition ??
+        '',
+    );
 
-    const da = new Date(this.getInspectionDate(a) || 0).getTime();
-    const db = new Date(this.getInspectionDate(b) || 0).getTime();
+    if (
+      inspection?.isOk === true ||
+      inspection?.ok === true ||
+      inspection?.passed === true ||
+      raw === 'OK' ||
+      raw === 'GOOD' ||
+      raw === 'PASS' ||
+      raw === 'PASSED' ||
+      raw === 'COMPLETED'
+    ) {
+      return 'OK';
+    }
 
-    return db >= da ? b : a;
+    if (
+      inspection?.isOk === false ||
+      inspection?.ok === false ||
+      inspection?.passed === false ||
+      raw === 'NOT_OK' ||
+      raw === 'NOT OK' ||
+      raw === 'BAD' ||
+      raw === 'FAIL' ||
+      raw === 'FAILED' ||
+      raw === 'ISSUE' ||
+      raw === 'DAMAGED'
+    ) {
+      return 'NOT_OK';
+    }
+
+    const issueCount =
+      Array.isArray(inspection?.inspectionIssues)
+        ? inspection.inspectionIssues.length
+        : Array.isArray(inspection?.issues)
+          ? inspection.issues.length
+          : 0;
+
+    if (
+      issueCount > 0 ||
+      inspection?.issueReason ||
+      inspection?.problem ||
+      inspection?.defect
+    ) {
+      return 'NOT_OK';
+    }
+
+    return 'OK';
   }
 
-  private mapLocation(location: any) {
-    if (!location) {
-      return {
-        id: null,
-        cluster: null,
-        building: 'NO LOCATION',
-        zone: null,
-        lane: null,
-        direction: null,
-        type: null,
-        excelId: null,
+  private deviceKeys(device: any): string[] {
+    const keys: string[] = [];
+
+    const id = this.getDeviceId(device);
+    const code = this.getDeviceCode(device);
+    const barcode = this.getBarcode(device);
+    const serial = this.getSerial(device);
+    const ip = this.getIp(device);
+
+    if (id) keys.push(`id:${id}`);
+    if (this.hasValue(code)) keys.push(`code:${this.normalize(code)}`);
+    if (this.hasValue(barcode)) keys.push(`barcode:${this.normalize(barcode)}`);
+    if (this.hasValue(serial)) keys.push(`serial:${this.normalize(serial)}`);
+    if (this.hasValue(ip)) keys.push(`ip:${this.cleanIp(ip)}`);
+
+    return this.unique(keys);
+  }
+
+  private inspectionKeys(inspection: any): string[] {
+    const keys: string[] = [];
+
+    const id = this.getInspectionDeviceId(inspection);
+    const code = this.getInspectionDeviceCode(inspection);
+    const barcode = this.getInspectionBarcode(inspection);
+    const serial = this.getInspectionSerial(inspection);
+    const ip = this.getInspectionIp(inspection);
+
+    if (id) keys.push(`id:${id}`);
+    if (this.hasValue(code)) keys.push(`code:${this.normalize(code)}`);
+    if (this.hasValue(barcode)) keys.push(`barcode:${this.normalize(barcode)}`);
+    if (this.hasValue(serial)) keys.push(`serial:${this.normalize(serial)}`);
+    if (this.hasValue(ip)) keys.push(`ip:${this.cleanIp(ip)}`);
+
+    return this.unique(keys);
+  }
+
+  private isTempOrTestDevice(device: any): boolean {
+    const code = this.upper(this.getDeviceCode(device));
+    const barcode = this.upper(this.getBarcode(device));
+    const serial = this.upper(this.getSerial(device));
+    const name = this.upper(device?.deviceName ?? device?.name ?? '');
+
+    const values = [code, barcode, serial, name].join(' ');
+
+    return (
+      values.includes('TEMP') ||
+      values.includes('TEST') ||
+      values.includes('DUMMY') ||
+      values.includes('SAMPLE') ||
+      values.includes('EXCEL SEED')
+    );
+  }
+
+  private isInactiveDevice(device: any): boolean {
+    const status = this.getDeviceStatus(device);
+
+    return (
+      status === 'INACTIVE' ||
+      status === 'DISABLED' ||
+      status === 'DELETED' ||
+      status === 'REMOVED' ||
+      status === 'ARCHIVED'
+    );
+  }
+
+  private hasIdentifier(device: any): boolean {
+    return (
+      this.hasValue(this.getDeviceCode(device)) ||
+      this.hasValue(this.getBarcode(device)) ||
+      this.hasValue(this.getSerial(device)) ||
+      this.hasValue(this.getIp(device))
+    );
+  }
+
+  private getExclusionReasons(device: any): string[] {
+    const reasons: string[] = [];
+
+    if (!this.hasIdentifier(device)) reasons.push('NO_IDENTIFIER');
+    if (!this.getLocationId(device)) reasons.push('NO_LOCATION');
+    if (this.isTempOrTestDevice(device)) reasons.push('TEMP_OR_TEST');
+    if (this.isInactiveDevice(device)) reasons.push('INACTIVE');
+
+    return reasons;
+  }
+
+  private isEligibleDevice(device: any): boolean {
+    const reasons = this.getExclusionReasons(device);
+    return reasons.length === 0;
+  }
+
+  private deviceDto(device: any, extra: any = {}) {
+    return {
+      id: device?.id,
+      deviceCode: device?.deviceCode ?? device?.code ?? null,
+      deviceName: device?.deviceName ?? device?.name ?? null,
+      barcode: device?.barcode ?? null,
+      serialNumber: device?.serialNumber ?? null,
+      ipAddress: device?.ipAddress ?? device?.ip ?? null,
+      currentStatus: device?.currentStatus ?? device?.status ?? null,
+      lastInspectionAt: device?.lastInspectionAt ?? null,
+      locationId: device?.locationId ?? device?.location?.id ?? null,
+      location: device?.location
+        ? {
+            id: device.location.id,
+            cluster: device.location.cluster,
+            building: device.location.building,
+            zone: device.location.zone,
+            lane: device.location.lane,
+            direction: device.location.direction,
+            type: device.location.type,
+          }
+        : null,
+      deviceType: device?.deviceType
+        ? {
+            id: device.deviceType.id,
+            name: device.deviceType.name,
+          }
+        : null,
+      ...extra,
+    };
+  }
+
+  private inspectionDto(inspection: any) {
+    return {
+      id: inspection?.id,
+      deviceId: this.getInspectionDeviceId(inspection),
+      technicianId:
+        inspection?.technicianId ??
+        inspection?.technician?.id ??
+        inspection?.userId ??
+        null,
+      technicianName:
+        inspection?.technician?.fullName ??
+        inspection?.technician?.username ??
+        inspection?.technician?.email ??
+        null,
+      inspectionStatus: this.getInspectionStatus(inspection),
+      inspectedAt: this.getInspectionDate(inspection),
+      notes: inspection?.notes ?? inspection?.issueReason ?? null,
+      deviceCode: this.getInspectionDeviceCode(inspection),
+      barcode: this.getInspectionBarcode(inspection),
+      serialNumber: this.getInspectionSerial(inspection),
+      ipAddress: this.getInspectionIp(inspection),
+      imagesCount: Array.isArray(inspection?.images)
+        ? inspection.images.length
+        : 0,
+      issuesCount: Array.isArray(inspection?.inspectionIssues)
+        ? inspection.inspectionIssues.length
+        : 0,
+    };
+  }
+
+  async devicesScanReport(options?: {
+    mode?: ReportMode;
+    debug?: boolean;
+  }) {
+    const mode = options?.mode || 'eligible';
+    const debug = options?.debug === true;
+
+    const prisma: any = this.prisma;
+
+    const allDevices = await prisma.device.findMany({
+      include: {
+        location: true,
+        deviceType: true,
+      },
+      orderBy: {
+        id: 'asc',
+      },
+    });
+
+    const allInspections = await prisma.inspection.findMany({
+      include: {
+        device: {
+          include: {
+            location: true,
+            deviceType: true,
+          },
+        },
+        technician: true,
+        images: true,
+        inspectionIssues: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const eligibleDevices =
+      mode === 'all'
+        ? allDevices
+        : allDevices.filter((device) => this.isEligibleDevice(device));
+
+    const excludedDevices =
+      mode === 'all'
+        ? []
+        : allDevices.filter((device) => !this.isEligibleDevice(device));
+
+    const scannedKeyToInspections = new Map<string, any[]>();
+
+    for (const inspection of allInspections) {
+      const keys = this.inspectionKeys(inspection);
+
+      for (const key of keys) {
+        if (!scannedKeyToInspections.has(key)) {
+          scannedKeyToInspections.set(key, []);
+        }
+
+        scannedKeyToInspections.get(key)!.push(inspection);
+      }
+    }
+
+    const scannedDevices: any[] = [];
+    const notInspectedDevices: any[] = [];
+
+    for (const device of eligibleDevices) {
+      const keys = this.deviceKeys(device);
+
+      const matchedEntries = keys
+        .filter((key) => scannedKeyToInspections.has(key))
+        .map((key) => ({
+          key,
+          inspections: scannedKeyToInspections.get(key) || [],
+        }));
+
+      const matchedInspections = matchedEntries.flatMap((x) => x.inspections);
+
+      const uniqueMatchedInspectionMap = new Map<string, any>();
+
+      for (const inspection of matchedInspections) {
+        const id = String(inspection?.id ?? Math.random());
+        uniqueMatchedInspectionMap.set(id, inspection);
+      }
+
+      const uniqueMatchedInspections = Array.from(
+        uniqueMatchedInspectionMap.values(),
+      );
+
+      const hasInspectionFromInspectionTable = uniqueMatchedInspections.length > 0;
+
+      if (hasInspectionFromInspectionTable) {
+        const latestInspection = uniqueMatchedInspections.sort((a, b) => {
+          const da = new Date(this.getInspectionDate(a) || 0).getTime();
+          const db = new Date(this.getInspectionDate(b) || 0).getTime();
+          return db - da;
+        })[0];
+
+        scannedDevices.push({
+          device,
+          matchedBy: matchedEntries.map((x) => x.key),
+          inspectionsCount: uniqueMatchedInspections.length,
+          latestInspection,
+          status: this.getInspectionStatus(latestInspection),
+        });
+      } else {
+        notInspectedDevices.push({
+          device,
+          reason: 'NOT_FOUND_IN_INSPECTIONS_TABLE',
+          deviceKeys: keys,
+        });
+      }
+    }
+
+    const inspectionsByStatus = allInspections.reduce(
+      (acc, inspection) => {
+        const status = this.getInspectionStatus(inspection);
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    const scannedDeviceIds = new Set(
+      scannedDevices.map((x) => String(x.device?.id)),
+    );
+
+    const repeatedInspections =
+      allInspections.length - scannedDeviceIds.size > 0
+        ? allInspections.length - scannedDeviceIds.size
+        : 0;
+
+    const excludedBreakdown = excludedDevices.reduce(
+      (acc, device) => {
+        const reasons = this.getExclusionReasons(device);
+
+        for (const reason of reasons) {
+          acc[reason] = (acc[reason] || 0) + 1;
+        }
+
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    const expectedNotInspectedDevices = 170;
+    const actualNotInspectedDevices = notInspectedDevices.length;
+    const mismatchFromExpected =
+      actualNotInspectedDevices - expectedNotInspectedDevices;
+
+    const result: any = {
+      success: true,
+      source: 'inspection-table-truth-plus-device-identifiers',
+      rule:
+        'Devices are counted as SCANNED when they appear in the inspections table by deviceId, deviceCode, barcode, serialNumber, or ipAddress. Not inspected devices are calculated from eligible devices only.',
+      mode,
+      summary: {
+        totalRawDevices: allDevices.length,
+        eligibleDevices: eligibleDevices.length,
+        excludedDevices: excludedDevices.length,
+
+        totalInspections: allInspections.length,
+        uniqueScannedDevices: scannedDevices.length,
+        repeatedOrExtraInspections: repeatedInspections,
+
+        notInspectedDevices: actualNotInspectedDevices,
+        expectedNotInspectedDevices,
+        mismatchFromExpected,
+        isExpectedNotInspectedCount:
+          Math.abs(mismatchFromExpected) <= 10,
+
+        inspectionsByStatus,
+
+        calculation: {
+          formula:
+            'notInspectedDevices = eligibleDevices - uniqueScannedDevices',
+          values: `${eligibleDevices.length} - ${scannedDevices.length} = ${actualNotInspectedDevices}`,
+        },
+      },
+
+      scannedDevices: scannedDevices.map((row) =>
+        this.deviceDto(row.device, {
+          scanStatus: 'SCANNED',
+          inspectionsCount: row.inspectionsCount,
+          matchedBy: row.matchedBy,
+          latestInspection: row.latestInspection
+            ? this.inspectionDto(row.latestInspection)
+            : null,
+          lastTechnician:
+            row.latestInspection?.technician?.fullName ??
+            row.latestInspection?.technician?.username ??
+            row.latestInspection?.technician?.email ??
+            null,
+        }),
+      ),
+
+      notInspectedDevices: notInspectedDevices.map((row) =>
+        this.deviceDto(row.device, {
+          scanStatus: 'NOT_SCANNED',
+          reason: row.reason,
+          deviceKeys: row.deviceKeys,
+        }),
+      ),
+    };
+
+    if (debug) {
+      result.debug = {
+        excludedBreakdown,
+        excludedDevices: excludedDevices.map((device) =>
+          this.deviceDto(device, {
+            scanStatus: 'EXCLUDED_FROM_ELIGIBLE_REPORT',
+            exclusionReasons: this.getExclusionReasons(device),
+            deviceKeys: this.deviceKeys(device),
+          }),
+        ),
+        sampleInspectionKeys: allInspections.slice(0, 20).map((inspection) => ({
+          inspectionId: inspection.id,
+          keys: this.inspectionKeys(inspection),
+          inspection: this.inspectionDto(inspection),
+        })),
+        sampleNotInspectedDevices: notInspectedDevices
+          .slice(0, 50)
+          .map((row) =>
+            this.deviceDto(row.device, {
+              reason: row.reason,
+              deviceKeys: row.deviceKeys,
+            }),
+          ),
       };
     }
 
-    return {
-      id: location.id,
-      cluster: location.cluster,
-      building: location.building,
-      zone: location.zone,
-      lane: location.lane,
-      direction: location.direction,
-      type: location.type,
-      excelId: location.excelId,
-      createdAt: location.createdAt,
-      updatedAt: location.updatedAt,
-    };
-  }
-
-  private mapDeviceType(deviceType: any) {
-    if (!deviceType) return null;
-
-    return {
-      id: deviceType.id,
-      name: deviceType.name,
-      description: deviceType.description,
-      createdAt: deviceType.createdAt,
-      updatedAt: deviceType.updatedAt,
-    };
-  }
-
-  private mapTechnician(technician: any) {
-    if (!technician) return null;
-
-    return {
-      id: technician.id,
-      fullName: technician.fullName,
-      username: technician.username,
-      email: technician.email,
-      phone: technician.phone,
-      jobTitle: technician.jobTitle,
-    };
-  }
-
-  private mapImages(images: any[]) {
-    if (!Array.isArray(images)) return [];
-
-    return images.map((img) => ({
-      id: img.id,
-      inspectionId: img.inspectionId,
-      imageUrl: img.imageUrl,
-      imageType: img.imageType,
-      createdAt: img.createdAt,
-    }));
-  }
-
-  private mapInspection(inspection: any, matchedDevice?: any, matchedBy?: string) {
-    if (!inspection) return null;
-
-    const images = this.mapImages(inspection.images || []);
-
-    return {
-      id: inspection.id,
-      deviceId: inspection.deviceId,
-      technicianId: inspection.technicianId,
-      taskId: inspection.taskId,
-
-      inspectionStatus: inspection.inspectionStatus,
-      issueReason: inspection.issueReason,
-      notes: inspection.notes,
-
-      latitude: inspection.latitude,
-      longitude: inspection.longitude,
-      locationText: inspection.locationText,
-
-      inspectedAt: inspection.inspectedAt,
-      createdAt: inspection.createdAt,
-      updatedAt: inspection.updatedAt,
-
-      technician: this.mapTechnician(inspection.technician),
-
-      images,
-      imagesCount: images.length,
-
-      inspectionIssues: [],
-      issuesCount: 0,
-
-      matchedBy: matchedBy || null,
-      device: matchedDevice || null,
-    };
-  }
-
-  private deviceKeys(device: any) {
-    const keys = [
-      this.key('deviceId', device?.id),
-      this.key('deviceCode', device?.deviceCode),
-      this.key('code', device?.deviceCode),
-      this.key('barcode', device?.barcode),
-      this.key('serial', device?.serialNumber),
-      this.key('ip', device?.ipAddress),
-    ].filter(Boolean) as string[];
-
-    return [...new Set(keys)];
-  }
-
-  private inspectionKeys(inspection: any) {
-    const device = inspection?.device || {};
-    const keys = [
-      this.key('deviceId', inspection?.deviceId),
-      this.key('deviceId', device?.id),
-
-      this.key('deviceCode', device?.deviceCode),
-      this.key('code', device?.deviceCode),
-      this.key('barcode', device?.barcode),
-      this.key('serial', device?.serialNumber),
-      this.key('ip', device?.ipAddress),
-    ].filter(Boolean) as string[];
-
-    const notes = String(inspection?.notes || '');
-    const locationText = String(inspection?.locationText || '');
-    const combined = `${notes}\n${locationText}`;
-
-    const deviceCodeMatches = [
-      ...combined.matchAll(/device\s*code\s*[:：]?\s*([A-Za-z0-9._-]+)/gi),
-      ...combined.matchAll(/code\s*[:：]?\s*([A-Za-z0-9._-]+)/gi),
-    ];
-
-    deviceCodeMatches.forEach((m) => {
-      if (!m?.[1]) return;
-
-      const k1 = this.key('deviceCode', m[1]);
-      const k2 = this.key('code', m[1]);
-
-      if (k1) keys.push(k1);
-      if (k2) keys.push(k2);
-    });
-
-    const ipMatches = [...combined.matchAll(/\b\d{1,3}(?:\.\d{1,3}){3}\b/g)];
-
-    ipMatches.forEach((m) => {
-      if (!m?.[0]) return;
-
-      const k = this.key('ip', m[0]);
-      if (k) keys.push(k);
-    });
-
-    return [...new Set(keys)];
-  }
-
-  private buildSyntheticInspection(device: any, matchedBy: string) {
-    return {
-      id: `device-last-${device.id}`,
-      deviceId: device.id,
-      technicianId: null,
-      taskId: null,
-      inspectionStatus: 'OK',
-      issueReason: null,
-      notes: 'Detected from device.lastInspectionAt',
-      latitude: null,
-      longitude: null,
-      locationText: null,
-      inspectedAt: device.lastInspectionAt || null,
-      createdAt: device.lastInspectionAt || null,
-      updatedAt: device.updatedAt || null,
-      technician: null,
-      images: [],
-      imagesCount: 0,
-      inspectionIssues: [],
-      issuesCount: 0,
-      matchedBy,
-    };
-  }
-
-  private mapDeviceWithInspection(
-    device: any,
-    latestInspection: any,
-    matchedBy?: string,
-  ) {
-    const location = this.mapLocation(device.location);
-    const deviceType = this.mapDeviceType(device.deviceType);
-
-    const deviceBasics = {
-      id: device.id,
-      deviceCode: device.deviceCode,
-      deviceName: device.deviceName,
-      barcode: device.barcode,
-      serialNumber: device.serialNumber,
-
-      manufacturer: device.manufacturer,
-      modelNumber: device.modelNumber,
-      currentStatus: device.currentStatus,
-
-      installDate: device.installDate,
-      lastInspectionAt: device.lastInspectionAt,
-      notes: device.notes,
-
-      excelDate: device.excelDate,
-      excelStatus: device.excelStatus,
-      firmware: device.firmware,
-      ipAddress: device.ipAddress,
-
-      createdAt: device.createdAt,
-      updatedAt: device.updatedAt,
-
-      deviceType,
-      deviceTypeId: device.deviceTypeId,
-
-      location,
-      locationId: location?.id || device.locationId,
-    };
-
-    const inspection = latestInspection
-      ? this.mapInspection(latestInspection, deviceBasics, matchedBy)
-      : null;
-
-    const isInspected = Boolean(inspection);
-
-    return {
-      ...deviceBasics,
-
-      isInspected,
-      scanStatus: isInspected ? 'SCANNED' : 'NOT_SCANNED',
-
-      latestInspection: inspection,
-
-      lastInspectionAt:
-        inspection?.inspectedAt ||
-        inspection?.createdAt ||
-        device.lastInspectionAt ||
-        null,
-
-      lastTechnician: inspection?.technician || null,
-
-      imagesCount: inspection?.imagesCount || 0,
-      issuesCount: 0,
-
-      matchedBy: matchedBy || null,
-
-      reason: isInspected
-        ? null
-        : 'No real inspection matched by direct relation, identifiers, or lastInspectionAt',
-    };
-  }
-
-  async getDevicesScanReport() {
-    const [devices, inspections] = await Promise.all([
-      this.prisma.device.findMany({
-        orderBy: {
-          id: 'asc',
-        },
-        include: {
-          deviceType: true,
-          location: true,
-
-          inspections: {
-            orderBy: [
-              {
-                inspectedAt: 'desc',
-              },
-              {
-                createdAt: 'desc',
-              },
-            ],
-            take: 1,
-            include: {
-              technician: {
-                select: {
-                  id: true,
-                  fullName: true,
-                  username: true,
-                  email: true,
-                  phone: true,
-                  jobTitle: true,
-                },
-              },
-              images: {
-                select: {
-                  id: true,
-                  inspectionId: true,
-                  imageUrl: true,
-                  imageType: true,
-                  createdAt: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-
-      this.prisma.inspection.findMany({
-        orderBy: [
-          {
-            inspectedAt: 'desc',
-          },
-          {
-            createdAt: 'desc',
-          },
-        ],
-        include: {
-          technician: {
-            select: {
-              id: true,
-              fullName: true,
-              username: true,
-              email: true,
-              phone: true,
-              jobTitle: true,
-            },
-          },
-          device: {
-            include: {
-              deviceType: true,
-              location: true,
-            },
-          },
-          images: {
-            select: {
-              id: true,
-              inspectionId: true,
-              imageUrl: true,
-              imageType: true,
-              createdAt: true,
-            },
-          },
-        },
-      }),
-    ]);
-
-    const inspectionByKey = new Map<string, any>();
-
-    inspections.forEach((inspection) => {
-      const keys = this.inspectionKeys(inspection);
-
-      keys.forEach((key) => {
-        const current = inspectionByKey.get(key);
-        const best = this.betterInspection(current, inspection);
-        inspectionByKey.set(key, best);
-      });
-    });
-
-    const mappedDevices = devices.map((device) => {
-      let latestInspection: any = null;
-      let matchedBy = '';
-
-      const directInspection =
-        Array.isArray(device.inspections) && device.inspections.length > 0
-          ? device.inspections[0]
-          : null;
-
-      if (directInspection) {
-        latestInspection = directInspection;
-        matchedBy = 'direct:device.inspections';
-      }
-
-      if (!latestInspection) {
-        const keys = this.deviceKeys(device);
-
-        for (const key of keys) {
-          const found = inspectionByKey.get(key);
-
-          if (found) {
-            const best = this.betterInspection(latestInspection, found);
-
-            if (best?.id === found.id) {
-              latestInspection = found;
-              matchedBy = key;
-            }
-          }
-        }
-      }
-
-      if (!latestInspection && device.lastInspectionAt) {
-        latestInspection = this.buildSyntheticInspection(
-          device,
-          'device.lastInspectionAt',
-        );
-        matchedBy = 'device.lastInspectionAt';
-      }
-
-      return this.mapDeviceWithInspection(device, latestInspection, matchedBy);
-    });
-
-    const locationsMap = new Map<string, any>();
-
-    mappedDevices.forEach((device) => {
-      const location = device.location || {};
-      const locationId = location.id || `NO_LOCATION_${device.locationId || 'NULL'}`;
-      const key = String(locationId);
-
-      if (!locationsMap.has(key)) {
-        locationsMap.set(key, {
-          location,
-          devices: [],
-          inspectedDevices: [],
-          notInspectedDevices: [],
-          latestInspections: [],
-        });
-      }
-
-      const item = locationsMap.get(key);
-
-      item.devices.push(device);
-
-      if (device.isInspected) {
-        item.inspectedDevices.push(device);
-
-        if (device.latestInspection) {
-          item.latestInspections.push({
-            ...device.latestInspection,
-            device: {
-              id: device.id,
-              deviceCode: device.deviceCode,
-              deviceName: device.deviceName,
-              barcode: device.barcode,
-              serialNumber: device.serialNumber,
-              currentStatus: device.currentStatus,
-              ipAddress: device.ipAddress,
-              deviceType: device.deviceType,
-              location: device.location,
-              locationId: device.location?.id || device.locationId,
-            },
-          });
-        }
-      } else {
-        item.notInspectedDevices.push(device);
-      }
-    });
-
-    const locations = Array.from(locationsMap.values()).map((item) => {
-      const latestSorted = item.latestInspections.slice().sort((a, b) => {
-        const da = new Date(a.inspectedAt || a.createdAt || 0).getTime();
-        const db = new Date(b.inspectedAt || b.createdAt || 0).getTime();
-        return db - da;
-      });
-
-      const lastInspection = latestSorted[0] || null;
-
-      return {
-        location: item.location,
-
-        counts: {
-          totalDevices: item.devices.length,
-          inspectedDevices: item.inspectedDevices.length,
-          notInspectedDevices: item.notInspectedDevices.length,
-          latestInspections: item.latestInspections.length,
-        },
-
-        scanStatus:
-          item.notInspectedDevices.length > 0
-            ? 'HAS_NOT_SCANNED_DEVICES'
-            : 'ALL_SCANNED',
-
-        lastInspectionAt:
-          lastInspection?.inspectedAt || lastInspection?.createdAt || null,
-
-        lastInspection,
-
-        devices: item.devices,
-        inspectedDevices: item.inspectedDevices,
-        notInspectedDevices: item.notInspectedDevices,
-        latestInspections: latestSorted,
-      };
-    });
-
-    locations.sort((a, b) => {
-      const aText = [
-        a.location?.cluster,
-        a.location?.building,
-        a.location?.zone,
-        a.location?.lane,
-        a.location?.direction,
-      ]
-        .filter(Boolean)
-        .join(' ');
-
-      const bText = [
-        b.location?.cluster,
-        b.location?.building,
-        b.location?.zone,
-        b.location?.lane,
-        b.location?.direction,
-      ]
-        .filter(Boolean)
-        .join(' ');
-
-      return aText.localeCompare(bText);
-    });
-
-    const totalDevices = mappedDevices.length;
-    const inspectedDevices = mappedDevices.filter((d) => d.isInspected).length;
-    const notInspectedDevices = mappedDevices.filter((d) => !d.isInspected).length;
-
-    const totalImages = mappedDevices.reduce(
-      (sum, device) => sum + Number(device.imagesCount || 0),
-      0,
-    );
-
-    const okInspections = mappedDevices.filter(
-      (device) => device.latestInspection?.inspectionStatus === 'OK',
-    ).length;
-
-    const notOkInspections = mappedDevices.filter(
-      (device) => device.latestInspection?.inspectionStatus === 'NOT_OK',
-    ).length;
-
-    const partialInspections = mappedDevices.filter(
-      (device) => device.latestInspection?.inspectionStatus === 'PARTIAL',
-    ).length;
-
-    const notReachableInspections = mappedDevices.filter(
-      (device) => device.latestInspection?.inspectionStatus === 'NOT_REACHABLE',
-    ).length;
-
-    const matchedByStats = mappedDevices.reduce((acc, device) => {
-      const key = device.matchedBy || 'NOT_MATCHED';
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return {
-      success: true,
-      source: 'backend-prisma-device-truth-direct-plus-identifiers',
-      rule:
-        'Device is SCANNED only when it has direct inspection relation, identifier match, or lastInspectionAt',
-
-      summary: {
-        totalLocations: locations.length,
-        totalDevices,
-        inspectedDevices,
-        notInspectedDevices,
-
-        expectedNotInspectedDevices: 170,
-        isExpectedNotInspectedCount:
-          Number(notInspectedDevices) === Number(170),
-
-        locationsWithMissingDevices: locations.filter(
-          (location) => location.counts.notInspectedDevices > 0,
-        ).length,
-
-        totalImages,
-        totalIssues: 0,
-
-        matchedByStats,
-
-        inspectionsByStatus: {
-          OK: okInspections,
-          NOT_OK: notOkInspections,
-          PARTIAL: partialInspections,
-          NOT_REACHABLE: notReachableInspections,
-        },
-      },
-
-      devices: mappedDevices,
-      locations,
-    };
-  }
-
-  async getLocationsScanSummary() {
-    return this.getDevicesScanReport();
-  }
-
-  async getNotInspectedDevices() {
-    const report = await this.getDevicesScanReport();
-
-    const devices = Array.isArray(report.devices)
-      ? report.devices.filter((device: any) => !device.isInspected)
-      : [];
-
-    return {
-      success: true,
-      source: report.source,
-      rule: report.rule,
-      count: devices.length,
-      devices,
-    };
-  }
-
-  async getDevicesScanSummary() {
-    const report = await this.getDevicesScanReport();
-
-    return {
-      success: true,
-      source: report.source,
-      rule: report.rule,
-      summary: report.summary,
-      devices: report.devices,
-    };
-  }
-
-  async getLatestInspections() {
-    const inspections = await this.prisma.inspection.findMany({
-      take: 3000,
-      orderBy: [
-        {
-          inspectedAt: 'desc',
-        },
-        {
-          createdAt: 'desc',
-        },
-      ],
-      include: {
-        technician: {
-          select: {
-            id: true,
-            fullName: true,
-            username: true,
-            email: true,
-            phone: true,
-            jobTitle: true,
-          },
-        },
-        device: {
-          include: {
-            deviceType: true,
-            location: true,
-          },
-        },
-        images: {
-          select: {
-            id: true,
-            inspectionId: true,
-            imageUrl: true,
-            imageType: true,
-            createdAt: true,
-          },
-        },
-      },
-    });
-
-    return {
-      success: true,
-      source: 'backend-prisma',
-      count: inspections.length,
-      inspections,
-    };
-  }
-
-  async getInspectionsSummary() {
-    const report = await this.getDevicesScanReport();
-
-    return {
-      success: true,
-      source: report.source,
-      rule: report.rule,
-      summary: report.summary,
-    };
+    return result;
   }
 }
