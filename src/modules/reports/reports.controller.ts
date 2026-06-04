@@ -33,4 +33,17 @@ export class ReportsController {
       debug: true,
     });
   }
+
+  @Get('not-inspected-devices')
+  async notInspectedDevices() {
+    return this.reportsService.notInspectedDevices();
+  }
+
+  @Get('locations-scan-summary')
+  async locationsScanSummary() {
+    return this.reportsService.devicesScanReport({
+      mode: 'eligible',
+      debug: false,
+    });
+  }
 }
