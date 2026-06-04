@@ -17,12 +17,42 @@ export class ReportsService {
 
   private key(prefix: string, value: any) {
     const v = this.norm(value);
-    if (!v || v === 'null' || v === 'undefined' || v === '—') return null;
+    if (!v || v === 'null' || v === 'undefined' || v === '—' || v === '-') {
+      return null;
+    }
     return `${prefix}:${v}`;
+  }
+
+  private isPositiveStatus(value: any) {
+    const v = this.norm(value);
+
+    return [
+      'ok',
+      'good',
+      'سليم',
+      'تم',
+      'done',
+      'completed',
+      'scanned',
+      'scan',
+      'inspected',
+      'تم الفحص',
+      'تم فحصه',
+    ].some((x) => v.includes(this.norm(x)));
   }
 
   private getInspectionDate(inspection: any) {
     return inspection?.inspectedAt || inspection?.createdAt || null;
+  }
+
+  private betterInspection(a: any, b: any) {
+    if (!a) return b;
+    if (!b) return a;
+
+    const da = new Date(this.getInspectionDate(a) || 0).getTime();
+    const db = new Date(this.getInspectionDate(b) || 0).getTime();
+
+    return db >= da ? b : a;
   }
 
   private mapLocation(location: any) {
@@ -141,7 +171,6 @@ export class ReportsService {
 
   private inspectionKeys(inspection: any) {
     const device = inspection?.device || {};
-
     const keys = [
       this.key('deviceId', inspection?.deviceId),
       this.key('deviceId', device?.id),
@@ -155,41 +184,62 @@ export class ReportsService {
 
     const notes = String(inspection?.notes || '');
     const locationText = String(inspection?.locationText || '');
-
     const combined = `${notes}\n${locationText}`;
 
-    const codeMatch =
-      combined.match(/device\s*code\s*[:：]?\s*([A-Za-z0-9._-]+)/i) ||
-      combined.match(/code\s*[:：]?\s*([A-Za-z0-9._-]+)/i);
+    const deviceCodeMatches = [
+      ...combined.matchAll(/device\s*code\s*[:：]?\s*([A-Za-z0-9._-]+)/gi),
+      ...combined.matchAll(/code\s*[:：]?\s*([A-Za-z0-9._-]+)/gi),
+    ];
 
-    if (codeMatch?.[1]) {
-      const code = codeMatch[1];
-      const k1 = this.key('deviceCode', code);
-      const k2 = this.key('code', code);
+    deviceCodeMatches.forEach((m) => {
+      if (!m?.[1]) return;
+
+      const k1 = this.key('deviceCode', m[1]);
+      const k2 = this.key('code', m[1]);
+
       if (k1) keys.push(k1);
       if (k2) keys.push(k2);
-    }
+    });
 
-    const ipMatch = combined.match(/\b\d{1,3}(?:\.\d{1,3}){3}\b/);
-    if (ipMatch?.[0]) {
-      const k = this.key('ip', ipMatch[0]);
+    const ipMatches = [...combined.matchAll(/\b\d{1,3}(?:\.\d{1,3}){3}\b/g)];
+    ipMatches.forEach((m) => {
+      if (!m?.[0]) return;
+      const k = this.key('ip', m[0]);
       if (k) keys.push(k);
-    }
+    });
 
     return [...new Set(keys)];
   }
 
-  private betterInspection(a: any, b: any) {
-    if (!a) return b;
-    if (!b) return a;
-
-    const da = new Date(this.getInspectionDate(a) || 0).getTime();
-    const db = new Date(this.getInspectionDate(b) || 0).getTime();
-
-    return db >= da ? b : a;
+  private buildSyntheticInspection(device: any, matchedBy: string) {
+    return {
+      id: `device-last-${device.id}`,
+      deviceId: device.id,
+      technicianId: null,
+      taskId: null,
+      inspectionStatus: 'OK',
+      issueReason: null,
+      notes: 'Detected from device lastInspectionAt/status fields',
+      latitude: null,
+      longitude: null,
+      locationText: null,
+      inspectedAt: device.lastInspectionAt || device.updatedAt || device.createdAt || null,
+      createdAt: device.lastInspectionAt || device.updatedAt || device.createdAt || null,
+      updatedAt: device.updatedAt || null,
+      technician: null,
+      images: [],
+      imagesCount: 0,
+      inspectionIssues: [],
+      issuesCount: 0,
+      matchedBy,
+    };
   }
 
-  private mapDeviceWithInspection(device: any, latestInspection: any, matchedBy?: string) {
+  private mapDeviceWithInspection(
+    device: any,
+    latestInspection: any,
+    matchedBy?: string,
+  ) {
     const location = this.mapLocation(device.location);
     const deviceType = this.mapDeviceType(device.deviceType);
 
@@ -252,7 +302,7 @@ export class ReportsService {
 
       reason: isInspected
         ? null
-        : 'No inspection matched by deviceId, deviceCode, barcode, serialNumber, or ipAddress',
+        : 'No inspection matched by deviceId, deviceCode, barcode, serialNumber, ipAddress, lastInspectionAt, or OK status',
     };
   }
 
@@ -308,7 +358,6 @@ export class ReportsService {
     ]);
 
     const inspectionByKey = new Map<string, any>();
-    const inspectionMatchKey = new Map<number, string>();
 
     inspections.forEach((inspection) => {
       const keys = this.inspectionKeys(inspection);
@@ -316,12 +365,7 @@ export class ReportsService {
       keys.forEach((key) => {
         const current = inspectionByKey.get(key);
         const best = this.betterInspection(current, inspection);
-
         inspectionByKey.set(key, best);
-
-        if (best?.id === inspection.id) {
-          inspectionMatchKey.set(inspection.id, key);
-        }
       });
     });
 
@@ -336,11 +380,29 @@ export class ReportsService {
 
         if (found) {
           const best = this.betterInspection(latestInspection, found);
+
           if (best?.id === found.id) {
             latestInspection = found;
             matchedBy = key;
           }
         }
+      }
+
+      if (!latestInspection && device.lastInspectionAt) {
+        latestInspection = this.buildSyntheticInspection(device, 'device.lastInspectionAt');
+        matchedBy = 'device.lastInspectionAt';
+      }
+
+      if (
+        !latestInspection &&
+        (this.isPositiveStatus(device.currentStatus) ||
+          this.isPositiveStatus(device.excelStatus))
+      ) {
+        latestInspection = this.buildSyntheticInspection(
+          device,
+          'device.currentStatus/excelStatus',
+        );
+        matchedBy = 'device.currentStatus/excelStatus';
       }
 
       return this.mapDeviceWithInspection(device, latestInspection, matchedBy);
@@ -477,11 +539,17 @@ export class ReportsService {
       (device) => device.latestInspection?.inspectionStatus === 'NOT_REACHABLE',
     ).length;
 
+    const matchedByStats = mappedDevices.reduce((acc, device) => {
+      const key = device.matchedBy || 'NOT_MATCHED';
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
     return {
       success: true,
-      source: 'backend-prisma-device-truth-matched-by-identifiers',
+      source: 'backend-prisma-device-truth-with-status-fallback',
       rule:
-        'Device is SCANNED when an inspection matches by deviceId, deviceCode, barcode, serialNumber, or ipAddress',
+        'Device is SCANNED when it matches inspection identifiers or has lastInspectionAt / OK status',
 
       summary: {
         totalLocations: locations.length,
@@ -499,6 +567,8 @@ export class ReportsService {
 
         totalImages,
         totalIssues: 0,
+
+        matchedByStats,
 
         inspectionsByStatus: {
           OK: okInspections,
@@ -547,7 +617,7 @@ export class ReportsService {
 
   async getLatestInspections() {
     const inspections = await this.prisma.inspection.findMany({
-      take: 2000,
+      take: 3000,
       orderBy: [
         {
           inspectedAt: 'desc',
