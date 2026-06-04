@@ -23,24 +23,6 @@ export class ReportsService {
     return `${prefix}:${v}`;
   }
 
-  private isPositiveStatus(value: any) {
-    const v = this.norm(value);
-
-    return [
-      'ok',
-      'good',
-      'سليم',
-      'تم',
-      'done',
-      'completed',
-      'scanned',
-      'scan',
-      'inspected',
-      'تم الفحص',
-      'تم فحصه',
-    ].some((x) => v.includes(this.norm(x)));
-  }
-
   private getInspectionDate(inspection: any) {
     return inspection?.inspectedAt || inspection?.createdAt || null;
   }
@@ -202,8 +184,10 @@ export class ReportsService {
     });
 
     const ipMatches = [...combined.matchAll(/\b\d{1,3}(?:\.\d{1,3}){3}\b/g)];
+
     ipMatches.forEach((m) => {
       if (!m?.[0]) return;
+
       const k = this.key('ip', m[0]);
       if (k) keys.push(k);
     });
@@ -219,12 +203,12 @@ export class ReportsService {
       taskId: null,
       inspectionStatus: 'OK',
       issueReason: null,
-      notes: 'Detected from device lastInspectionAt/status fields',
+      notes: 'Detected from device.lastInspectionAt',
       latitude: null,
       longitude: null,
       locationText: null,
-      inspectedAt: device.lastInspectionAt || device.updatedAt || device.createdAt || null,
-      createdAt: device.lastInspectionAt || device.updatedAt || device.createdAt || null,
+      inspectedAt: device.lastInspectionAt || null,
+      createdAt: device.lastInspectionAt || null,
       updatedAt: device.updatedAt || null,
       technician: null,
       images: [],
@@ -302,7 +286,7 @@ export class ReportsService {
 
       reason: isInspected
         ? null
-        : 'No inspection matched by deviceId, deviceCode, barcode, serialNumber, ipAddress, lastInspectionAt, or OK status',
+        : 'No real inspection matched by direct relation, identifiers, or lastInspectionAt',
     };
   }
 
@@ -315,6 +299,39 @@ export class ReportsService {
         include: {
           deviceType: true,
           location: true,
+
+          inspections: {
+            orderBy: [
+              {
+                inspectedAt: 'desc',
+              },
+              {
+                createdAt: 'desc',
+              },
+            ],
+            take: 1,
+            include: {
+              technician: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  username: true,
+                  email: true,
+                  phone: true,
+                  jobTitle: true,
+                },
+              },
+              images: {
+                select: {
+                  id: true,
+                  inspectionId: true,
+                  imageUrl: true,
+                  imageType: true,
+                  createdAt: true,
+                },
+              },
+            },
+          },
         },
       }),
 
@@ -370,39 +387,42 @@ export class ReportsService {
     });
 
     const mappedDevices = devices.map((device) => {
-      const keys = this.deviceKeys(device);
-
       let latestInspection: any = null;
       let matchedBy = '';
 
-      for (const key of keys) {
-        const found = inspectionByKey.get(key);
+      const directInspection =
+        Array.isArray(device.inspections) && device.inspections.length > 0
+          ? device.inspections[0]
+          : null;
 
-        if (found) {
-          const best = this.betterInspection(latestInspection, found);
+      if (directInspection) {
+        latestInspection = directInspection;
+        matchedBy = 'direct:device.inspections';
+      }
 
-          if (best?.id === found.id) {
-            latestInspection = found;
-            matchedBy = key;
+      if (!latestInspection) {
+        const keys = this.deviceKeys(device);
+
+        for (const key of keys) {
+          const found = inspectionByKey.get(key);
+
+          if (found) {
+            const best = this.betterInspection(latestInspection, found);
+
+            if (best?.id === found.id) {
+              latestInspection = found;
+              matchedBy = key;
+            }
           }
         }
       }
 
       if (!latestInspection && device.lastInspectionAt) {
-        latestInspection = this.buildSyntheticInspection(device, 'device.lastInspectionAt');
-        matchedBy = 'device.lastInspectionAt';
-      }
-
-      if (
-        !latestInspection &&
-        (this.isPositiveStatus(device.currentStatus) ||
-          this.isPositiveStatus(device.excelStatus))
-      ) {
         latestInspection = this.buildSyntheticInspection(
           device,
-          'device.currentStatus/excelStatus',
+          'device.lastInspectionAt',
         );
-        matchedBy = 'device.currentStatus/excelStatus';
+        matchedBy = 'device.lastInspectionAt';
       }
 
       return this.mapDeviceWithInspection(device, latestInspection, matchedBy);
@@ -547,9 +567,9 @@ export class ReportsService {
 
     return {
       success: true,
-      source: 'backend-prisma-device-truth-with-status-fallback',
+      source: 'backend-prisma-device-truth-direct-plus-identifiers',
       rule:
-        'Device is SCANNED when it matches inspection identifiers or has lastInspectionAt / OK status',
+        'Device is SCANNED only when it has direct inspection relation, identifier match, or lastInspectionAt',
 
       summary: {
         totalLocations: locations.length,
