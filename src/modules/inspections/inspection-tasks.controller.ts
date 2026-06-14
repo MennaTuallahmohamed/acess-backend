@@ -4,67 +4,54 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
-  Request,
-  UseGuards,
-  Logger,
+  Query,
 } from '@nestjs/common';
+
 import { InspectionTasksService } from './inspection-tasks.service';
-import { CreateInspectionTaskDto } from './dto/create-inspection-task.dto';
-import { UpdateInspectionTaskDto } from './dto/update-inspection-task.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('inspection-tasks')
 export class InspectionTasksController {
-  private readonly logger = new Logger(InspectionTasksController.name);
-
-  constructor(private readonly inspectionTasksService: InspectionTasksService) {}
+  constructor(private readonly service: InspectionTasksService) {}
 
   @Post()
-  create(@Body() createInspectionTaskDto: CreateInspectionTaskDto) {
-    return this.inspectionTasksService.create(createInspectionTaskDto);
+  create(@Body() body: any) {
+    return this.service.create(body);
   }
 
   @Get()
-  findAll() {
-    return this.inspectionTasksService.findAll();
+  findAll(@Query() query: any) {
+    return this.service.findAll(query);
   }
 
-  @Get('my-tasks')
-  @UseGuards(JwtAuthGuard)
-  myTasks(@Request() req: any) {
-    this.logger.log(`req.user = ${JSON.stringify(req.user)}`);
-    const technicianId = Number(req.user?.userId ?? req.user?.id ?? req.user?.sub);
-
-    return this.inspectionTasksService.findByTechnician(technicianId);
+  @Get('dashboard')
+  getDashboard() {
+    return this.service.getDashboard();
   }
 
-  @Get('my-history')
-  @UseGuards(JwtAuthGuard)
-  myHistory(@Request() req: any) {
-    this.logger.log(`req.user = ${JSON.stringify(req.user)}`);
-    const technicianId = Number(req.user?.userId ?? req.user?.id ?? req.user?.sub);
-
-    return this.inspectionTasksService.getMyHistory(technicianId);
+  @Get('technician/:technicianId')
+  findByTechnician(@Param('technicianId') technicianId: string) {
+    return this.service.findByTechnician(Number(technicianId));
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.inspectionTasksService.findOne(id);
+  findOne(@Param('id') id: string) {
+    return this.service.findOne(Number(id));
+  }
+
+  @Post(':id/complete-item')
+  completeItem(@Param('id') id: string, @Body() body: any) {
+    return this.service.completeItem(Number(id), body);
   }
 
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateInspectionTaskDto: UpdateInspectionTaskDto,
-  ) {
-    return this.inspectionTasksService.update(id, updateInspectionTaskDto);
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.service.update(Number(id), body);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.inspectionTasksService.remove(id);
+  remove(@Param('id') id: string) {
+    return this.service.remove(Number(id));
   }
 }

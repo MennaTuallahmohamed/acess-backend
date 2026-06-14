@@ -38,6 +38,7 @@ model User {
   notes                    String?
   officeNumber             String?
   region                   String?
+
   auditLogs                AuditLog[]
   movements                DeviceMovement[]
   statusChanges            DeviceStatusHistory[]
@@ -46,7 +47,12 @@ model User {
   issueSolutionActions     InspectionIssueSolutionAction[] @relation("IssueSolutionActionBy")
   assignedTasks            InspectionTask[]                @relation("TaskAssignedTo")
   createdTasks             InspectionTask[]                @relation("TaskCreatedBy")
+  assignedTaskItems        InspectionTaskItem[]            @relation("TaskItemAssignedTo")
+  completedTaskItems       InspectionTaskItem[]            @relation("TaskItemCompletedBy")
+  createdCampaigns         InspectionCampaign[]            @relation("CampaignCreatedBy")
+  assignedCampaigns        InspectionCampaign[]            @relation("CampaignAssignedTo")
   maintenanceLogs          MaintenanceLog[]
+
   role                     Role                            @relation(fields: [roleId], references: [id])
 
   @@index([roleId])
@@ -63,20 +69,28 @@ model Location {
   lane      String?
   type      String?
   zone      String?
+
   devices   Device[]
+  gates     Gate[]
 
   @@index([cluster])
   @@index([building])
+  @@index([zone])
+  @@index([direction])
 }
 
 model DeviceType {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  assetType   AssetType @default(DEVICE)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
   devices     Device[]
   issues      Issue[]
+
+  @@index([assetType])
 }
 
 model Device {
@@ -95,51 +109,192 @@ model Device {
   notes            String?
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
+
   excelDate        String?
   excelStatus      String?
   firmware         String?
   ipAddress        String?
 
-  secretCode String? @unique
+  assetType        AssetType           @default(DEVICE)
 
-  deviceType      DeviceType            @relation(fields: [deviceTypeId], references: [id])
-  location        Location              @relation(fields: [locationId], references: [id])
-  movements       DeviceMovement[]
-  statusHistory   DeviceStatusHistory[]
-  inspections     Inspection[]
-  tasks           InspectionTask[]
-  maintenanceLogs MaintenanceLog[]
+  // هنسيب دول مؤقتًا عشان الداتا القديمة ما تتأثرش
+  gateNo           String?
+  secretCode       String?             @unique
+  gateDirection    String?
+  gateZone         String?
+  gateCluster      String?
+  gateBuilding     String?
+
+  deviceType       DeviceType          @relation(fields: [deviceTypeId], references: [id])
+  location         Location            @relation(fields: [locationId], references: [id])
+  movements        DeviceMovement[]
+  statusHistory    DeviceStatusHistory[]
+  inspections      Inspection[]
+  tasks            InspectionTask[]
+  taskItems        InspectionTaskItem[]
+  maintenanceLogs  MaintenanceLog[]
 
   @@index([deviceTypeId])
   @@index([locationId])
   @@index([barcode])
   @@index([secretCode])
+  @@index([assetType])
+  @@index([gateNo])
+  @@index([gateCluster])
+  @@index([gateBuilding])
+}
+
+model Gate {
+  id               Int              @id @default(autoincrement())
+
+  gateNo           String           @unique
+  secretCode       String           @unique
+
+  cluster          String
+  building         String
+  zone             String?
+  direction        String?
+  lane             String?
+  type             String?
+  excelId          String?          @unique
+
+  locationId       Int?
+  status           GateStatus       @default(ACTIVE)
+  currentStatus    DeviceCurrentStatus @default(OK)
+
+  notes            String?
+  lastInspectionAt DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  location         Location?        @relation(fields: [locationId], references: [id])
+  inspections      Inspection[]
+  tasks            InspectionTask[]
+  taskItems        InspectionTaskItem[]
+
+  @@index([gateNo])
+  @@index([secretCode])
+  @@index([cluster])
+  @@index([building])
+  @@index([zone])
+  @@index([direction])
+  @@index([locationId])
+  @@index([status])
+  @@index([currentStatus])
+}
+
+model InspectionCampaign {
+  id            Int              @id @default(autoincrement())
+  title         String
+  description   String?
+  createdById   Int
+  assignedToId  Int?
+  assetType     AssetType?
+  status        CampaignStatus   @default(DRAFT)
+  priority      TaskPriority     @default(MEDIUM)
+  startDate     DateTime?
+  dueDate       DateTime?
+  completedAt   DateTime?
+  notes         String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  createdBy     User             @relation("CampaignCreatedBy", fields: [createdById], references: [id])
+  assignedTo    User?            @relation("CampaignAssignedTo", fields: [assignedToId], references: [id])
+  tasks         InspectionTask[]
+
+  @@index([createdById])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([assetType])
+  @@index([dueDate])
 }
 
 model InspectionTask {
-  id            Int          @id @default(autoincrement())
-  deviceId      Int
-  assignedToId  Int?
-  createdById   Int
-  scheduledDate DateTime
-  frequency     String?
-  status        TaskStatus   @default(PENDING)
-  notes         String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  inspections   Inspection[]
-  assignedTo    User?        @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
-  createdBy     User         @relation("TaskCreatedBy", fields: [createdById], references: [id])
-  device        Device       @relation(fields: [deviceId], references: [id])
+  id                  Int              @id @default(autoincrement())
+  campaignId          Int?
+  deviceId            Int?
+  gateId              Int?
+  assignedToId        Int?
+  createdById         Int
+  scheduledDate       DateTime
+  dueDate             DateTime?
+  frequency           String?
+  status              TaskStatus       @default(PENDING)
+  priority            TaskPriority     @default(MEDIUM)
+  assetType           AssetType        @default(DEVICE)
+  title               String?
+  notes               String?
+  startedAt           DateTime?
+  completedAt         DateTime?
+  adminReview         TaskReviewStatus @default(PENDING_REVIEW)
+  adminNote           String?
 
+  totalItems          Int              @default(0)
+  completedItems      Int              @default(0)
+  issueItems          Int              @default(0)
+  notReachableItems   Int              @default(0)
+  remainingItems      Int              @default(0)
+  progressPercent     Float            @default(0)
+
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  campaign            InspectionCampaign? @relation(fields: [campaignId], references: [id])
+  assignedTo          User?            @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
+  createdBy           User             @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  device              Device?          @relation(fields: [deviceId], references: [id])
+  gate                Gate?            @relation(fields: [gateId], references: [id])
+  inspections         Inspection[]
+  items               InspectionTaskItem[]
+
+  @@index([campaignId])
   @@index([deviceId])
+  @@index([gateId])
   @@index([assignedToId])
   @@index([createdById])
+  @@index([status])
+  @@index([assetType])
+  @@index([dueDate])
+}
+
+model InspectionTaskItem {
+  id              Int                  @id @default(autoincrement())
+  taskId          Int
+  deviceId        Int?
+  gateId          Int?
+  assignedToId    Int?
+  completedById   Int?
+  status          TaskItemStatus       @default(PENDING)
+  inspectionId    Int?                 @unique
+  notes           String?
+  issueFound      Boolean              @default(false)
+  startedAt       DateTime?
+  inspectedAt     DateTime?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  task            InspectionTask       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  device          Device?              @relation(fields: [deviceId], references: [id])
+  gate            Gate?                @relation(fields: [gateId], references: [id])
+  assignedTo      User?                @relation("TaskItemAssignedTo", fields: [assignedToId], references: [id])
+  completedBy     User?                @relation("TaskItemCompletedBy", fields: [completedById], references: [id])
+  inspection      Inspection?          @relation(fields: [inspectionId], references: [id])
+
+  @@unique([taskId, deviceId])
+  @@unique([taskId, gateId])
+  @@index([taskId])
+  @@index([deviceId])
+  @@index([gateId])
+  @@index([assignedToId])
+  @@index([completedById])
+  @@index([status])
 }
 
 model Inspection {
   id               Int                             @id @default(autoincrement())
-  deviceId         Int
+  deviceId         Int?
+  gateId           Int?
   technicianId     Int
   taskId           Int?
   inspectionStatus InspectionStatus
@@ -151,16 +306,22 @@ model Inspection {
   inspectedAt      DateTime                        @default(now())
   createdAt        DateTime                        @default(now())
   updatedAt        DateTime                        @updatedAt
-  device           Device                          @relation(fields: [deviceId], references: [id])
+
+  device           Device?                         @relation(fields: [deviceId], references: [id])
+  gate             Gate?                           @relation(fields: [gateId], references: [id])
   task             InspectionTask?                 @relation(fields: [taskId], references: [id])
   technician       User                            @relation(fields: [technicianId], references: [id])
+  taskItem         InspectionTaskItem?
   images           InspectionImage[]
   inspectionIssues InspectionIssue[]
   solutionActions  InspectionIssueSolutionAction[]
 
   @@index([deviceId])
+  @@index([gateId])
   @@index([technicianId])
   @@index([taskId])
+  @@index([inspectionStatus])
+  @@index([inspectedAt])
 }
 
 model InspectionImage {
@@ -169,7 +330,10 @@ model InspectionImage {
   imageUrl     String
   imageType    String?
   createdAt    DateTime   @default(now())
-  inspection   Inspection @relation(fields: [inspectionId], references: [id])
+
+  inspection   Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@index([inspectionId])
 }
 
 model MaintenanceLog {
@@ -186,11 +350,13 @@ model MaintenanceLog {
   completedAt      DateTime?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
+
   createdBy        User              @relation(fields: [createdById], references: [id])
   device           Device            @relation(fields: [deviceId], references: [id])
 
   @@index([deviceId])
   @@index([createdById])
+  @@index([status])
 }
 
 model DeviceMovement {
@@ -205,6 +371,7 @@ model DeviceMovement {
   reason         String?
   movedAt        DateTime     @default(now())
   createdAt      DateTime     @default(now())
+
   device         Device       @relation(fields: [deviceId], references: [id])
   movedBy        User         @relation(fields: [movedById], references: [id])
 
@@ -220,6 +387,7 @@ model DeviceStatusHistory {
   changedById Int
   note        String?
   changedAt   DateTime             @default(now())
+
   changedBy   User                 @relation(fields: [changedById], references: [id])
   device      Device               @relation(fields: [deviceId], references: [id])
 
@@ -235,19 +403,26 @@ model AuditLog {
   entityId   Int?
   details    String?
   createdAt  DateTime @default(now())
+
   user       User?    @relation(fields: [userId], references: [id])
 
   @@index([userId])
+  @@index([entityType])
+  @@index([action])
 }
 
 model IssueCategory {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  code        String?  @unique
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  code        String?    @unique
+  assetType   AssetType?
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
   issues      Issue[]
+
+  @@index([assetType])
 }
 
 model Issue {
@@ -257,19 +432,26 @@ model Issue {
   description     String?
   severity        IssueSeverity     @default(MEDIUM)
   status          IssueStatus       @default(ACTIVE)
+
+  assetType       AssetType         @default(DEVICE)
+
   categoryId      Int
-  deviceTypeId    Int
+  deviceTypeId    Int?
+
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
   inspectionItems InspectionIssue[]
   category        IssueCategory     @relation(fields: [categoryId], references: [id])
-  deviceType      DeviceType        @relation(fields: [deviceTypeId], references: [id])
+  deviceType      DeviceType?       @relation(fields: [deviceTypeId], references: [id])
   solutions       IssueSolution[]
 
   @@index([categoryId])
   @@index([deviceTypeId])
+  @@index([assetType])
   @@index([status])
   @@index([title])
+  @@index([severity])
 }
 
 model IssueSolution {
@@ -283,6 +465,7 @@ model IssueSolution {
   status       SolutionStatus                  @default(ACTIVE)
   createdAt    DateTime                        @default(now())
   updatedAt    DateTime                        @updatedAt
+
   actions      InspectionIssueSolutionAction[]
   issue        Issue                           @relation(fields: [issueId], references: [id], onDelete: Cascade)
 
@@ -302,6 +485,7 @@ model InspectionIssue {
   unresolvedReason String?
   createdAt        DateTime                        @default(now())
   updatedAt        DateTime                        @updatedAt
+
   inspection       Inspection                      @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
   issue            Issue                           @relation(fields: [issueId], references: [id])
   reportedBy       User                            @relation("InspectionIssueReportedBy", fields: [reportedById], references: [id])
@@ -310,6 +494,7 @@ model InspectionIssue {
   @@index([inspectionId])
   @@index([issueId])
   @@index([reportedById])
+  @@index([status])
 }
 
 model InspectionIssueSolutionAction {
@@ -323,6 +508,7 @@ model InspectionIssueSolutionAction {
   doneAt            DateTime?
   createdAt         DateTime              @default(now())
   updatedAt         DateTime              @updatedAt
+
   inspection        Inspection            @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
   inspectionIssue   InspectionIssue       @relation(fields: [inspectionIssueId], references: [id], onDelete: Cascade)
   solution          IssueSolution         @relation(fields: [solutionId], references: [id])
@@ -333,11 +519,24 @@ model InspectionIssueSolutionAction {
   @@index([inspectionIssueId])
   @@index([solutionId])
   @@index([technicianId])
+  @@index([status])
 }
 
 enum UserStatus {
   ACTIVE
   INACTIVE
+}
+
+enum AssetType {
+  DEVICE
+  GATE
+  SOFTWARE
+}
+
+enum GateStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
 }
 
 enum DeviceCurrentStatus {
@@ -356,6 +555,36 @@ enum InspectionStatus {
 
 enum TaskStatus {
   PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskItemStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+  ISSUE_FOUND
+  NOT_REACHABLE
+  SKIPPED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskReviewStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum CampaignStatus {
+  DRAFT
+  ASSIGNED
   IN_PROGRESS
   COMPLETED
   CANCELLED

@@ -791,7 +791,7 @@ export class InspectionsService {
       data,
     });
 
-    if (data.inspectionStatus) {
+    if (data.inspectionStatus && updated.deviceId != null) {
       const newDeviceStatus = this.mapInspectionStatusToDeviceStatus(
         updated.inspectionStatus,
       );
