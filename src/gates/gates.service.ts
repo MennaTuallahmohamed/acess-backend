@@ -7,6 +7,7 @@ import { PrismaService } from '../database/prisma/prisma.service';
 import { gatePublicSelect } from './gate.select';
 import * as XLSX from 'xlsx';
 import {
+  AssetType,
   DeviceCurrentStatus,
   GateStatus,
   InspectionStatus,
@@ -15,7 +16,6 @@ import {
   TaskPriority,
   TaskReviewStatus,
   TaskStatus,
-  AssetType,
 } from '@prisma/client';
 
 @Injectable()
@@ -43,12 +43,13 @@ export class GatesService {
   }
 
   async findByGateNo(gateNo: string) {
-    const gate = await this.prisma.gate.findUnique({
+    const gate = await this.prisma.gate.findMany({
       where: { gateNo },
       select: gatePublicSelect,
+      orderBy: [{ cluster: 'asc' }, { building: 'asc' }, { id: 'asc' }],
     });
 
-    if (!gate) {
+    if (!gate.length) {
       throw new NotFoundException('Gate not found');
     }
 
