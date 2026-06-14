@@ -147,7 +147,7 @@ model Device {
 model Gate {
   id               Int              @id @default(autoincrement())
 
-  gateNo           String           @unique
+  gateNo           String           
   secretCode       String           @unique
 
   cluster          String
