@@ -68,6 +68,11 @@ export class InspectionsController {
     console.log('========== CREATE INSPECTION ==========');
     console.log('BODY:', createInspectionDto);
     console.log('FILE:', file);
+    console.log('ASSET META:', {
+      deviceId: createInspectionDto.deviceId,
+      gateId: createInspectionDto.gateId,
+      assetType: createInspectionDto.assetType,
+    });
     console.log('SCAN META:', {
       scanned: createInspectionDto.scanned,
       scanMethod: createInspectionDto.scanMethod,

@@ -10,9 +10,20 @@ import {
 import { InspectionStatus } from '@prisma/client';
 
 export class CreateInspectionDto {
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  deviceId: number | undefined;
+  deviceId?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  gateId?: number;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => (value ? String(value).trim().toUpperCase() : value))
+  assetType?: 'DEVICE' | 'GATE';
 
   @IsOptional()
   @Type(() => Number)
@@ -24,9 +35,20 @@ export class CreateInspectionDto {
   @IsInt()
   taskId?: number;
 
-  @Transform(({ value }) => String(value).trim())
+  @IsOptional()
+  @Transform(({ value }) => String(value || '').trim().toUpperCase())
   @IsEnum(InspectionStatus)
-  inspectionStatus: InspectionStatus | undefined;
+  inspectionStatus?: InspectionStatus;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => (value ? String(value).trim() : value))
+  status?: string;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => (value ? String(value).trim() : value))
+  result?: string;
 
   @IsOptional()
   @IsString()
@@ -50,14 +72,14 @@ export class CreateInspectionDto {
   @IsString()
   locationText?: string;
 
-  // =========================
-  // Scan / Security metadata
-  // =========================
+  @IsOptional()
+  @IsString()
+  issueIds?: string;
 
-  /**
-   * هل التفتيش بدأ بعد Scan؟
-   * true لو المستخدم عمل QR scan أو manual بعد محاولات QR
-   */
+  @IsOptional()
+  @IsString()
+  issues?: string;
+
   @IsOptional()
   @Transform(({ value }) => {
     if (value === true || value === 'true') return true;
@@ -67,49 +89,26 @@ export class CreateInspectionDto {
   @IsBoolean()
   scanned?: boolean;
 
-  /**
-   * طريقة الوصول للجهاز:
-   * QR
-   * MANUAL
-   */
   @IsOptional()
   @IsString()
   @Transform(({ value }) => (value ? String(value).trim() : value))
   scanMethod?: string;
 
-  /**
-   * نوع الكود المستخدم:
-   * SECRET_QR
-   * DEVICE_CODE
-   * SERIAL_NUMBER
-   * BARCODE
-   * IP
-   */
   @IsOptional()
   @IsString()
   @Transform(({ value }) => (value ? String(value).trim() : value))
   scanCodeType?: string;
 
-  /**
-   * قيمة الكود المستخدمة في البحث
-   * ملاحظة: الباك إند هيخزنها masked مش صريحة في response
-   */
   @IsOptional()
   @IsString()
   @Transform(({ value }) => (value ? String(value).trim() : value))
   scanCodeValue?: string;
 
-  /**
-   * عدد محاولات QR الفاشلة قبل التفتيش
-   */
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   qrAttempts?: number;
 
-  /**
-   * هل تم فتح manual box بعد 3 محاولات؟
-   */
   @IsOptional()
   @Transform(({ value }) => {
     if (value === true || value === 'true') return true;
