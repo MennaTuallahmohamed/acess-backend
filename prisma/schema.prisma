@@ -2,10 +2,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-  output   = "./ERD.png"
-}
+//generator erd {
+ // provider = "prisma-erd-generator"
+  //output   = "./ERD.png"
+//}
 
 datasource db {
   provider = "postgresql"
@@ -17,6 +17,7 @@ model Role {
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   users     User[]
 }
 
@@ -45,17 +46,31 @@ model User {
   inspections              Inspection[]
   reportedInspectionIssues InspectionIssue[]               @relation("InspectionIssueReportedBy")
   issueSolutionActions     InspectionIssueSolutionAction[] @relation("IssueSolutionActionBy")
+
   assignedTasks            InspectionTask[]                @relation("TaskAssignedTo")
   createdTasks             InspectionTask[]                @relation("TaskCreatedBy")
   assignedTaskItems        InspectionTaskItem[]            @relation("TaskItemAssignedTo")
   completedTaskItems       InspectionTaskItem[]            @relation("TaskItemCompletedBy")
+
   createdCampaigns         InspectionCampaign[]            @relation("CampaignCreatedBy")
   assignedCampaigns        InspectionCampaign[]            @relation("CampaignAssignedTo")
+
   maintenanceLogs          MaintenanceLog[]
+
+  technicianActivityLogs   TechnicianActivityLog[]
+
+  morphoRepairs            DeviceMorphoRepair[]            @relation("MorphoRepairBy")
+
+  createdReplacements      DeviceReplacement[]             @relation("DeviceReplacementBy")
+  approvedReplacements     DeviceReplacement[]             @relation("DeviceReplacementApprovedBy")
 
   role                     Role                            @relation(fields: [roleId], references: [id])
 
   @@index([roleId])
+  @@index([status])
+  @@index([isActive])
+  @@index([username])
+  @@index([email])
 }
 
 model Location {
@@ -73,10 +88,15 @@ model Location {
   devices   Device[]
   gates     Gate[]
 
+  replacementFrom DeviceReplacement[] @relation("ReplacementFromLocation")
+  replacementTo   DeviceReplacement[] @relation("ReplacementToLocation")
+
   @@index([cluster])
   @@index([building])
   @@index([zone])
   @@index([direction])
+  @@index([lane])
+  @@index([type])
 }
 
 model DeviceType {
@@ -94,45 +114,58 @@ model DeviceType {
 }
 
 model Device {
-  id               Int                 @id @default(autoincrement())
-  deviceCode       String              @unique
+  id               Int                   @id @default(autoincrement())
+  deviceCode       String                @unique
   deviceName       String
-  barcode          String              @unique
-  serialNumber     String?             @unique
+  barcode          String                @unique
+  serialNumber     String?               @unique
   manufacturer     String?
   modelNumber      String?
-  currentStatus    DeviceCurrentStatus @default(OK)
+
+  currentStatus    DeviceCurrentStatus   @default(OK)
+  lifecycleStatus  DeviceLifecycleStatus @default(ACTIVE)
+
   installDate      DateTime?
   lastInspectionAt DateTime?
+
   deviceTypeId     Int
   locationId       Int
+
   notes            String?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
 
   excelDate        String?
   excelStatus      String?
   firmware         String?
   ipAddress        String?
 
-  assetType        AssetType           @default(DEVICE)
+  assetType        AssetType             @default(DEVICE)
 
-  // هنسيب دول مؤقتًا عشان الداتا القديمة ما تتأثرش
+  // بيانات قديمة مؤقتة عشان الداتا القديمة ما تتأثرش
   gateNo           String?
-  secretCode       String?             @unique
+  secretCode       String?               @unique
   gateDirection    String?
   gateZone         String?
   gateCluster      String?
   gateBuilding     String?
 
-  deviceType       DeviceType          @relation(fields: [deviceTypeId], references: [id])
-  location         Location            @relation(fields: [locationId], references: [id])
+  deviceType       DeviceType            @relation(fields: [deviceTypeId], references: [id])
+  location         Location              @relation(fields: [locationId], references: [id])
+
   movements        DeviceMovement[]
   statusHistory    DeviceStatusHistory[]
   inspections      Inspection[]
   tasks            InspectionTask[]
   taskItems        InspectionTaskItem[]
   maintenanceLogs  MaintenanceLog[]
+
+  morphoRepairs    DeviceMorphoRepair[]
+
+  replacementAsOld DeviceReplacement[]    @relation("OldDeviceReplacement")
+  replacementAsNew DeviceReplacement[]    @relation("NewDeviceReplacement")
+
+  activityLogs     TechnicianActivityLog[]
 
   @@index([deviceTypeId])
   @@index([locationId])
@@ -142,13 +175,17 @@ model Device {
   @@index([gateNo])
   @@index([gateCluster])
   @@index([gateBuilding])
+  @@index([ipAddress])
+  @@index([currentStatus])
+  @@index([lifecycleStatus])
+  @@index([lastInspectionAt])
 }
 
 model Gate {
-  id               Int              @id @default(autoincrement())
+  id               Int                 @id @default(autoincrement())
 
-  gateNo           String           
-  secretCode       String           @unique
+  gateNo           String
+  secretCode       String              @unique
 
   cluster          String
   building         String
@@ -156,21 +193,23 @@ model Gate {
   direction        String?
   lane             String?
   type             String?
-  excelId          String?          @unique
+  excelId          String?             @unique
 
   locationId       Int?
-  status           GateStatus       @default(ACTIVE)
+  status           GateStatus          @default(ACTIVE)
   currentStatus    DeviceCurrentStatus @default(OK)
 
   notes            String?
   lastInspectionAt DateTime?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 
-  location         Location?        @relation(fields: [locationId], references: [id])
+  location         Location?           @relation(fields: [locationId], references: [id])
   inspections      Inspection[]
   tasks            InspectionTask[]
   taskItems        InspectionTaskItem[]
+
+  activityLogs     TechnicianActivityLog[]
 
   @@index([gateNo])
   @@index([secretCode])
@@ -181,6 +220,7 @@ model Gate {
   @@index([locationId])
   @@index([status])
   @@index([currentStatus])
+  @@index([lastInspectionAt])
 }
 
 model InspectionCampaign {
@@ -190,6 +230,7 @@ model InspectionCampaign {
   createdById   Int
   assignedToId  Int?
   assetType     AssetType?
+  taskKind      TaskKind?
   status        CampaignStatus   @default(DRAFT)
   priority      TaskPriority     @default(MEDIUM)
   startDate     DateTime?
@@ -207,26 +248,38 @@ model InspectionCampaign {
   @@index([assignedToId])
   @@index([status])
   @@index([assetType])
+  @@index([taskKind])
   @@index([dueDate])
 }
 
 model InspectionTask {
   id                  Int              @id @default(autoincrement())
+
   campaignId          Int?
   deviceId            Int?
   gateId              Int?
+
   assignedToId        Int?
   createdById         Int
+
   scheduledDate       DateTime
   dueDate             DateTime?
   frequency           String?
+
   status              TaskStatus       @default(PENDING)
   priority            TaskPriority     @default(MEDIUM)
   assetType           AssetType        @default(DEVICE)
+
+  taskKind            TaskKind         @default(SINGLE_ASSET)
+  requiresScan        Boolean          @default(true)
+  requiresLocation    Boolean          @default(false)
+
   title               String?
   notes               String?
+
   startedAt           DateTime?
   completedAt         DateTime?
+
   adminReview         TaskReviewStatus @default(PENDING_REVIEW)
   adminNote           String?
 
@@ -243,10 +296,14 @@ model InspectionTask {
   campaign            InspectionCampaign? @relation(fields: [campaignId], references: [id])
   assignedTo          User?            @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
   createdBy           User             @relation("TaskCreatedBy", fields: [createdById], references: [id])
+
   device              Device?          @relation(fields: [deviceId], references: [id])
   gate                Gate?            @relation(fields: [gateId], references: [id])
+
   inspections         Inspection[]
   items               InspectionTaskItem[]
+
+  activityLogs        TechnicianActivityLog[]
 
   @@index([campaignId])
   @@index([deviceId])
@@ -255,54 +312,84 @@ model InspectionTask {
   @@index([createdById])
   @@index([status])
   @@index([assetType])
+  @@index([taskKind])
   @@index([dueDate])
+  @@index([scheduledDate])
 }
 
 model InspectionTaskItem {
-  id              Int                  @id @default(autoincrement())
-  taskId          Int
-  deviceId        Int?
-  gateId          Int?
-  assignedToId    Int?
-  completedById   Int?
-  status          TaskItemStatus       @default(PENDING)
-  inspectionId    Int?                 @unique
-  notes           String?
-  issueFound      Boolean              @default(false)
-  startedAt       DateTime?
-  inspectedAt     DateTime?
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
+  id                    Int                  @id @default(autoincrement())
 
-  task            InspectionTask       @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  device          Device?              @relation(fields: [deviceId], references: [id])
-  gate            Gate?                @relation(fields: [gateId], references: [id])
-  assignedTo      User?                @relation("TaskItemAssignedTo", fields: [assignedToId], references: [id])
-  completedBy     User?                @relation("TaskItemCompletedBy", fields: [completedById], references: [id])
-  inspection      Inspection?          @relation(fields: [inspectionId], references: [id])
+  taskId                Int
+  deviceId              Int?
+  gateId                Int?
+
+  assignedToId          Int?
+  completedById         Int?
+
+  status                TaskItemStatus       @default(PENDING)
+  inspectionId          Int?                 @unique
+
+  routeOrder            Int?
+
+  notes                 String?
+  completionNote        String?
+  issueFound            Boolean              @default(false)
+
+  scannedCode           String?
+
+  startedAt             DateTime?
+  inspectedAt           DateTime?
+
+  completedLatitude     Float?
+  completedLongitude    Float?
+  completedLocationText String?
+
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  task                  InspectionTask       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  device                Device?              @relation(fields: [deviceId], references: [id])
+  gate                  Gate?                @relation(fields: [gateId], references: [id])
+
+  assignedTo            User?                @relation("TaskItemAssignedTo", fields: [assignedToId], references: [id])
+  completedBy           User?                @relation("TaskItemCompletedBy", fields: [completedById], references: [id])
+
+  inspection            Inspection?          @relation(fields: [inspectionId], references: [id])
+
+  morphoRepairs         DeviceMorphoRepair[]
+  replacements          DeviceReplacement[]
+  activityLogs          TechnicianActivityLog[]
 
   @@unique([taskId, deviceId])
   @@unique([taskId, gateId])
+
   @@index([taskId])
   @@index([deviceId])
   @@index([gateId])
   @@index([assignedToId])
   @@index([completedById])
   @@index([status])
+  @@index([routeOrder])
+  @@index([inspectedAt])
 }
 
 model Inspection {
   id               Int                             @id @default(autoincrement())
+
   deviceId         Int?
   gateId           Int?
   technicianId     Int
   taskId           Int?
+
   inspectionStatus InspectionStatus
   issueReason      String?
   notes            String?
+
   latitude         Float?
   longitude        Float?
   locationText     String?
+
   inspectedAt      DateTime                        @default(now())
   createdAt        DateTime                        @default(now())
   updatedAt        DateTime                        @updatedAt
@@ -311,10 +398,16 @@ model Inspection {
   gate             Gate?                           @relation(fields: [gateId], references: [id])
   task             InspectionTask?                 @relation(fields: [taskId], references: [id])
   technician       User                            @relation(fields: [technicianId], references: [id])
+
   taskItem         InspectionTaskItem?
+
   images           InspectionImage[]
   inspectionIssues InspectionIssue[]
   solutionActions  InspectionIssueSolutionAction[]
+
+  morphoRepairs    DeviceMorphoRepair[]
+  replacements     DeviceReplacement[]
+  activityLogs     TechnicianActivityLog[]
 
   @@index([deviceId])
   @@index([gateId])
@@ -338,16 +431,22 @@ model InspectionImage {
 
 model MaintenanceLog {
   id               Int               @id @default(autoincrement())
+
   deviceId         Int
   createdById      Int
+
   status           MaintenanceStatus @default(OPEN)
+
   issueReason      String?
   notes            String?
+
   sentOut          Boolean           @default(false)
   maintenancePlace String?
   externalVendor   String?
+
   startedAt        DateTime?
   completedAt      DateTime?
+
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
@@ -361,14 +460,19 @@ model MaintenanceLog {
 
 model DeviceMovement {
   id             Int          @id @default(autoincrement())
+
   deviceId       Int
   movedById      Int
+
   movementType   MovementType
+
   fromLocationId Int?
   toLocationId   Int?
+
   fromText       String?
   toText         String?
   reason         String?
+
   movedAt        DateTime     @default(now())
   createdAt      DateTime     @default(now())
 
@@ -377,15 +481,19 @@ model DeviceMovement {
 
   @@index([deviceId])
   @@index([movedById])
+  @@index([movementType])
+  @@index([movedAt])
 }
 
 model DeviceStatusHistory {
   id          Int                  @id @default(autoincrement())
+
   deviceId    Int
   oldStatus   DeviceCurrentStatus?
   newStatus   DeviceCurrentStatus
   changedById Int
   note        String?
+
   changedAt   DateTime             @default(now())
 
   changedBy   User                 @relation(fields: [changedById], references: [id])
@@ -393,15 +501,19 @@ model DeviceStatusHistory {
 
   @@index([deviceId])
   @@index([changedById])
+  @@index([newStatus])
+  @@index([changedAt])
 }
 
 model AuditLog {
   id         Int      @id @default(autoincrement())
+
   userId     Int?
   action     String
   entityType String
   entityId   Int?
   details    String?
+
   createdAt  DateTime @default(now())
 
   user       User?    @relation(fields: [userId], references: [id])
@@ -409,14 +521,17 @@ model AuditLog {
   @@index([userId])
   @@index([entityType])
   @@index([action])
+  @@index([createdAt])
 }
 
 model IssueCategory {
   id          Int        @id @default(autoincrement())
+
   name        String     @unique
   code        String?    @unique
   assetType   AssetType?
   description String?
+
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -427,9 +542,11 @@ model IssueCategory {
 
 model Issue {
   id              Int               @id @default(autoincrement())
+
   issueCode       String            @unique
   title           String
   description     String?
+
   severity        IssueSeverity     @default(MEDIUM)
   status          IssueStatus       @default(ACTIVE)
 
@@ -442,8 +559,10 @@ model Issue {
   updatedAt       DateTime          @updatedAt
 
   inspectionItems InspectionIssue[]
+
   category        IssueCategory     @relation(fields: [categoryId], references: [id])
   deviceType      DeviceType?       @relation(fields: [deviceTypeId], references: [id])
+
   solutions       IssueSolution[]
 
   @@index([categoryId])
@@ -456,39 +575,50 @@ model Issue {
 
 model IssueSolution {
   id           Int                             @id @default(autoincrement())
+
   solutionCode String?                         @unique
   issueId      Int
+
   title        String
   description  String?
+
   stepOrder    Int
   isRequired   Boolean                         @default(true)
   status       SolutionStatus                  @default(ACTIVE)
+
   createdAt    DateTime                        @default(now())
   updatedAt    DateTime                        @updatedAt
 
   actions      InspectionIssueSolutionAction[]
+
   issue        Issue                           @relation(fields: [issueId], references: [id], onDelete: Cascade)
 
   @@unique([issueId, stepOrder])
   @@index([issueId])
   @@index([stepOrder])
+  @@index([status])
 }
 
 model InspectionIssue {
   id               Int                             @id @default(autoincrement())
+
   inspectionId     Int
   issueId          Int
   reportedById     Int
+
   status           InspectionIssueStatus           @default(OPEN)
+
   notes            String?
   resolvedAt       DateTime?
   unresolvedReason String?
+
   createdAt        DateTime                        @default(now())
   updatedAt        DateTime                        @updatedAt
 
   inspection       Inspection                      @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
   issue            Issue                           @relation(fields: [issueId], references: [id])
   reportedBy       User                            @relation("InspectionIssueReportedBy", fields: [reportedById], references: [id])
+
   actions          InspectionIssueSolutionAction[]
 
   @@index([inspectionId])
@@ -499,13 +629,16 @@ model InspectionIssue {
 
 model InspectionIssueSolutionAction {
   id                Int                   @id @default(autoincrement())
+
   inspectionId      Int
   inspectionIssueId Int
   solutionId        Int
   technicianId      Int
+
   status            ActionExecutionStatus @default(PENDING)
   note              String?
   doneAt            DateTime?
+
   createdAt         DateTime              @default(now())
   updatedAt         DateTime              @updatedAt
 
@@ -515,11 +648,158 @@ model InspectionIssueSolutionAction {
   technician        User                  @relation("IssueSolutionActionBy", fields: [technicianId], references: [id])
 
   @@unique([inspectionIssueId, solutionId])
+
   @@index([inspectionId])
   @@index([inspectionIssueId])
   @@index([solutionId])
   @@index([technicianId])
   @@index([status])
+}
+
+model TechnicianActivityLog {
+  id             Int                  @id @default(autoincrement())
+
+  userId         Int
+  action         TechnicianActionType
+
+  deviceId       Int?
+  gateId         Int?
+  taskId         Int?
+  taskItemId     Int?
+  inspectionId   Int?
+  replacementId  Int?
+  morphoRepairId Int?
+
+  title          String?
+  message        String?
+
+  beforeStatus   String?
+  afterStatus    String?
+
+  latitude       Float?
+  longitude      Float?
+  locationText   String?
+
+  metadata       Json?
+
+  createdAt      DateTime             @default(now())
+
+  user           User                 @relation(fields: [userId], references: [id])
+  device         Device?              @relation(fields: [deviceId], references: [id])
+  gate           Gate?                @relation(fields: [gateId], references: [id])
+  task           InspectionTask?      @relation(fields: [taskId], references: [id])
+  taskItem       InspectionTaskItem?  @relation(fields: [taskItemId], references: [id])
+  inspection     Inspection?          @relation(fields: [inspectionId], references: [id])
+  replacement    DeviceReplacement?   @relation(fields: [replacementId], references: [id])
+  morphoRepair   DeviceMorphoRepair?  @relation(fields: [morphoRepairId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([deviceId])
+  @@index([gateId])
+  @@index([taskId])
+  @@index([taskItemId])
+  @@index([inspectionId])
+  @@index([replacementId])
+  @@index([morphoRepairId])
+  @@index([createdAt])
+}
+
+model DeviceMorphoRepair {
+  id             Int                 @id @default(autoincrement())
+
+  deviceId       Int
+  technicianId   Int
+
+  taskItemId     Int?
+  inspectionId   Int?
+
+  status         MorphoRepairStatus  @default(REPORTED_FIXED)
+
+  oldStatus      DeviceCurrentStatus?
+  newStatus      DeviceCurrentStatus @default(OK)
+
+  source         String              @default("MORPHO_APP")
+
+  notes          String?
+  proofImageUrl  String?
+
+  fixedAt        DateTime            @default(now())
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  device         Device              @relation(fields: [deviceId], references: [id])
+  technician     User                @relation("MorphoRepairBy", fields: [technicianId], references: [id])
+
+  taskItem       InspectionTaskItem? @relation(fields: [taskItemId], references: [id])
+  inspection     Inspection?         @relation(fields: [inspectionId], references: [id])
+
+  activityLogs   TechnicianActivityLog[]
+
+  @@index([deviceId])
+  @@index([technicianId])
+  @@index([taskItemId])
+  @@index([inspectionId])
+  @@index([status])
+  @@index([fixedAt])
+}
+
+model DeviceReplacement {
+  id              Int                     @id @default(autoincrement())
+
+  oldDeviceId     Int
+  newDeviceId     Int
+
+  replacedById    Int
+  approvedById    Int?
+
+  taskItemId      Int?
+  inspectionId    Int?
+
+  fromLocationId  Int?
+  toLocationId    Int?
+
+  oldIpAddress    String?
+  newIpAddress    String?
+  keepSameIp      Boolean                 @default(true)
+
+  reason          String?
+  notes           String?
+
+  status          DeviceReplacementStatus @default(COMPLETED)
+
+  replacedAt      DateTime                @default(now())
+  approvedAt      DateTime?
+
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  oldDevice       Device                  @relation("OldDeviceReplacement", fields: [oldDeviceId], references: [id])
+  newDevice       Device                  @relation("NewDeviceReplacement", fields: [newDeviceId], references: [id])
+
+  replacedBy      User                    @relation("DeviceReplacementBy", fields: [replacedById], references: [id])
+  approvedBy      User?                   @relation("DeviceReplacementApprovedBy", fields: [approvedById], references: [id])
+
+  taskItem        InspectionTaskItem?     @relation(fields: [taskItemId], references: [id])
+  inspection      Inspection?             @relation(fields: [inspectionId], references: [id])
+
+  fromLocation    Location?               @relation("ReplacementFromLocation", fields: [fromLocationId], references: [id])
+  toLocation      Location?               @relation("ReplacementToLocation", fields: [toLocationId], references: [id])
+
+  activityLogs    TechnicianActivityLog[]
+
+  @@index([oldDeviceId])
+  @@index([newDeviceId])
+  @@index([replacedById])
+  @@index([approvedById])
+  @@index([taskItemId])
+  @@index([inspectionId])
+  @@index([fromLocationId])
+  @@index([toLocationId])
+  @@index([oldIpAddress])
+  @@index([newIpAddress])
+  @@index([status])
+  @@index([replacedAt])
 }
 
 enum UserStatus {
@@ -544,6 +824,14 @@ enum DeviceCurrentStatus {
   NEEDS_MAINTENANCE
   UNDER_MAINTENANCE
   OUT_OF_SERVICE
+}
+
+enum DeviceLifecycleStatus {
+  ACTIVE
+  REPLACED
+  RETIRED
+  ARCHIVED
+  LOST
 }
 
 enum InspectionStatus {
@@ -603,6 +891,7 @@ enum MovementType {
   SENT_TO_MAINTENANCE
   RETURNED_FROM_MAINTENANCE
   RELOCATED
+  REPLACED
 }
 
 enum IssueSeverity {
@@ -635,4 +924,40 @@ enum ActionExecutionStatus {
   DONE
   FAILED
   SKIPPED
+}
+
+enum TaskKind {
+  SINGLE_ASSET
+  GLOBAL_ROUTE
+  MAINTENANCE_CHECK
+  REPLACEMENT_ROUTE
+  SOFTWARE_CHECK
+}
+
+enum TechnicianActionType {
+  TASK_STARTED
+  TASK_ITEM_STARTED
+  TASK_ITEM_DONE
+  TASK_ITEM_ISSUE_FOUND
+  TASK_ITEM_NOT_REACHABLE
+  INSPECTION_CREATED
+  MORPHO_FIXED
+  DEVICE_REPLACED
+  DEVICE_STATUS_CHANGED
+  NOTE_ADDED
+  ADMIN_REVIEWED
+}
+
+enum MorphoRepairStatus {
+  REPORTED_FIXED
+  CONFIRMED_BY_ADMIN
+  REJECTED
+  REOPENED
+}
+
+enum DeviceReplacementStatus {
+  DRAFT
+  COMPLETED
+  APPROVED
+  CANCELLED
 }
