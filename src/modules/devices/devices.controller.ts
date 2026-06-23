@@ -8,7 +8,9 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
+
 import { DevicesService } from './devices.service';
+import { UpdateDeviceMorphoStatusDto } from './dto/update-device-morpho-status.dto';
 
 @Controller('devices')
 export class DevicesController {
@@ -24,21 +26,19 @@ export class DevicesController {
     return this.devicesService.searchDevice(q);
   }
 
-  /**
-   * QR Scan Endpoint
-   * الفني يعمل Scan للـ QR
-   * QR يحتوي secretCode فقط
-   * الباك إند يرجع بيانات الجهاز بدون secretCode
-   */
+ 
+  @Get('morpho-candidates')
+  async getMorphoCandidates() {
+    return this.devicesService.getMorphoCandidates();
+  }
+
+ 
   @Get('scan/:secretCode')
   async scanBySecretCode(@Param('secretCode') secretCode: string) {
     return this.devicesService.scanBySecretCode(secretCode);
   }
 
-  /**
-   * تسجيل محاولات QR
-   * هنستخدمها من Flutter عشان نحفظ إن الفني حاول يعمل scan
-   */
+  
   @Post('scan-attempts')
   async logQrScanAttempt(
     @Body()
@@ -59,20 +59,33 @@ export class DevicesController {
     });
   }
 
-  /**
-   * بحث يدوي بعد 3 محاولات QR فاشلة
-   * يدعم:
-   * deviceCode / barcode / serialNumber / ipAddress
-   */
+ 
   @Get('barcode/:code')
   async scanByBarcode(@Param('code') code: string) {
     return this.devicesService.searchDevice(code);
   }
 
-  /**
-   * مهم جدًا:
-   * لازم :id يكون آخر route
-   */
+  
+  @Post(':id/morpho-status')
+  async updateMorphoStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateDeviceMorphoStatusDto,
+  ) {
+    return this.devicesService.updateMorphoStatus(id, body);
+  }
+
+
+  @Get(':id/morpho-history')
+  async getMorphoHistory(@Param('id', ParseIntPipe) id: number) {
+    return this.devicesService.getMorphoHistory(id);
+  }
+
+  @Get(':id/status-history')
+  async getDeviceStatusHistory(@Param('id', ParseIntPipe) id: number) {
+    return this.devicesService.getDeviceStatusHistory(id);
+  }
+
+ 
   @Get(':id')
   async getDeviceById(@Param('id', ParseIntPipe) id: number) {
     return this.devicesService.getDeviceById(id);

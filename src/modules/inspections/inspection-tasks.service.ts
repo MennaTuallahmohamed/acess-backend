@@ -3,16 +3,26 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
 import {
   AssetType,
+  DeviceCurrentStatus,
   InspectionStatus,
   Prisma,
   TaskItemStatus,
+  TaskKind,
   TaskPriority,
   TaskStatus,
+  TechnicianActionType,
 } from '@prisma/client';
 
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { CreateInspectionTaskDto } from './dto/create-inspection-task.dto';
+
+import { UpdateInspectionTaskDto } from './dto/update-inspection-task.dto';
+import { CompleteInspectionTaskItemDto } from './dto/complete-inspection-task-item.dto';
+
+type TaskMode = 'HARDWARE' | 'SOFTWARE' | 'GATE';
 
 @Injectable()
 export class InspectionTasksService {
@@ -20,11 +30,15 @@ export class InspectionTasksService {
 
   private toNumber(value: any, name: string, required = true): number | null {
     if (value === undefined || value === null || value === '') {
-      if (required) throw new BadRequestException(`${name} is required`);
+      if (required) {
+        throw new BadRequestException(`${name} is required`);
+      }
+
       return null;
     }
 
     const parsed = Number(value);
+
     if (Number.isNaN(parsed)) {
       throw new BadRequestException(`${name} must be a valid number`);
     }
@@ -36,24 +50,64 @@ export class InspectionTasksService {
     if (!value) return [];
 
     if (Array.isArray(value)) {
-      return value.map(Number).filter((id) => !Number.isNaN(id));
+      return value
+        .map((id) => Number(id))
+        .filter((id) => !Number.isNaN(id));
     }
 
     if (typeof value === 'string') {
       try {
         const parsed = JSON.parse(value);
+
         if (Array.isArray(parsed)) {
-          return parsed.map(Number).filter((id) => !Number.isNaN(id));
+          return parsed
+            .map((id) => Number(id))
+            .filter((id) => !Number.isNaN(id));
         }
       } catch (_) {}
 
       return value
         .split(',')
-        .map((id) => Number(id.trim()))
+        .map((id) => Number(String(id).trim()))
         .filter((id) => !Number.isNaN(id));
     }
 
     return [];
+  }
+
+  private normalizeBoolean(value: any, defaultValue: boolean): boolean {
+    if (value === undefined || value === null || value === '') return defaultValue;
+    if (value === true || value === 'true') return true;
+    if (value === false || value === 'false') return false;
+    return Boolean(value);
+  }
+
+  private normalizeTaskMode(dto: any): TaskMode {
+    const rawTaskType = String(
+      dto.taskType || dto.workType || dto.mode || '',
+    )
+      .trim()
+      .toUpperCase();
+
+    const rawAssetType = String(dto.assetType || '')
+      .trim()
+      .toUpperCase();
+
+    if (rawTaskType === 'SOFTWARE') return 'SOFTWARE';
+    if (rawTaskType === 'HARDWARE') return 'HARDWARE';
+    if (rawTaskType === 'GATE') return 'GATE';
+
+    if (rawAssetType === 'SOFTWARE') return 'SOFTWARE';
+    if (rawAssetType === 'GATE') return 'GATE';
+
+    return 'HARDWARE';
+  }
+
+  private getAssetTypeFromMode(mode: TaskMode): AssetType {
+    if (mode === 'SOFTWARE') return AssetType.SOFTWARE;
+    if (mode === 'GATE') return AssetType.GATE;
+
+    return AssetType.DEVICE;
   }
 
   private normalizeAssetType(value: any): AssetType {
@@ -65,14 +119,227 @@ export class InspectionTasksService {
     return AssetType.DEVICE;
   }
 
-  private async recalculateTaskProgress(taskId: number, tx: any = this.prisma) {
-    const [totalItems, existingTask] = await Promise.all([
-      tx.inspectionTaskItem.count({ where: { taskId } }),
-      tx.inspectionTask.findUnique({
-        where: { id: taskId },
-        select: { startedAt: true },
-      }),
-    ]);
+  private normalizeTaskKind(value: any, mode?: TaskMode): TaskKind {
+    const raw = String(value || '').trim().toUpperCase();
+
+    if (raw === 'GLOBAL_ROUTE') return TaskKind.GLOBAL_ROUTE;
+    if (raw === 'MAINTENANCE_CHECK') return TaskKind.MAINTENANCE_CHECK;
+    if (raw === 'REPLACEMENT_ROUTE') return TaskKind.REPLACEMENT_ROUTE;
+    if (raw === 'SOFTWARE_CHECK') return TaskKind.SOFTWARE_CHECK;
+
+    if (mode === 'SOFTWARE') return TaskKind.SOFTWARE_CHECK;
+
+    return TaskKind.GLOBAL_ROUTE;
+  }
+
+  private normalizePriority(value: any): TaskPriority {
+    const raw = String(value || '').trim().toUpperCase();
+
+    if (raw === 'LOW') return TaskPriority.LOW;
+    if (raw === 'HIGH') return TaskPriority.HIGH;
+    if (raw === 'URGENT') return TaskPriority.URGENT;
+
+    return TaskPriority.MEDIUM;
+  }
+
+  private normalizeTaskStatus(value: any): TaskStatus {
+    const raw = String(value || '').trim().toUpperCase();
+
+    if (raw === 'IN_PROGRESS') return TaskStatus.IN_PROGRESS;
+    if (raw === 'COMPLETED') return TaskStatus.COMPLETED;
+    if (raw === 'CANCELLED') return TaskStatus.CANCELLED;
+
+    return TaskStatus.PENDING;
+  }
+
+  private normalizeInspectionStatus(value: any): InspectionStatus {
+    const raw = String(value || '').trim().toUpperCase();
+
+    if (raw === 'NOT_REACHABLE') return InspectionStatus.NOT_REACHABLE;
+    if (raw === 'NOT_OK') return InspectionStatus.NOT_OK;
+    if (raw === 'PARTIAL') return InspectionStatus.PARTIAL;
+
+    return InspectionStatus.OK;
+  }
+
+  private normalizeTaskItemStatus(value: any): TaskItemStatus | null {
+    if (!value) return null;
+
+    const raw = String(value).trim().toUpperCase();
+
+    if (raw === 'IN_PROGRESS') return TaskItemStatus.IN_PROGRESS;
+    if (raw === 'DONE') return TaskItemStatus.DONE;
+    if (raw === 'ISSUE_FOUND') return TaskItemStatus.ISSUE_FOUND;
+    if (raw === 'NOT_REACHABLE') return TaskItemStatus.NOT_REACHABLE;
+    if (raw === 'SKIPPED') return TaskItemStatus.SKIPPED;
+
+    return null;
+  }
+
+  private getItemStatusFromInspectionStatus(
+    inspectionStatus: InspectionStatus,
+  ): TaskItemStatus {
+    if (inspectionStatus === InspectionStatus.NOT_REACHABLE) {
+      return TaskItemStatus.NOT_REACHABLE;
+    }
+
+    if (
+      inspectionStatus === InspectionStatus.NOT_OK ||
+      inspectionStatus === InspectionStatus.PARTIAL
+    ) {
+      return TaskItemStatus.ISSUE_FOUND;
+    }
+
+    return TaskItemStatus.DONE;
+  }
+
+  private async createActivityLog(
+    tx: Prisma.TransactionClient,
+    data: {
+      userId: number;
+      action: TechnicianActionType;
+      deviceId?: number | null;
+      gateId?: number | null;
+      taskId?: number | null;
+      taskItemId?: number | null;
+      inspectionId?: number | null;
+      title?: string | null;
+      message?: string | null;
+      beforeStatus?: string | null;
+      afterStatus?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+      locationText?: string | null;
+      metadata?: Prisma.InputJsonValue;
+    },
+  ) {
+    return tx.technicianActivityLog.create({
+      data: {
+        userId: data.userId,
+        action: data.action,
+
+        deviceId: data.deviceId || null,
+        gateId: data.gateId || null,
+        taskId: data.taskId || null,
+        taskItemId: data.taskItemId || null,
+        inspectionId: data.inspectionId || null,
+
+        title: data.title || null,
+        message: data.message || null,
+
+        beforeStatus: data.beforeStatus || null,
+        afterStatus: data.afterStatus || null,
+
+        latitude: data.latitude ?? null,
+        longitude: data.longitude ?? null,
+        locationText: data.locationText || null,
+
+        metadata:
+          data.metadata === undefined ? Prisma.JsonNull : data.metadata,
+      },
+    });
+  }
+
+  private taskInclude() {
+    return {
+      assignedTo: {
+        select: {
+          id: true,
+          fullName: true,
+          username: true,
+          email: true,
+          phone: true,
+          jobTitle: true,
+        },
+      },
+
+      createdBy: {
+        select: {
+          id: true,
+          fullName: true,
+          username: true,
+          email: true,
+        },
+      },
+
+      device: {
+        include: {
+          location: true,
+          deviceType: true,
+        },
+      },
+
+      gate: {
+        include: {
+          location: true,
+        },
+      },
+
+      items: {
+        orderBy: [
+          {
+            routeOrder: 'asc' as const,
+          },
+          {
+            id: 'asc' as const,
+          },
+        ],
+        include: {
+          device: {
+            include: {
+              location: true,
+              deviceType: true,
+            },
+          },
+
+          gate: {
+            include: {
+              location: true,
+            },
+          },
+
+          assignedTo: {
+            select: {
+              id: true,
+              fullName: true,
+              username: true,
+              email: true,
+              phone: true,
+              jobTitle: true,
+            },
+          },
+
+          completedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              username: true,
+              email: true,
+            },
+          },
+
+          inspection: true,
+          morphoRepairs: true,
+          replacements: true,
+        },
+      },
+    };
+  }
+
+  private async recalculateTaskProgress(
+    taskId: number,
+    tx: Prisma.TransactionClient | PrismaService = this.prisma,
+  ) {
+    const taskBefore = await tx.inspectionTask.findUnique({
+      where: { id: taskId },
+      select: {
+        startedAt: true,
+      },
+    });
+
+    const totalItems = await tx.inspectionTaskItem.count({
+      where: { taskId },
+    });
 
     const completedItems = await tx.inspectionTaskItem.count({
       where: {
@@ -102,7 +369,9 @@ export class InspectionTasksService {
       },
     });
 
-    const finishedItems = completedItems + issueItems + notReachableItems + skippedItems;
+    const finishedItems =
+      completedItems + issueItems + notReachableItems + skippedItems;
+
     const remainingItems = Math.max(totalItems - finishedItems, 0);
 
     const progressPercent =
@@ -128,60 +397,26 @@ export class InspectionTasksService {
         status,
         completedAt: status === TaskStatus.COMPLETED ? new Date() : null,
         startedAt:
-          status !== TaskStatus.PENDING && !existingTask?.startedAt
+          status !== TaskStatus.PENDING && !taskBefore?.startedAt
             ? new Date()
             : undefined,
       },
-      include: {
-        assignedTo: {
-          select: {
-            id: true,
-            fullName: true,
-            username: true,
-            email: true,
-          },
-        },
-        createdBy: {
-          select: {
-            id: true,
-            fullName: true,
-            username: true,
-            email: true,
-          },
-        },
-        device: true,
-        gate: true,
-        items: {
-          include: {
-            device: true,
-            gate: true,
-            assignedTo: {
-              select: {
-                id: true,
-                fullName: true,
-                username: true,
-                email: true,
-              },
-            },
-            completedBy: {
-              select: {
-                id: true,
-                fullName: true,
-                username: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
+      include: this.taskInclude(),
     });
   }
 
-  async create(dto: any) {
-    const assetType = this.normalizeAssetType(dto.assetType);
+  async create(dto: CreateInspectionTaskDto | any) {
+    const mode = this.normalizeTaskMode(dto);
+    const assetType = this.getAssetTypeFromMode(mode);
+    const taskKind = this.normalizeTaskKind(dto.taskKind, mode);
 
     const createdById = this.toNumber(dto.createdById, 'createdById') as number;
-    const assignedToId = this.toNumber(dto.assignedToId, 'assignedToId', false);
+
+    const assignedToId = this.toNumber(
+      dto.assignedToId,
+      'assignedToId',
+      false,
+    );
 
     const scheduledDate = dto.scheduledDate
       ? new Date(dto.scheduledDate)
@@ -213,7 +448,7 @@ export class InspectionTasksService {
     let finalDeviceIds: number[] = [];
     let finalGateIds: number[] = [];
 
-    if (assetType === AssetType.DEVICE) {
+    if (mode === 'HARDWARE' || mode === 'SOFTWARE') {
       finalDeviceIds = deviceIds;
 
       if (finalDeviceIds.length === 0 && dto.deviceId) {
@@ -221,11 +456,19 @@ export class InspectionTasksService {
       }
 
       if (finalDeviceIds.length === 0) {
-        throw new BadRequestException('deviceIds are required');
+        throw new BadRequestException(
+          mode === 'SOFTWARE'
+            ? 'deviceIds are required for SOFTWARE task'
+            : 'deviceIds are required for HARDWARE task',
+        );
       }
 
       const devicesCount = await this.prisma.device.count({
-        where: { id: { in: finalDeviceIds } },
+        where: {
+          id: {
+            in: finalDeviceIds,
+          },
+        },
       });
 
       if (devicesCount !== finalDeviceIds.length) {
@@ -233,7 +476,7 @@ export class InspectionTasksService {
       }
     }
 
-    if (assetType === AssetType.GATE) {
+    if (mode === 'GATE') {
       finalGateIds = gateIds;
 
       if (finalGateIds.length === 0 && dto.gateId) {
@@ -247,8 +490,12 @@ export class InspectionTasksService {
             building: dto.building || undefined,
             zone: dto.zone || undefined,
             direction: dto.direction || undefined,
+            lane: dto.lane || undefined,
+            type: dto.type || undefined,
           },
-          select: { id: true },
+          select: {
+            id: true,
+          },
         });
 
         finalGateIds = gates.map((gate) => gate.id);
@@ -259,7 +506,11 @@ export class InspectionTasksService {
       }
 
       const gatesCount = await this.prisma.gate.count({
-        where: { id: { in: finalGateIds } },
+        where: {
+          id: {
+            in: finalGateIds,
+          },
+        },
       });
 
       if (gatesCount !== finalGateIds.length) {
@@ -268,60 +519,115 @@ export class InspectionTasksService {
     }
 
     const totalItems =
-      assetType === AssetType.GATE ? finalGateIds.length : finalDeviceIds.length;
+      mode === 'GATE' ? finalGateIds.length : finalDeviceIds.length;
 
     return this.prisma.$transaction(async (tx) => {
       const task = await tx.inspectionTask.create({
         data: {
           campaignId: dto.campaignId ? Number(dto.campaignId) : null,
+
           deviceId:
-            assetType === AssetType.DEVICE && finalDeviceIds.length === 1
+            mode !== 'GATE' && finalDeviceIds.length === 1
               ? finalDeviceIds[0]
-              : undefined,
+              : null,
+
           gateId:
-            assetType === AssetType.GATE && finalGateIds.length === 1
+            mode === 'GATE' && finalGateIds.length === 1
               ? finalGateIds[0]
-              : undefined,
+              : null,
+
           assignedToId: assignedToId || null,
           createdById,
+
           scheduledDate,
           dueDate,
+
           frequency: dto.frequency || null,
-          status: TaskStatus.PENDING,
-          priority: dto.priority || 'MEDIUM',
+
+          status: dto.status
+            ? this.normalizeTaskStatus(dto.status)
+            : TaskStatus.PENDING,
+
+          priority: this.normalizePriority(dto.priority),
           assetType,
-          title: dto.title || null,
+          taskKind,
+
+          requiresScan:
+            mode === 'SOFTWARE'
+              ? this.normalizeBoolean(dto.requiresScan, false)
+              : this.normalizeBoolean(dto.requiresScan, true),
+
+          requiresLocation: this.normalizeBoolean(dto.requiresLocation, false),
+
+          title:
+            dto.title ||
+            (mode === 'SOFTWARE'
+              ? 'Software check task'
+              : mode === 'GATE'
+                ? 'Gate inspection task'
+                : 'Hardware inspection task'),
+
           notes: dto.notes || null,
+
           totalItems,
-          remainingItems: totalItems,
           completedItems: 0,
           issueItems: 0,
           notReachableItems: 0,
+          remainingItems: totalItems,
           progressPercent: 0,
         },
       });
 
-      if (assetType === AssetType.DEVICE) {
+      if (mode === 'HARDWARE' || mode === 'SOFTWARE') {
         await tx.inspectionTaskItem.createMany({
-          data: finalDeviceIds.map((deviceId) => ({
+          data: finalDeviceIds.map((deviceId, index) => ({
             taskId: task.id,
             deviceId,
+            gateId: null,
             assignedToId: assignedToId || null,
             status: TaskItemStatus.PENDING,
+            routeOrder: index + 1,
           })),
           skipDuplicates: true,
         });
       }
 
-      if (assetType === AssetType.GATE) {
+      if (mode === 'GATE') {
         await tx.inspectionTaskItem.createMany({
-          data: finalGateIds.map((gateId) => ({
+          data: finalGateIds.map((gateId, index) => ({
             taskId: task.id,
+            deviceId: null,
             gateId,
             assignedToId: assignedToId || null,
             status: TaskItemStatus.PENDING,
+            routeOrder: index + 1,
           })),
           skipDuplicates: true,
+        });
+      }
+
+      if (assignedToId) {
+        await this.createActivityLog(tx, {
+          userId: assignedToId,
+          action: TechnicianActionType.TASK_STARTED,
+          taskId: task.id,
+          title: 'New task assigned',
+          message:
+            mode === 'SOFTWARE'
+              ? `New software task assigned with ${totalItems} devices`
+              : mode === 'GATE'
+                ? `New gate task assigned with ${totalItems} gates`
+                : `New hardware task assigned with ${totalItems} devices`,
+          afterStatus: TaskStatus.PENDING,
+          metadata: {
+            mode,
+            taskId: task.id,
+            assetType,
+            taskKind,
+            totalItems,
+            createdById,
+            assignedToId,
+          },
         });
       }
 
@@ -332,28 +638,42 @@ export class InspectionTasksService {
   async findAll(query: any = {}) {
     const where: Prisma.InspectionTaskWhereInput = {};
 
-    if (query.status) where.status = query.status;
-    if (query.assetType) where.assetType = this.normalizeAssetType(query.assetType);
-    if (query.assignedToId) where.assignedToId = Number(query.assignedToId);
+    if (query.status) {
+      where.status = this.normalizeTaskStatus(query.status);
+    }
+
+    if (query.taskType || query.workType || query.mode) {
+      const mode = this.normalizeTaskMode(query);
+      where.assetType = this.getAssetTypeFromMode(mode);
+    } else if (query.assetType) {
+      where.assetType = this.normalizeAssetType(query.assetType);
+    }
+
+    if (query.taskKind) {
+      where.taskKind = this.normalizeTaskKind(query.taskKind);
+    }
+
+    if (query.assignedToId) {
+      where.assignedToId = Number(query.assignedToId);
+    }
+
+    if (query.createdById) {
+      where.createdById = Number(query.createdById);
+    }
+
+    if (query.from || query.to) {
+      where.scheduledDate = {
+        gte: query.from ? new Date(query.from) : undefined,
+        lte: query.to ? new Date(query.to) : undefined,
+      };
+    }
 
     return this.prisma.inspectionTask.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        assignedTo: true,
-        createdBy: true,
-        device: true,
-        gate: true,
-        items: {
-          include: {
-            device: true,
-            gate: true,
-            assignedTo: true,
-            completedBy: true,
-            inspection: true,
-          },
-        },
+      orderBy: {
+        createdAt: 'desc',
       },
+      include: this.taskInclude(),
     });
   }
 
@@ -361,58 +681,166 @@ export class InspectionTasksService {
     const task = await this.prisma.inspectionTask.findUnique({
       where: { id },
       include: {
-        assignedTo: true,
-        createdBy: true,
-        device: true,
-        gate: true,
-        items: {
-          include: {
-            device: true,
-            gate: true,
-            assignedTo: true,
-            completedBy: true,
-            inspection: true,
-          },
-          orderBy: { id: 'asc' },
-        },
+        ...this.taskInclude(),
+
         inspections: {
+          orderBy: {
+            inspectedAt: 'desc',
+          },
           include: {
             device: true,
             gate: true,
-            technician: true,
+            technician: {
+              select: {
+                id: true,
+                fullName: true,
+                username: true,
+                email: true,
+              },
+            },
             images: true,
             inspectionIssues: {
-              include: { issue: true },
+              include: {
+                issue: true,
+              },
             },
+          },
+        },
+
+        activityLogs: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 100,
+          include: {
+            user: {
+              select: {
+                id: true,
+                fullName: true,
+                username: true,
+                email: true,
+              },
+            },
+            device: true,
+            gate: true,
           },
         },
       },
     });
 
-    if (!task) throw new NotFoundException('Inspection task not found');
+    if (!task) {
+      throw new NotFoundException('Inspection task not found');
+    }
 
     return task;
   }
 
-  async findByTechnician(technicianId: number) {
-    return this.prisma.inspectionTask.findMany({
-      where: { assignedToId: technicianId },
-      orderBy: { scheduledDate: 'desc' },
-      include: {
-        device: true,
-        gate: true,
-        items: {
-          include: {
-            device: true,
-            gate: true,
-            inspection: true,
+  async findByTechnician(technicianId: number, query: any = {}) {
+    const technician = await this.prisma.user.findUnique({
+      where: { id: technicianId },
+    });
+
+    if (!technician) {
+      throw new NotFoundException('Technician not found');
+    }
+
+    const where: Prisma.InspectionTaskWhereInput = {
+      OR: [
+        {
+          assignedToId: technicianId,
+        },
+        {
+          items: {
+            some: {
+              assignedToId: technicianId,
+            },
           },
         },
-      },
+      ],
+    };
+
+    if (query.taskType || query.workType || query.mode) {
+      const mode = this.normalizeTaskMode(query);
+      where.assetType = this.getAssetTypeFromMode(mode);
+    }
+
+    if (query.assetType) {
+      where.assetType = this.normalizeAssetType(query.assetType);
+    }
+
+    if (query.status) {
+      where.status = this.normalizeTaskStatus(query.status);
+    }
+
+    return this.prisma.inspectionTask.findMany({
+      where,
+      orderBy: [
+        {
+          status: 'asc',
+        },
+        {
+          scheduledDate: 'desc',
+        },
+      ],
+      include: this.taskInclude(),
     });
   }
 
-  async completeItem(taskId: number, dto: any) {
+  async startTask(taskId: number, dto: any) {
+    const technicianId = this.toNumber(
+      dto.technicianId || dto.userId,
+      'technicianId',
+    ) as number;
+
+    const task = await this.prisma.inspectionTask.findUnique({
+      where: { id: taskId },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Inspection task not found');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const updatedTask = await tx.inspectionTask.update({
+        where: { id: taskId },
+        data: {
+          status:
+            task.status === TaskStatus.PENDING
+              ? TaskStatus.IN_PROGRESS
+              : task.status,
+          startedAt: task.startedAt || new Date(),
+        },
+        include: this.taskInclude(),
+      });
+
+      await this.createActivityLog(tx, {
+        userId: technicianId,
+        action: TechnicianActionType.TASK_STARTED,
+        taskId,
+        title: 'Task started',
+        message: 'Technician started the task',
+        beforeStatus: task.status,
+        afterStatus: updatedTask.status,
+        latitude:
+          dto.latitude !== undefined && dto.latitude !== null
+            ? Number(dto.latitude)
+            : null,
+        longitude:
+          dto.longitude !== undefined && dto.longitude !== null
+            ? Number(dto.longitude)
+            : null,
+        locationText: dto.locationText || null,
+        metadata: {
+          assetType: task.assetType,
+          taskKind: task.taskKind,
+        },
+      });
+
+      return updatedTask;
+    });
+  }
+
+  async completeItem(taskId: number, dto: CompleteInspectionTaskItemDto | any) {
     const technicianId = this.toNumber(
       dto.technicianId || dto.completedById,
       'technicianId',
@@ -426,13 +854,17 @@ export class InspectionTasksService {
       where: { id: taskId },
     });
 
-    if (!task) throw new NotFoundException('Inspection task not found');
+    if (!task) {
+      throw new NotFoundException('Inspection task not found');
+    }
 
     const technician = await this.prisma.user.findUnique({
       where: { id: technicianId },
     });
 
-    if (!technician) throw new NotFoundException('Technician not found');
+    if (!technician) {
+      throw new NotFoundException('Technician not found');
+    }
 
     const item = await this.prisma.inspectionTaskItem.findFirst({
       where: {
@@ -441,26 +873,46 @@ export class InspectionTasksService {
         ...(deviceId ? { deviceId } : {}),
         ...(gateId ? { gateId } : {}),
       },
+      include: {
+        device: true,
+        gate: true,
+        inspection: true,
+      },
     });
 
-    if (!item) throw new NotFoundException('Inspection task item not found');
+    if (!item) {
+      throw new NotFoundException('Inspection task item not found');
+    }
 
-    const inspectionStatus =
-      dto.inspectionStatus === 'NOT_REACHABLE'
-        ? InspectionStatus.NOT_REACHABLE
-        : dto.inspectionStatus === 'NOT_OK'
-          ? InspectionStatus.NOT_OK
-          : dto.inspectionStatus === 'PARTIAL'
-            ? InspectionStatus.PARTIAL
-            : InspectionStatus.OK;
+    if (item.inspectionId && !dto.allowRecomplete) {
+      throw new BadRequestException(
+        'This task item is already completed. Send allowRecomplete=true if you really want to complete it again.',
+      );
+    }
+
+    const inspectionStatus = this.normalizeInspectionStatus(
+      dto.inspectionStatus,
+    );
+
+    const normalizedItemStatus = this.normalizeTaskItemStatus(dto.itemStatus);
 
     const itemStatus =
-      inspectionStatus === InspectionStatus.NOT_REACHABLE
-        ? TaskItemStatus.NOT_REACHABLE
-        : inspectionStatus === InspectionStatus.NOT_OK ||
-            inspectionStatus === InspectionStatus.PARTIAL
-          ? TaskItemStatus.ISSUE_FOUND
-          : TaskItemStatus.DONE;
+      normalizedItemStatus ||
+      this.getItemStatusFromInspectionStatus(inspectionStatus);
+
+    const latitude =
+      dto.latitude !== undefined && dto.latitude !== null
+        ? Number(dto.latitude)
+        : null;
+
+    const longitude =
+      dto.longitude !== undefined && dto.longitude !== null
+        ? Number(dto.longitude)
+        : null;
+
+    const isSoftwareTask = task.assetType === AssetType.SOFTWARE;
+    const isHardwareDeviceTask = task.assetType === AssetType.DEVICE;
+    const isGateTask = task.assetType === AssetType.GATE;
 
     return this.prisma.$transaction(async (tx) => {
       const inspection = await tx.inspection.create({
@@ -469,17 +921,13 @@ export class InspectionTasksService {
           gateId: item.gateId || null,
           technicianId,
           taskId,
+
           inspectionStatus,
           issueReason: dto.issueReason || null,
-          notes: dto.notes || null,
-          latitude:
-            dto.latitude !== undefined && dto.latitude !== null
-              ? Number(dto.latitude)
-              : null,
-          longitude:
-            dto.longitude !== undefined && dto.longitude !== null
-              ? Number(dto.longitude)
-              : null,
+          notes: dto.notes || dto.completionNote || null,
+
+          latitude,
+          longitude,
           locationText: dto.locationText || null,
         },
       });
@@ -490,25 +938,128 @@ export class InspectionTasksService {
           status: itemStatus,
           completedById: technicianId,
           inspectionId: inspection.id,
+
           inspectedAt: inspection.inspectedAt,
+          startedAt: item.startedAt || new Date(),
+
           issueFound: itemStatus === TaskItemStatus.ISSUE_FOUND,
+
           notes: dto.notes || null,
+          completionNote: dto.completionNote || dto.notes || null,
+
+          scannedCode: dto.scannedCode || dto.scanCodeValue || null,
+
+          completedLatitude: latitude,
+          completedLongitude: longitude,
+          completedLocationText: dto.locationText || null,
         },
       });
 
       if (item.deviceId) {
         await tx.device.update({
           where: { id: item.deviceId },
-          data: { lastInspectionAt: inspection.inspectedAt },
+          data: {
+            lastInspectionAt: inspection.inspectedAt,
+
+            // مهم:
+            // لو التاسك SOFTWARE لا نغير حالة الجهاز هاردوير.
+            // لو التاسك HARDWARE وفيه مشكلة نغير الجهاز لـ NEEDS_MAINTENANCE.
+            currentStatus:
+              isHardwareDeviceTask && itemStatus === TaskItemStatus.ISSUE_FOUND
+                ? DeviceCurrentStatus.NEEDS_MAINTENANCE
+                : undefined,
+          },
         });
       }
 
       if (item.gateId) {
         await tx.gate.update({
           where: { id: item.gateId },
-          data: { lastInspectionAt: inspection.inspectedAt },
+          data: {
+            lastInspectionAt: inspection.inspectedAt,
+
+            currentStatus:
+              isGateTask && itemStatus === TaskItemStatus.ISSUE_FOUND
+                ? DeviceCurrentStatus.NEEDS_MAINTENANCE
+                : undefined,
+          },
         });
       }
+
+      let action: TechnicianActionType = TechnicianActionType.TASK_ITEM_DONE;
+
+      if (itemStatus === TaskItemStatus.ISSUE_FOUND) {
+        action = TechnicianActionType.TASK_ITEM_ISSUE_FOUND;
+      }
+
+      if (itemStatus === TaskItemStatus.NOT_REACHABLE) {
+        action = TechnicianActionType.TASK_ITEM_NOT_REACHABLE;
+      }
+
+      await this.createActivityLog(tx, {
+        userId: technicianId,
+        action,
+        deviceId: item.deviceId || null,
+        gateId: item.gateId || null,
+        taskId,
+        taskItemId: item.id,
+        inspectionId: inspection.id,
+        title: isSoftwareTask
+          ? 'Software task item completed'
+          : isGateTask
+            ? 'Gate task item completed'
+            : 'Hardware task item completed',
+        message: isSoftwareTask
+          ? 'Software check completed by technician'
+          : isGateTask
+            ? 'Gate inspection completed by technician'
+            : 'Hardware inspection completed by technician',
+        beforeStatus: item.status,
+        afterStatus: itemStatus,
+        latitude,
+        longitude,
+        locationText: dto.locationText || null,
+        metadata: {
+          taskId,
+          itemId: item.id,
+          deviceId: item.deviceId,
+          gateId: item.gateId,
+          taskAssetType: task.assetType,
+          taskKind: task.taskKind,
+          isSoftwareTask,
+          isHardwareDeviceTask,
+          isGateTask,
+          inspectionStatus,
+          itemStatus,
+          scannedCode: dto.scannedCode || dto.scanCodeValue || null,
+          issueReason: dto.issueReason || null,
+          notes: dto.notes || dto.completionNote || null,
+          softwareCategory: dto.softwareCategory || null,
+          morphoStatus: dto.morphoStatus || null,
+          firmwareNote: dto.firmwareNote || null,
+          ipNote: dto.ipNote || null,
+        },
+      });
+
+      await this.createActivityLog(tx, {
+        userId: technicianId,
+        action: TechnicianActionType.INSPECTION_CREATED,
+        deviceId: item.deviceId || null,
+        gateId: item.gateId || null,
+        taskId,
+        taskItemId: item.id,
+        inspectionId: inspection.id,
+        title: 'Inspection created',
+        message: 'Inspection record created from task item completion',
+        afterStatus: inspectionStatus,
+        latitude,
+        longitude,
+        locationText: dto.locationText || null,
+        metadata: {
+          taskAssetType: task.assetType,
+          taskKind: task.taskKind,
+        },
+      });
 
       return this.recalculateTaskProgress(taskId, tx);
     });
@@ -518,127 +1069,228 @@ export class InspectionTasksService {
     const [
       totalDevices,
       totalGates,
-      remainingDevices,
-      remainingGates,
-      completedDeviceItems,
-      completedGateItems,
-      issueDeviceItems,
-      issueGateItems,
-      totalTasks,
-      completedTasks,
-      pendingTasks,
-      inProgressTasks,
+
+      hardwareTasks,
+      softwareTasks,
+      gateTasks,
+
+      completedHardwareTasks,
+      completedSoftwareTasks,
+      completedGateTasks,
+
+      pendingHardwareTasks,
+      pendingSoftwareTasks,
+      pendingGateTasks,
+
+      inProgressHardwareTasks,
+      inProgressSoftwareTasks,
+      inProgressGateTasks,
+
+      hardwareDoneItems,
+      softwareDoneItems,
+      gateDoneItems,
+
+      hardwareIssueItems,
+      softwareIssueItems,
+      gateIssueItems,
+
+      hardwareRemainingItems,
+      softwareRemainingItems,
+      gateRemainingItems,
     ] = await Promise.all([
       this.prisma.device.count(),
       this.prisma.gate.count(),
 
-      this.prisma.inspectionTaskItem.count({
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.DEVICE },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.SOFTWARE },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.GATE },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.DEVICE, status: TaskStatus.COMPLETED },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.SOFTWARE, status: TaskStatus.COMPLETED },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.GATE, status: TaskStatus.COMPLETED },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.DEVICE, status: TaskStatus.PENDING },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.SOFTWARE, status: TaskStatus.PENDING },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.GATE, status: TaskStatus.PENDING },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.DEVICE, status: TaskStatus.IN_PROGRESS },
+      }),
+
+      this.prisma.inspectionTask.count({
         where: {
-          status: { in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS] },
-          deviceId: { not: null },
+          assetType: AssetType.SOFTWARE,
+          status: TaskStatus.IN_PROGRESS,
         },
+      }),
+
+      this.prisma.inspectionTask.count({
+        where: { assetType: AssetType.GATE, status: TaskStatus.IN_PROGRESS },
       }),
 
       this.prisma.inspectionTaskItem.count({
         where: {
-          status: { in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS] },
-          gateId: { not: null },
+          status: TaskItemStatus.DONE,
+          task: { assetType: AssetType.DEVICE },
         },
       }),
 
       this.prisma.inspectionTaskItem.count({
         where: {
           status: TaskItemStatus.DONE,
-          deviceId: { not: null },
+          task: { assetType: AssetType.SOFTWARE },
         },
       }),
 
       this.prisma.inspectionTaskItem.count({
         where: {
           status: TaskItemStatus.DONE,
-          gateId: { not: null },
+          task: { assetType: AssetType.GATE },
         },
       }),
 
       this.prisma.inspectionTaskItem.count({
         where: {
           status: TaskItemStatus.ISSUE_FOUND,
-          deviceId: { not: null },
+          task: { assetType: AssetType.DEVICE },
         },
       }),
 
       this.prisma.inspectionTaskItem.count({
         where: {
           status: TaskItemStatus.ISSUE_FOUND,
-          gateId: { not: null },
+          task: { assetType: AssetType.SOFTWARE },
         },
       }),
 
-      this.prisma.inspectionTask.count(),
-
-      this.prisma.inspectionTask.count({
-        where: { status: TaskStatus.COMPLETED },
+      this.prisma.inspectionTaskItem.count({
+        where: {
+          status: TaskItemStatus.ISSUE_FOUND,
+          task: { assetType: AssetType.GATE },
+        },
       }),
 
-      this.prisma.inspectionTask.count({
-        where: { status: TaskStatus.PENDING },
+      this.prisma.inspectionTaskItem.count({
+        where: {
+          status: {
+            in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
+          },
+          task: { assetType: AssetType.DEVICE },
+        },
       }),
 
-      this.prisma.inspectionTask.count({
-        where: { status: TaskStatus.IN_PROGRESS },
+      this.prisma.inspectionTaskItem.count({
+        where: {
+          status: {
+            in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
+          },
+          task: { assetType: AssetType.SOFTWARE },
+        },
+      }),
+
+      this.prisma.inspectionTaskItem.count({
+        where: {
+          status: {
+            in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
+          },
+          task: { assetType: AssetType.GATE },
+        },
       }),
     ]);
 
     const users = await this.prisma.user.findMany({
       where: {
-        assignedTasks: {
-          some: {},
-        },
+        OR: [
+          {
+            assignedTasks: {
+              some: {},
+            },
+          },
+          {
+            assignedTaskItems: {
+              some: {},
+            },
+          },
+          {
+            completedTaskItems: {
+              some: {},
+            },
+          },
+        ],
       },
       select: {
         id: true,
         fullName: true,
         username: true,
         email: true,
+        phone: true,
+        jobTitle: true,
       },
     });
 
     const technicians = await Promise.all(
       users.map(async (user) => {
         const [
-          assignedTasks,
-          technicianCompletedTasks,
-          technicianPendingTasks,
-          technicianInProgressTasks,
-          doneDevices,
-          doneGates,
-          techRemainingDevices,
-          techRemainingGates,
-          issueDevices,
-          issueGates,
+          assignedHardwareTasks,
+          assignedSoftwareTasks,
+          assignedGateTasks,
+
+          doneHardwareItems,
+          doneSoftwareItems,
+          doneGateItems,
+
+          issueHardwareItems,
+          issueSoftwareItems,
+          issueGateItems,
+
+          remainingHardwareItems,
+          remainingSoftwareItems,
+          remainingGateItems,
+
+          lastActivity,
         ] = await Promise.all([
           this.prisma.inspectionTask.count({
-            where: { assignedToId: user.id },
-          }),
-
-          this.prisma.inspectionTask.count({
             where: {
               assignedToId: user.id,
-              status: TaskStatus.COMPLETED,
+              assetType: AssetType.DEVICE,
             },
           }),
 
           this.prisma.inspectionTask.count({
             where: {
               assignedToId: user.id,
-              status: TaskStatus.PENDING,
+              assetType: AssetType.SOFTWARE,
             },
           }),
 
           this.prisma.inspectionTask.count({
             where: {
               assignedToId: user.id,
-              status: TaskStatus.IN_PROGRESS,
+              assetType: AssetType.GATE,
             },
           }),
 
@@ -646,7 +1298,7 @@ export class InspectionTasksService {
             where: {
               assignedToId: user.id,
               status: TaskItemStatus.DONE,
-              deviceId: { not: null },
+              task: { assetType: AssetType.DEVICE },
             },
           }),
 
@@ -654,23 +1306,15 @@ export class InspectionTasksService {
             where: {
               assignedToId: user.id,
               status: TaskItemStatus.DONE,
-              gateId: { not: null },
+              task: { assetType: AssetType.SOFTWARE },
             },
           }),
 
           this.prisma.inspectionTaskItem.count({
             where: {
               assignedToId: user.id,
-              status: { in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS] },
-              deviceId: { not: null },
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: { in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS] },
-              gateId: { not: null },
+              status: TaskItemStatus.DONE,
+              task: { assetType: AssetType.GATE },
             },
           }),
 
@@ -678,7 +1322,7 @@ export class InspectionTasksService {
             where: {
               assignedToId: user.id,
               status: TaskItemStatus.ISSUE_FOUND,
-              deviceId: { not: null },
+              task: { assetType: AssetType.DEVICE },
             },
           }),
 
@@ -686,24 +1330,89 @@ export class InspectionTasksService {
             where: {
               assignedToId: user.id,
               status: TaskItemStatus.ISSUE_FOUND,
-              gateId: { not: null },
+              task: { assetType: AssetType.SOFTWARE },
+            },
+          }),
+
+          this.prisma.inspectionTaskItem.count({
+            where: {
+              assignedToId: user.id,
+              status: TaskItemStatus.ISSUE_FOUND,
+              task: { assetType: AssetType.GATE },
+            },
+          }),
+
+          this.prisma.inspectionTaskItem.count({
+            where: {
+              assignedToId: user.id,
+              status: {
+                in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
+              },
+              task: { assetType: AssetType.DEVICE },
+            },
+          }),
+
+          this.prisma.inspectionTaskItem.count({
+            where: {
+              assignedToId: user.id,
+              status: {
+                in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
+              },
+              task: { assetType: AssetType.SOFTWARE },
+            },
+          }),
+
+          this.prisma.inspectionTaskItem.count({
+            where: {
+              assignedToId: user.id,
+              status: {
+                in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
+              },
+              task: { assetType: AssetType.GATE },
+            },
+          }),
+
+          this.prisma.technicianActivityLog.findFirst({
+            where: {
+              userId: user.id,
+            },
+            orderBy: {
+              createdAt: 'desc',
             },
           }),
         ]);
 
         return {
           technicianId: user.id,
-          technicianName: user.fullName || user.username || user.email,
-          assignedTasks,
-          completedTasks: technicianCompletedTasks,
-          pendingTasks: technicianPendingTasks,
-          inProgressTasks: technicianInProgressTasks,
-          doneDevices,
-          doneGates,
-          remainingDevices: techRemainingDevices,
-          remainingGates: techRemainingGates,
-          issueDevices,
-          issueGates,
+          technicianName:
+            user.fullName || user.username || user.email || `User ${user.id}`,
+          username: user.username,
+          email: user.email,
+          phone: user.phone,
+          jobTitle: user.jobTitle,
+
+          hardware: {
+            assignedTasks: assignedHardwareTasks,
+            doneItems: doneHardwareItems,
+            issueItems: issueHardwareItems,
+            remainingItems: remainingHardwareItems,
+          },
+
+          software: {
+            assignedTasks: assignedSoftwareTasks,
+            doneItems: doneSoftwareItems,
+            issueItems: issueSoftwareItems,
+            remainingItems: remainingSoftwareItems,
+          },
+
+          gates: {
+            assignedTasks: assignedGateTasks,
+            doneItems: doneGateItems,
+            issueItems: issueGateItems,
+            remainingItems: remainingGateItems,
+          },
+
+          lastActivity,
         };
       }),
     );
@@ -712,37 +1421,156 @@ export class InspectionTasksService {
       summary: {
         totalDevices,
         totalGates,
-        remainingDevices,
-        remainingGates,
-        completedDeviceItems,
-        completedGateItems,
-        issueDeviceItems,
-        issueGateItems,
-        totalTasks,
-        completedTasks,
-        pendingTasks,
-        inProgressTasks,
+
+        hardware: {
+          tasks: hardwareTasks,
+          completedTasks: completedHardwareTasks,
+          pendingTasks: pendingHardwareTasks,
+          inProgressTasks: inProgressHardwareTasks,
+          doneItems: hardwareDoneItems,
+          issueItems: hardwareIssueItems,
+          remainingItems: hardwareRemainingItems,
+        },
+
+        software: {
+          tasks: softwareTasks,
+          completedTasks: completedSoftwareTasks,
+          pendingTasks: pendingSoftwareTasks,
+          inProgressTasks: inProgressSoftwareTasks,
+          doneItems: softwareDoneItems,
+          issueItems: softwareIssueItems,
+          remainingItems: softwareRemainingItems,
+        },
+
+        gates: {
+          tasks: gateTasks,
+          completedTasks: completedGateTasks,
+          pendingTasks: pendingGateTasks,
+          inProgressTasks: inProgressGateTasks,
+          doneItems: gateDoneItems,
+          issueItems: gateIssueItems,
+          remainingItems: gateRemainingItems,
+        },
       },
+
       technicians,
     };
   }
 
-  async update(id: number, dto: any) {
+  async getActivity(query: any = {}) {
+    const where: Prisma.TechnicianActivityLogWhereInput = {};
+
+    if (query.userId) {
+      where.userId = Number(query.userId);
+    }
+
+    if (query.taskId) {
+      where.taskId = Number(query.taskId);
+    }
+
+    if (query.deviceId) {
+      where.deviceId = Number(query.deviceId);
+    }
+
+    if (query.gateId) {
+      where.gateId = Number(query.gateId);
+    }
+
+    if (query.action) {
+      where.action = String(query.action).toUpperCase() as TechnicianActionType;
+    }
+
+    if (query.from || query.to) {
+      where.createdAt = {
+        gte: query.from ? new Date(query.from) : undefined,
+        lte: query.to ? new Date(query.to) : undefined,
+      };
+    }
+
+    return this.prisma.technicianActivityLog.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: query.limit ? Number(query.limit) : 200,
+      include: {
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            username: true,
+            email: true,
+            phone: true,
+            jobTitle: true,
+          },
+        },
+        device: {
+          include: {
+            location: true,
+            deviceType: true,
+          },
+        },
+        gate: {
+          include: {
+            location: true,
+          },
+        },
+        task: true,
+        taskItem: true,
+        inspection: true,
+        morphoRepair: true,
+        replacement: true,
+      },
+    });
+  }
+
+  async update(id: number, dto: UpdateInspectionTaskDto | any) {
     await this.findOne(id);
 
-    const data: any = {};
+    const data: Prisma.InspectionTaskUpdateInput = {};
 
-    if (dto.title !== undefined) data.title = dto.title || null;
-    if (dto.notes !== undefined) data.notes = dto.notes || null;
-    if (dto.status !== undefined) data.status = dto.status;
-    if (dto.priority !== undefined) data.priority = dto.priority;
+    if (dto.title !== undefined) {
+      data.title = dto.title || null;
+    }
+
+    if (dto.notes !== undefined) {
+      data.notes = dto.notes || null;
+    }
+
+    if (dto.status !== undefined) {
+      data.status = this.normalizeTaskStatus(dto.status);
+    }
+
+    if (dto.priority !== undefined) {
+      data.priority = this.normalizePriority(dto.priority);
+    }
+
+    if (dto.taskKind !== undefined) {
+      data.taskKind = this.normalizeTaskKind(dto.taskKind);
+    }
+
+    if (dto.requiresScan !== undefined) {
+      data.requiresScan = this.normalizeBoolean(dto.requiresScan, true);
+    }
+
+    if (dto.requiresLocation !== undefined) {
+      data.requiresLocation = this.normalizeBoolean(dto.requiresLocation, false);
+    }
+
     if (dto.dueDate !== undefined) {
       data.dueDate = dto.dueDate ? new Date(dto.dueDate) : null;
+    }
+
+    if (dto.scheduledDate !== undefined) {
+      data.scheduledDate = dto.scheduledDate
+        ? new Date(dto.scheduledDate)
+        : undefined;
     }
 
     return this.prisma.inspectionTask.update({
       where: { id },
       data,
+      include: this.taskInclude(),
     });
   }
 

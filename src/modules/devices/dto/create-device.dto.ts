@@ -12,15 +12,15 @@ export enum DeviceStatus {
 export class CreateDeviceDto {
   @IsString()
   @IsNotEmpty()
-  deviceName: string;
+  deviceName: string | undefined;
 
   @IsString()
   @IsNotEmpty()
-  deviceCode: string;
+  deviceCode: string | undefined;
 
   @IsString()
   @IsNotEmpty()
-  serialNumber: string;
+  serialNumber: string | undefined;
 
   @IsString()
   @IsOptional()
@@ -28,13 +28,13 @@ export class CreateDeviceDto {
 
   @IsEnum(DeviceStatus)
   @IsOptional()
-  currentStatus?: DeviceStatus; // لو بتستخدم status مثل OK، Not Working، إلخ.
+  currentStatus?: DeviceStatus;
 
   @IsString()
   @IsOptional()
-  location?: string; // لو الجهاز له موقع معين
+  location?: string; 
 
   @IsString()
   @IsOptional()
-  installationDate?: string; // تاريخ التثبيت
+  installationDate?: string; 
 }
