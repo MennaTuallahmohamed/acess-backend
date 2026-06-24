@@ -19,6 +19,18 @@ export class DeviceReplacementsService {
     return text ? text : null;
   }
 
+  private removeEmpty(data: any) {
+    const cleaned = { ...data };
+
+    Object.keys(cleaned).forEach((key) => {
+      if (cleaned[key] === undefined || cleaned[key] === null) {
+        delete cleaned[key];
+      }
+    });
+
+    return cleaned;
+  }
+
   private getDeviceCode(device: any) {
     return (
       device?.deviceCode ||
@@ -98,6 +110,46 @@ export class DeviceReplacementsService {
     } catch {
       return null;
     }
+  }
+
+  private async findFallbackUserIdSafe() {
+    try {
+      const user = await (this.prisma as any).user.findFirst({
+        orderBy: { id: 'asc' },
+        select: { id: true },
+      });
+
+      return user?.id || null;
+    } catch {
+      try {
+        const user = await (this.prisma as any).user.findFirst();
+        return user?.id || null;
+      } catch {
+        return null;
+      }
+    }
+  }
+
+  private async resolveReplacedById(preferredId?: number | null) {
+    const preferred = Number(preferredId || 0);
+
+    if (preferred) {
+      const user = await this.findUserSafe(preferred);
+
+      if (user?.id) {
+        return user.id;
+      }
+    }
+
+    const fallbackId = await this.findFallbackUserIdSafe();
+
+    if (fallbackId) {
+      return fallbackId;
+    }
+
+    throw new BadRequestException(
+      'DeviceReplacement requires replacedBy user, but no valid user was found.',
+    );
   }
 
   private async enrich(record: any) {
@@ -181,6 +233,8 @@ export class DeviceReplacementsService {
       throw new NotFoundException('Device not found');
     }
 
+    const replacedById = await this.resolveReplacedById(dto.replacedById || null);
+
     const oldSnapshot = this.snapshotDevice(oldDevice);
     const sameIp = oldDevice.ipAddress || null;
 
@@ -228,7 +282,7 @@ export class DeviceReplacementsService {
     const replacementRecord = await this.createReplacementRecordSafe({
       oldDeviceId: oldDevice.id,
       newDeviceId: oldDevice.id,
-      replacedById: dto.replacedById || null,
+      replacedById,
       status: 'COMPLETED',
       oldIpAddress: sameIp,
       oldSnapshot,
@@ -239,7 +293,7 @@ export class DeviceReplacementsService {
     });
 
     await this.writeAuditLogSafe({
-      userId: dto.replacedById || null,
+      userId: replacedById,
       action: 'DEVICE_LOCATION_REPLACED',
       message: `Device ${this.getDeviceCode(
         oldDevice,
@@ -314,13 +368,11 @@ export class DeviceReplacementsService {
 
     for (const data of attempts) {
       try {
-        const cleaned = { ...data };
+        const cleaned = this.removeEmpty(data);
 
-        Object.keys(cleaned).forEach((key) => {
-          if ((cleaned as any)[key] === undefined) {
-            delete (cleaned as any)[key];
-          }
-        });
+        if (!Object.keys(cleaned).length) {
+          continue;
+        }
 
         return await (this.prisma as any).device.update({
           where: { id: deviceId },
@@ -345,13 +397,17 @@ export class DeviceReplacementsService {
 
     const oldId = Number(data.oldDeviceId);
     const newId = Number(data.newDeviceId);
+    const userId = await this.resolveReplacedById(data.replacedById);
 
-    const fullDataWithUser: any = {
+    const withSnapshots: any = {
       oldDevice: {
         connect: { id: oldId },
       },
       newDevice: {
         connect: { id: newId },
+      },
+      replacedBy: {
+        connect: { id: userId },
       },
       status: data.status || 'COMPLETED',
       oldIpAddress: data.oldIpAddress || null,
@@ -362,34 +418,32 @@ export class DeviceReplacementsService {
       replacementDate: data.replacementDate || new Date(),
     };
 
-    if (data.replacedById) {
-      fullDataWithUser.replacedBy = {
-        connect: { id: Number(data.replacedById) },
-      };
-    }
-
-    const fullDataWithoutUser: any = {
+    const withoutSnapshots: any = {
       oldDevice: {
         connect: { id: oldId },
       },
       newDevice: {
         connect: { id: newId },
       },
+      replacedBy: {
+        connect: { id: userId },
+      },
       status: data.status || 'COMPLETED',
       oldIpAddress: data.oldIpAddress || null,
-      oldSnapshot: data.oldSnapshot,
-      newSnapshot: data.newSnapshot,
       reason: data.reason || null,
       notes: data.notes || null,
       replacementDate: data.replacementDate || new Date(),
     };
 
-    const minimalData: any = {
+    const minimal: any = {
       oldDevice: {
         connect: { id: oldId },
       },
       newDevice: {
         connect: { id: newId },
+      },
+      replacedBy: {
+        connect: { id: userId },
       },
       status: data.status || 'COMPLETED',
       oldIpAddress: data.oldIpAddress || null,
@@ -398,21 +452,15 @@ export class DeviceReplacementsService {
     };
 
     const attempts = [
-      fullDataWithUser,
-      fullDataWithoutUser,
-      minimalData,
+      this.removeEmpty(withSnapshots),
+      this.removeEmpty(withoutSnapshots),
+      this.removeEmpty(minimal),
     ];
 
     let lastError: any;
 
     for (const attempt of attempts) {
       try {
-        Object.keys(attempt).forEach((key) => {
-          if (attempt[key] === undefined) {
-            delete attempt[key];
-          }
-        });
-
         return await model.create({
           data: attempt,
         });
