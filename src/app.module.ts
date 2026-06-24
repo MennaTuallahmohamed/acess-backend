@@ -19,6 +19,8 @@ import { ReportsModule } from './modules/reports/reports.module';
 import { GatesModule } from './gates/gates.module';
 import { InspectionWorkflowModule } from './modules/inspection-workflow/inspection-workflow.module';
 
+import { DeviceReplacementsModule } from './modules/device-replacements/device-replacements.module';
+
 @Module({
   imports: [
     PrismaModule,
@@ -41,6 +43,8 @@ import { InspectionWorkflowModule } from './modules/inspection-workflow/inspecti
     GatesModule,
 
     InspectionWorkflowModule,
+
+    DeviceReplacementsModule,
   ],
 })
 export class AppModule {}
