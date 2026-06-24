@@ -63,6 +63,11 @@ export class DeviceReplacementsService {
       gateDirection: device.gateDirection ?? null,
       createdAt: device.createdAt ?? null,
       updatedAt: device.updatedAt ?? null,
+      lastInspectionAt:
+        device.lastInspectionAt ||
+        device.inspections?.[0]?.inspectedAt ||
+        device.inspections?.[0]?.createdAt ||
+        null,
     };
   }
 
@@ -102,6 +107,17 @@ export class DeviceReplacementsService {
     }
   }
 
+  private makeDeviceFromSnapshot(snapshot: any, liveDevice: any) {
+    if (!snapshot && !liveDevice) return null;
+
+    return {
+      ...(snapshot || {}),
+      inspections: liveDevice?.inspections || [],
+      location: liveDevice?.location || null,
+      deviceType: liveDevice?.deviceType || null,
+    };
+  }
+
   private async enrich(record: any) {
     if (!record) return null;
 
@@ -109,16 +125,19 @@ export class DeviceReplacementsService {
     const newDeviceId = Number(record.newDeviceId || 0);
     const replacedById = Number(record.replacedById || record.userId || 0);
 
-    const [oldDevice, newDevice, replacedBy] = await Promise.all([
+    const [oldLiveDevice, newLiveDevice, replacedBy] = await Promise.all([
       oldDeviceId ? this.findDeviceSafe(oldDeviceId) : null,
       newDeviceId ? this.findDeviceSafe(newDeviceId) : null,
       replacedById ? this.findUserSafe(replacedById) : null,
     ]);
 
+    const oldSnapshot = record.oldSnapshot || record.oldDeviceSnapshot || null;
+    const newSnapshot = record.newSnapshot || record.newDeviceSnapshot || null;
+
     return {
       ...record,
-      oldDevice,
-      newDevice,
+      oldDevice: this.makeDeviceFromSnapshot(oldSnapshot, oldLiveDevice),
+      newDevice: this.makeDeviceFromSnapshot(newSnapshot, newLiveDevice),
       replacedBy,
     };
   }
@@ -183,6 +202,12 @@ export class DeviceReplacementsService {
       throw new NotFoundException('Old device not found');
     }
 
+    if (!oldDevice.barcode) {
+      throw new BadRequestException(
+        'Old device has no barcode. Replacement cannot continue because barcode is required.',
+      );
+    }
+
     const newDeviceCode = this.clean(dto.newDeviceCode);
     const newDeviceName = this.clean(dto.newDeviceName) || oldDevice.deviceName;
 
@@ -194,25 +219,25 @@ export class DeviceReplacementsService {
       throw new BadRequestException('newDeviceName is required');
     }
 
-    const deviceTypeId = Number(oldDevice.deviceTypeId);
-
-    if (!deviceTypeId || Number.isNaN(deviceTypeId)) {
-      throw new BadRequestException(
-        'Old device has no deviceTypeId. Cannot create replacement device.',
-      );
-    }
-
     const oldSnapshot = this.snapshotDevice(oldDevice);
     const sameIp = oldDevice.ipAddress || null;
+    const sameBarcode = oldDevice.barcode;
 
-    const newDeviceData: any = this.omitUndefined({
+    const updateDeviceData: any = this.omitUndefined({
       deviceCode: newDeviceCode,
       deviceName: newDeviceName,
 
-      serialNumber: this.clean(dto.newSerialNumber),
-      barcode: this.clean(dto.newBarcode),
-      modelNumber: this.clean(dto.newModelNumber),
-      firmware: this.clean(dto.newFirmware) ?? oldDevice.firmware ?? null,
+      serialNumber:
+        this.clean(dto.newSerialNumber) ?? oldDevice.serialNumber ?? null,
+
+      barcode: sameBarcode,
+
+      modelNumber:
+        this.clean(dto.newModelNumber) ?? oldDevice.modelNumber ?? null,
+
+      firmware:
+        this.clean(dto.newFirmware) ?? oldDevice.firmware ?? null,
+
       manufacturer:
         this.clean(dto.newManufacturer) ?? oldDevice.manufacturer ?? null,
 
@@ -220,108 +245,88 @@ export class DeviceReplacementsService {
 
       currentStatus: 'OK',
       lifecycleStatus: 'ACTIVE',
-      assetType: 'DEVICE',
+      assetType: oldDevice.assetType ?? 'DEVICE',
 
       gateNo: oldDevice.gateNo ?? null,
-      gateCluster: this.clean(dto.newCluster) ?? oldDevice.gateCluster ?? null,
+      gateCluster:
+        this.clean(dto.newCluster) ?? oldDevice.gateCluster ?? null,
       gateBuilding:
         this.clean(dto.newBuilding) ?? oldDevice.gateBuilding ?? null,
-      gateZone: this.clean(dto.newZone) ?? oldDevice.gateZone ?? null,
+      gateZone:
+        this.clean(dto.newZone) ?? oldDevice.gateZone ?? null,
       gateDirection:
         this.clean(dto.newDirection) ?? oldDevice.gateDirection ?? null,
 
-      notes: this.clean(dto.notes),
-
-      deviceType: {
-        connect: {
-          id: deviceTypeId,
-        },
-      },
-
-      location: oldDevice.locationId
-        ? {
-            connect: {
-              id: oldDevice.locationId,
-            },
-          }
-        : undefined,
+      notes: this.clean(dto.notes) ?? oldDevice.notes ?? null,
     });
 
-    let newDevice: any;
+    let replacementRecord: any;
 
     try {
-      newDevice = await (this.prisma as any).device.create({
-        data: newDeviceData,
-      });
+      replacementRecord = await (this.prisma as any).$transaction(
+        async (tx: any) => {
+          const updatedDevice = await tx.device.update({
+            where: {
+              id: oldDevice.id,
+            },
+            data: updateDeviceData,
+          });
+
+          const newSnapshot = this.snapshotDevice(updatedDevice);
+
+          const replacementBase: any = {
+            oldDeviceId: oldDevice.id,
+            newDeviceId: updatedDevice.id,
+
+            replacedById: dto.replacedById || null,
+
+            status: 'COMPLETED',
+            oldIpAddress: sameIp,
+
+            oldSnapshot,
+            newSnapshot,
+
+            reason: this.clean(dto.reason),
+            notes: this.clean(dto.notes),
+
+            replacementDate: new Date(),
+          };
+
+          const createdReplacement =
+            await this.createReplacementRecordSafeWithClient(
+              tx,
+              replacementBase,
+            );
+
+          await this.writeAuditLogSafeWithClient(tx, {
+            userId: dto.replacedById || null,
+            action: 'DEVICE_REPLACED',
+            message: `Device ${this.getDeviceCode(
+              oldSnapshot,
+            )} updated/replaced to ${this.getDeviceCode(newSnapshot)}`,
+            oldDeviceId: oldDevice.id,
+            newDeviceId: updatedDevice.id,
+            replacementId: createdReplacement.id,
+          });
+
+          return createdReplacement;
+        },
+      );
     } catch (error: any) {
       throw new BadRequestException(
-        error?.message || 'Failed to create new device',
+        error?.message || 'Failed to replace device',
       );
     }
-
-    const newSnapshot = this.snapshotDevice(newDevice);
-
-    await this.markOldDeviceAsReplaced(oldDevice.id);
-
-    const replacementBase: any = {
-      oldDeviceId: oldDevice.id,
-      newDeviceId: newDevice.id,
-      replacedById: dto.replacedById || null,
-      status: 'COMPLETED',
-      oldIpAddress: sameIp,
-      oldSnapshot,
-      newSnapshot,
-      reason: this.clean(dto.reason),
-      notes: this.clean(dto.notes),
-      replacementDate: new Date(),
-    };
-
-    const replacementRecord = await this.createReplacementRecordSafe(
-      replacementBase,
-    );
-
-    await this.writeAuditLogSafe({
-      userId: dto.replacedById || null,
-      action: 'DEVICE_REPLACED',
-      message: `Device ${this.getDeviceCode(
-        oldDevice,
-      )} replaced by ${this.getDeviceCode(newDevice)}`,
-      oldDeviceId: oldDevice.id,
-      newDeviceId: newDevice.id,
-      replacementId: replacementRecord.id,
-    });
 
     return this.enrich(replacementRecord);
   }
 
-  private async markOldDeviceAsReplaced(oldDeviceId: number) {
-    try {
-      await (this.prisma as any).device.update({
-        where: { id: oldDeviceId },
-        data: {
-          lifecycleStatus: 'REPLACED',
-        },
-      });
+  private async createReplacementRecordSafeWithClient(client: any, data: any) {
+    const model = client.deviceReplacement;
 
-      return;
-    } catch {
-      // fallback
+    if (!model?.create) {
+      throw new BadRequestException('DeviceReplacement model is not available');
     }
-
-    try {
-      await (this.prisma as any).device.update({
-        where: { id: oldDeviceId },
-        data: {
-          currentStatus: 'NEEDS_MAINTENANCE',
-        },
-      });
-    } catch {
-      // do not break replacement because status fields can differ by schema
-    }
-  }
-
-  private async createReplacementRecordSafe(data: any) {
-    const model = this.replacementModel;
 
     const attempts = [
       data,
@@ -379,16 +384,19 @@ export class DeviceReplacementsService {
     );
   }
 
-  private async writeAuditLogSafe(data: {
-    userId?: number | null;
-    action: string;
-    message: string;
-    oldDeviceId?: number;
-    newDeviceId?: number;
-    replacementId?: number;
-  }) {
+  private async writeAuditLogSafeWithClient(
+    client: any,
+    data: {
+      userId?: number | null;
+      action: string;
+      message: string;
+      oldDeviceId?: number;
+      newDeviceId?: number;
+      replacementId?: number;
+    },
+  ) {
     try {
-      await (this.prisma as any).auditLog.create({
+      await client.auditLog.create({
         data: {
           userId: data.userId || null,
           action: data.action,
