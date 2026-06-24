@@ -19,6 +19,16 @@ export class DeviceReplacementsService {
     return text ? text : null;
   }
 
+  private omitUndefined<T extends Record<string, any>>(data: T): T {
+    Object.keys(data).forEach((key) => {
+      if (data[key] === undefined) {
+        delete data[key];
+      }
+    });
+
+    return data;
+  }
+
   private getDeviceCode(device: any) {
     return (
       device?.deviceCode ||
@@ -43,6 +53,7 @@ export class DeviceReplacementsService {
       ipAddress: device.ipAddress ?? null,
       currentStatus: device.currentStatus ?? null,
       lifecycleStatus: device.lifecycleStatus ?? null,
+      assetType: device.assetType ?? null,
       deviceTypeId: device.deviceTypeId ?? null,
       locationId: device.locationId ?? null,
       gateNo: device.gateNo ?? null,
@@ -160,23 +171,50 @@ export class DeviceReplacementsService {
       );
     }
 
-    const oldDevice = await this.findDeviceSafe(Number(dto.oldDeviceId));
+    const oldDeviceId = Number(dto.oldDeviceId);
+
+    if (!oldDeviceId || Number.isNaN(oldDeviceId)) {
+      throw new BadRequestException('oldDeviceId is required');
+    }
+
+    const oldDevice = await this.findDeviceSafe(oldDeviceId);
 
     if (!oldDevice) {
       throw new NotFoundException('Old device not found');
     }
 
+    const newDeviceCode = this.clean(dto.newDeviceCode);
+    const newDeviceName = this.clean(dto.newDeviceName) || oldDevice.deviceName;
+
+    if (!newDeviceCode) {
+      throw new BadRequestException('newDeviceCode is required');
+    }
+
+    if (!newDeviceName) {
+      throw new BadRequestException('newDeviceName is required');
+    }
+
+    const deviceTypeId = Number(oldDevice.deviceTypeId);
+
+    if (!deviceTypeId || Number.isNaN(deviceTypeId)) {
+      throw new BadRequestException(
+        'Old device has no deviceTypeId. Cannot create replacement device.',
+      );
+    }
+
     const oldSnapshot = this.snapshotDevice(oldDevice);
     const sameIp = oldDevice.ipAddress || null;
 
-    const newDeviceData: any = {
-      deviceCode: this.clean(dto.newDeviceCode),
-      deviceName: this.clean(dto.newDeviceName),
+    const newDeviceData: any = this.omitUndefined({
+      deviceCode: newDeviceCode,
+      deviceName: newDeviceName,
+
       serialNumber: this.clean(dto.newSerialNumber),
       barcode: this.clean(dto.newBarcode),
       modelNumber: this.clean(dto.newModelNumber),
-      firmware: this.clean(dto.newFirmware),
-      manufacturer: this.clean(dto.newManufacturer),
+      firmware: this.clean(dto.newFirmware) ?? oldDevice.firmware ?? null,
+      manufacturer:
+        this.clean(dto.newManufacturer) ?? oldDevice.manufacturer ?? null,
 
       ipAddress: sameIp,
 
@@ -184,23 +222,29 @@ export class DeviceReplacementsService {
       lifecycleStatus: 'ACTIVE',
       assetType: 'DEVICE',
 
-      deviceTypeId: oldDevice.deviceTypeId ?? null,
-      locationId: oldDevice.locationId ?? null,
-
       gateNo: oldDevice.gateNo ?? null,
       gateCluster: this.clean(dto.newCluster) ?? oldDevice.gateCluster ?? null,
-      gateBuilding: this.clean(dto.newBuilding) ?? oldDevice.gateBuilding ?? null,
+      gateBuilding:
+        this.clean(dto.newBuilding) ?? oldDevice.gateBuilding ?? null,
       gateZone: this.clean(dto.newZone) ?? oldDevice.gateZone ?? null,
       gateDirection:
         this.clean(dto.newDirection) ?? oldDevice.gateDirection ?? null,
 
       notes: this.clean(dto.notes),
-    };
 
-    Object.keys(newDeviceData).forEach((key) => {
-      if (newDeviceData[key] === undefined) {
-        delete newDeviceData[key];
-      }
+      deviceType: {
+        connect: {
+          id: deviceTypeId,
+        },
+      },
+
+      location: oldDevice.locationId
+        ? {
+            connect: {
+              id: oldDevice.locationId,
+            },
+          }
+        : undefined,
     });
 
     let newDevice: any;
@@ -239,9 +283,9 @@ export class DeviceReplacementsService {
     await this.writeAuditLogSafe({
       userId: dto.replacedById || null,
       action: 'DEVICE_REPLACED',
-      message: `Device ${this.getDeviceCode(oldDevice)} replaced by ${this.getDeviceCode(
-        newDevice,
-      )}`,
+      message: `Device ${this.getDeviceCode(
+        oldDevice,
+      )} replaced by ${this.getDeviceCode(newDevice)}`,
       oldDeviceId: oldDevice.id,
       newDeviceId: newDevice.id,
       replacementId: replacementRecord.id,
@@ -255,7 +299,6 @@ export class DeviceReplacementsService {
       await (this.prisma as any).device.update({
         where: { id: oldDeviceId },
         data: {
-          currentStatus: 'OUT_OF_SERVICE',
           lifecycleStatus: 'REPLACED',
         },
       });
@@ -269,11 +312,11 @@ export class DeviceReplacementsService {
       await (this.prisma as any).device.update({
         where: { id: oldDeviceId },
         data: {
-          currentStatus: 'OUT_OF_SERVICE',
+          currentStatus: 'NEEDS_MAINTENANCE',
         },
       });
     } catch {
-      // do not break replacement because of optional status field
+      // do not break replacement because status fields can differ by schema
     }
   }
 
@@ -292,6 +335,16 @@ export class DeviceReplacementsService {
         newSnapshot: data.newSnapshot,
         reason: data.reason,
         notes: data.notes,
+        replacementDate: data.replacementDate,
+      },
+      {
+        oldDeviceId: data.oldDeviceId,
+        newDeviceId: data.newDeviceId,
+        replacedById: data.replacedById,
+        status: data.status,
+        oldIpAddress: data.oldIpAddress,
+        reason: data.reason,
+        notes: data.notes,
       },
       {
         oldDeviceId: data.oldDeviceId,
@@ -304,9 +357,6 @@ export class DeviceReplacementsService {
       {
         oldDeviceId: data.oldDeviceId,
         newDeviceId: data.newDeviceId,
-        oldIpAddress: data.oldIpAddress,
-        reason: data.reason,
-        notes: data.notes,
       },
     ];
 
@@ -314,9 +364,7 @@ export class DeviceReplacementsService {
 
     for (const attempt of attempts) {
       try {
-        Object.keys(attempt).forEach((key) => {
-          if (attempt[key] === undefined) delete attempt[key];
-        });
+        this.omitUndefined(attempt);
 
         return await model.create({
           data: attempt,
