@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -13,23 +14,22 @@ import { DeviceReplacementsService } from './device-replacements.service';
 export class DeviceReplacementsController {
   constructor(private readonly service: DeviceReplacementsService) {}
 
-  @Post()
-  create(@Body() dto: CreateDeviceReplacementDto) {
-    return this.service.create(dto);
-  }
-
   @Get()
   findAll() {
     return this.service.findAll();
   }
 
-  @Get('device/:deviceId')
-  findByDevice(@Param('deviceId', ParseIntPipe) deviceId: number) {
-    return this.service.findByDevice(deviceId);
-  }
-
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
+    if (!id || Number.isNaN(id)) {
+      throw new BadRequestException('Replacement id must be a number');
+    }
+
     return this.service.findOne(id);
+  }
+
+  @Post()
+  create(@Body() body: CreateDeviceReplacementDto) {
+    return this.service.create(body);
   }
 }

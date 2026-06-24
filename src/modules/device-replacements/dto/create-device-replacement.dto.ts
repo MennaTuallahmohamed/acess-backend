@@ -1,62 +1,67 @@
-import { Type, Transform } from 'class-transformer';
-import {
-  IsInt,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateDeviceReplacementDto {
   @Type(() => Number)
   @IsInt()
-  @Min(1)
-  oldDeviceId!: number;
+  oldDeviceId: number | undefined;
 
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   replacedById?: number;
 
-  @Transform(({ value }) => String(value || '').trim())
   @IsString()
-  newDeviceCode!: string;
+  newDeviceCode: string | undefined;
 
-  @Transform(({ value }) => String(value || '').trim())
   @IsString()
-  newDeviceName!: string;
+  newDeviceName: string | undefined;
 
   @IsOptional()
-  @Transform(({ value }) => String(value || '').trim())
   @IsString()
   newSerialNumber?: string;
 
   @IsOptional()
-  @Transform(({ value }) => String(value || '').trim())
   @IsString()
   newBarcode?: string;
 
   @IsOptional()
-  @Transform(({ value }) => String(value || '').trim())
   @IsString()
   newModelNumber?: string;
 
   @IsOptional()
-  @Transform(({ value }) => String(value || '').trim())
   @IsString()
   newFirmware?: string;
 
   @IsOptional()
-  @Transform(({ value }) => String(value || '').trim())
   @IsString()
   newManufacturer?: string;
 
   @IsOptional()
-  @Transform(({ value }) => String(value || '').trim())
+  @IsString()
+  newCluster?: string;
+
+  @IsOptional()
+  @IsString()
+  newBuilding?: string;
+
+  @IsOptional()
+  @IsString()
+  newZone?: string;
+
+  @IsOptional()
+  @IsString()
+  newDirection?: string;
+
+  @IsOptional()
+  @IsString()
+  newLane?: string;
+
+  @IsOptional()
   @IsString()
   reason?: string;
 
   @IsOptional()
-  @Transform(({ value }) => String(value || '').trim())
   @IsString()
   notes?: string;
 }

@@ -13,13 +13,13 @@ import { InspectionImageModule } from './modules/inspections/dto/inspection-imag
 
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { DevicesModule } from './modules/devices/devices.module';
+import { DeviceReplacementsModule } from './modules/device-replacements/device-replacements.module';
+
 import { IssuesModule } from './issues/issues.module';
 import { ReportsModule } from './modules/reports/reports.module';
 
 import { GatesModule } from './gates/gates.module';
 import { InspectionWorkflowModule } from './modules/inspection-workflow/inspection-workflow.module';
-
-import { DeviceReplacementsModule } from './modules/device-replacements/device-replacements.module';
 
 @Module({
   imports: [
@@ -31,6 +31,7 @@ import { DeviceReplacementsModule } from './modules/device-replacements/device-r
 
     LocationsModule,
     DevicesModule,
+    DeviceReplacementsModule,
 
     InspectionsModule,
     InspectionTasksModule,
@@ -43,8 +44,6 @@ import { DeviceReplacementsModule } from './modules/device-replacements/device-r
     GatesModule,
 
     InspectionWorkflowModule,
-
-    DeviceReplacementsModule,
   ],
 })
 export class AppModule {}
