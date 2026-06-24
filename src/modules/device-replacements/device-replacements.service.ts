@@ -19,10 +19,6 @@ export class DeviceReplacementsService {
     return text ? text : null;
   }
 
-  private keep(value: any, fallback: any = null) {
-    return value === undefined ? fallback : value;
-  }
-
   private getDeviceCode(device: any) {
     return (
       device?.deviceCode ||
@@ -174,6 +170,11 @@ export class DeviceReplacementsService {
     }
 
     const deviceId = Number(dto.oldDeviceId);
+
+    if (!deviceId || Number.isNaN(deviceId)) {
+      throw new BadRequestException('oldDeviceId must be a valid device id.');
+    }
+
     const oldDevice = await this.findDeviceSafe(deviceId);
 
     if (!oldDevice) {
@@ -183,13 +184,37 @@ export class DeviceReplacementsService {
     const oldSnapshot = this.snapshotDevice(oldDevice);
     const sameIp = oldDevice.ipAddress || null;
 
-    const newCluster = this.clean(dto.newCluster) ?? oldDevice.gateCluster ?? oldDevice.cluster ?? null;
-    const newBuilding = this.clean(dto.newBuilding) ?? oldDevice.gateBuilding ?? oldDevice.building ?? null;
-    const newZone = this.clean(dto.newZone) ?? oldDevice.gateZone ?? oldDevice.zone ?? null;
-    const newDirection = this.clean(dto.newDirection) ?? oldDevice.gateDirection ?? oldDevice.direction ?? null;
-    const newLane = this.clean(dto.newLane) ?? oldDevice.gateNo ?? oldDevice.lane ?? null;
+    const newCluster =
+      this.clean(dto.newCluster) ??
+      oldDevice.gateCluster ??
+      oldDevice.cluster ??
+      null;
 
-    const updatedDevice = await this.updateSameDeviceLocationSafe(oldDevice.id, {
+    const newBuilding =
+      this.clean(dto.newBuilding) ??
+      oldDevice.gateBuilding ??
+      oldDevice.building ??
+      null;
+
+    const newZone =
+      this.clean(dto.newZone) ??
+      oldDevice.gateZone ??
+      oldDevice.zone ??
+      null;
+
+    const newDirection =
+      this.clean(dto.newDirection) ??
+      oldDevice.gateDirection ??
+      oldDevice.direction ??
+      null;
+
+    const newLane =
+      this.clean(dto.newLane) ??
+      oldDevice.gateNo ??
+      oldDevice.lane ??
+      null;
+
+    await this.updateSameDeviceLocationSafe(oldDevice.id, {
       newCluster,
       newBuilding,
       newZone,
@@ -198,7 +223,7 @@ export class DeviceReplacementsService {
     });
 
     const freshDevice = await this.findDeviceSafe(oldDevice.id);
-    const newSnapshot = this.snapshotDevice(freshDevice || updatedDevice || oldDevice);
+    const newSnapshot = this.snapshotDevice(freshDevice || oldDevice);
 
     const replacementBase: any = {
       oldDeviceId: oldDevice.id,
@@ -220,7 +245,9 @@ export class DeviceReplacementsService {
     await this.writeAuditLogSafe({
       userId: dto.replacedById || null,
       action: 'DEVICE_LOCATION_REPLACED',
-      message: `Device ${this.getDeviceCode(oldDevice)} updated as same device with same IP ${sameIp || '—'}`,
+      message: `Device ${this.getDeviceCode(
+        oldDevice,
+      )} updated as same device with same IP ${sameIp || '—'}`,
       oldDeviceId: oldDevice.id,
       newDeviceId: oldDevice.id,
       replacementId: replacementRecord.id,
@@ -316,44 +343,116 @@ export class DeviceReplacementsService {
   private async createReplacementRecordSafe(data: any) {
     const model = this.replacementModel;
 
+    if (!model?.create) {
+      throw new BadRequestException('DeviceReplacement model is not available.');
+    }
+
+    const relationCreateWithUser: any = {
+      oldDevice: {
+        connect: {
+          id: Number(data.oldDeviceId),
+        },
+      },
+      newDevice: {
+        connect: {
+          id: Number(data.newDeviceId),
+        },
+      },
+      status: data.status,
+      oldIpAddress: data.oldIpAddress,
+      oldSnapshot: data.oldSnapshot,
+      newSnapshot: data.newSnapshot,
+      reason: data.reason,
+      notes: data.notes,
+      replacementDate: data.replacementDate,
+    };
+
+    if (data.replacedById) {
+      relationCreateWithUser.replacedBy = {
+        connect: {
+          id: Number(data.replacedById),
+        },
+      };
+    }
+
+    const relationCreateWithoutUser: any = {
+      oldDevice: {
+        connect: {
+          id: Number(data.oldDeviceId),
+        },
+      },
+      newDevice: {
+        connect: {
+          id: Number(data.newDeviceId),
+        },
+      },
+      status: data.status,
+      oldIpAddress: data.oldIpAddress,
+      oldSnapshot: data.oldSnapshot,
+      newSnapshot: data.newSnapshot,
+      reason: data.reason,
+      notes: data.notes,
+      replacementDate: data.replacementDate,
+    };
+
+    const scalarCreateWithSnapshots: any = {
+      oldDeviceId: data.oldDeviceId,
+      newDeviceId: data.newDeviceId,
+      replacedById: data.replacedById,
+      status: data.status,
+      oldIpAddress: data.oldIpAddress,
+      oldSnapshot: data.oldSnapshot,
+      newSnapshot: data.newSnapshot,
+      reason: data.reason,
+      notes: data.notes,
+      replacementDate: data.replacementDate,
+    };
+
+    const scalarCreateWithoutUser: any = {
+      oldDeviceId: data.oldDeviceId,
+      newDeviceId: data.newDeviceId,
+      status: data.status,
+      oldIpAddress: data.oldIpAddress,
+      oldSnapshot: data.oldSnapshot,
+      newSnapshot: data.newSnapshot,
+      reason: data.reason,
+      notes: data.notes,
+      replacementDate: data.replacementDate,
+    };
+
+    const relationMinimal: any = {
+      oldDevice: {
+        connect: {
+          id: Number(data.oldDeviceId),
+        },
+      },
+      newDevice: {
+        connect: {
+          id: Number(data.newDeviceId),
+        },
+      },
+      status: data.status,
+      oldIpAddress: data.oldIpAddress,
+      reason: data.reason,
+      notes: data.notes,
+    };
+
+    const scalarMinimal: any = {
+      oldDeviceId: data.oldDeviceId,
+      newDeviceId: data.newDeviceId,
+      status: data.status,
+      oldIpAddress: data.oldIpAddress,
+      reason: data.reason,
+      notes: data.notes,
+    };
+
     const attempts = [
-      data,
-      {
-        oldDeviceId: data.oldDeviceId,
-        newDeviceId: data.newDeviceId,
-        replacedById: data.replacedById,
-        status: data.status,
-        oldIpAddress: data.oldIpAddress,
-        oldSnapshot: data.oldSnapshot,
-        newSnapshot: data.newSnapshot,
-        reason: data.reason,
-        notes: data.notes,
-      },
-      {
-        oldDeviceId: data.oldDeviceId,
-        newDeviceId: data.newDeviceId,
-        status: data.status,
-        oldIpAddress: data.oldIpAddress,
-        oldSnapshot: data.oldSnapshot,
-        newSnapshot: data.newSnapshot,
-        reason: data.reason,
-        notes: data.notes,
-      },
-      {
-        oldDeviceId: data.oldDeviceId,
-        newDeviceId: data.newDeviceId,
-        status: data.status,
-        oldIpAddress: data.oldIpAddress,
-        reason: data.reason,
-        notes: data.notes,
-      },
-      {
-        oldDeviceId: data.oldDeviceId,
-        newDeviceId: data.newDeviceId,
-        oldIpAddress: data.oldIpAddress,
-        reason: data.reason,
-        notes: data.notes,
-      },
+      relationCreateWithUser,
+      relationCreateWithoutUser,
+      scalarCreateWithSnapshots,
+      scalarCreateWithoutUser,
+      relationMinimal,
+      scalarMinimal,
     ];
 
     let lastError: any;
@@ -361,7 +460,9 @@ export class DeviceReplacementsService {
     for (const attempt of attempts) {
       try {
         Object.keys(attempt).forEach((key) => {
-          if (attempt[key] === undefined) delete attempt[key];
+          if (attempt[key] === undefined || attempt[key] === null) {
+            delete attempt[key];
+          }
         });
 
         return await model.create({
