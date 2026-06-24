@@ -11,32 +11,6 @@ export class CreateDeviceReplacementDto {
   @IsInt()
   replacedById?: number;
 
-  @IsString()
-  newDeviceCode: string | undefined;
-
-  @IsString()
-  newDeviceName: string | undefined;
-
-  @IsOptional()
-  @IsString()
-  newSerialNumber?: string;
-
-  @IsOptional()
-  @IsString()
-  newBarcode?: string;
-
-  @IsOptional()
-  @IsString()
-  newModelNumber?: string;
-
-  @IsOptional()
-  @IsString()
-  newFirmware?: string;
-
-  @IsOptional()
-  @IsString()
-  newManufacturer?: string;
-
   @IsOptional()
   @IsString()
   newCluster?: string;
@@ -64,4 +38,33 @@ export class CreateDeviceReplacementDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  // Optional old fields kept only for backward compatibility.
+  @IsOptional()
+  @IsString()
+  newDeviceCode?: string;
+
+  @IsOptional()
+  @IsString()
+  newDeviceName?: string;
+
+  @IsOptional()
+  @IsString()
+  newSerialNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  newBarcode?: string;
+
+  @IsOptional()
+  @IsString()
+  newModelNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  newFirmware?: string;
+
+  @IsOptional()
+  @IsString()
+  newManufacturer?: string;
 }
