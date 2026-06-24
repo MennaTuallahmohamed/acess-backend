@@ -225,7 +225,7 @@ export class DeviceReplacementsService {
     const freshDevice = await this.findDeviceSafe(oldDevice.id);
     const newSnapshot = this.snapshotDevice(freshDevice || oldDevice);
 
-    const replacementBase: any = {
+    const replacementRecord = await this.createReplacementRecordSafe({
       oldDeviceId: oldDevice.id,
       newDeviceId: oldDevice.id,
       replacedById: dto.replacedById || null,
@@ -236,11 +236,7 @@ export class DeviceReplacementsService {
       reason: this.clean(dto.reason),
       notes: this.clean(dto.notes),
       replacementDate: new Date(),
-    };
-
-    const replacementRecord = await this.createReplacementRecordSafe(
-      replacementBase,
-    );
+    });
 
     await this.writeAuditLogSafe({
       userId: dto.replacedById || null,
@@ -347,112 +343,64 @@ export class DeviceReplacementsService {
       throw new BadRequestException('DeviceReplacement model is not available.');
     }
 
-    const relationCreateWithUser: any = {
+    const oldId = Number(data.oldDeviceId);
+    const newId = Number(data.newDeviceId);
+
+    const fullDataWithUser: any = {
       oldDevice: {
-        connect: {
-          id: Number(data.oldDeviceId),
-        },
+        connect: { id: oldId },
       },
       newDevice: {
-        connect: {
-          id: Number(data.newDeviceId),
-        },
+        connect: { id: newId },
       },
-      status: data.status,
-      oldIpAddress: data.oldIpAddress,
+      status: data.status || 'COMPLETED',
+      oldIpAddress: data.oldIpAddress || null,
       oldSnapshot: data.oldSnapshot,
       newSnapshot: data.newSnapshot,
-      reason: data.reason,
-      notes: data.notes,
-      replacementDate: data.replacementDate,
+      reason: data.reason || null,
+      notes: data.notes || null,
+      replacementDate: data.replacementDate || new Date(),
     };
 
     if (data.replacedById) {
-      relationCreateWithUser.replacedBy = {
-        connect: {
-          id: Number(data.replacedById),
-        },
+      fullDataWithUser.replacedBy = {
+        connect: { id: Number(data.replacedById) },
       };
     }
 
-    const relationCreateWithoutUser: any = {
+    const fullDataWithoutUser: any = {
       oldDevice: {
-        connect: {
-          id: Number(data.oldDeviceId),
-        },
+        connect: { id: oldId },
       },
       newDevice: {
-        connect: {
-          id: Number(data.newDeviceId),
-        },
+        connect: { id: newId },
       },
-      status: data.status,
-      oldIpAddress: data.oldIpAddress,
+      status: data.status || 'COMPLETED',
+      oldIpAddress: data.oldIpAddress || null,
       oldSnapshot: data.oldSnapshot,
       newSnapshot: data.newSnapshot,
-      reason: data.reason,
-      notes: data.notes,
-      replacementDate: data.replacementDate,
+      reason: data.reason || null,
+      notes: data.notes || null,
+      replacementDate: data.replacementDate || new Date(),
     };
 
-    const scalarCreateWithSnapshots: any = {
-      oldDeviceId: data.oldDeviceId,
-      newDeviceId: data.newDeviceId,
-      replacedById: data.replacedById,
-      status: data.status,
-      oldIpAddress: data.oldIpAddress,
-      oldSnapshot: data.oldSnapshot,
-      newSnapshot: data.newSnapshot,
-      reason: data.reason,
-      notes: data.notes,
-      replacementDate: data.replacementDate,
-    };
-
-    const scalarCreateWithoutUser: any = {
-      oldDeviceId: data.oldDeviceId,
-      newDeviceId: data.newDeviceId,
-      status: data.status,
-      oldIpAddress: data.oldIpAddress,
-      oldSnapshot: data.oldSnapshot,
-      newSnapshot: data.newSnapshot,
-      reason: data.reason,
-      notes: data.notes,
-      replacementDate: data.replacementDate,
-    };
-
-    const relationMinimal: any = {
+    const minimalData: any = {
       oldDevice: {
-        connect: {
-          id: Number(data.oldDeviceId),
-        },
+        connect: { id: oldId },
       },
       newDevice: {
-        connect: {
-          id: Number(data.newDeviceId),
-        },
+        connect: { id: newId },
       },
-      status: data.status,
-      oldIpAddress: data.oldIpAddress,
-      reason: data.reason,
-      notes: data.notes,
-    };
-
-    const scalarMinimal: any = {
-      oldDeviceId: data.oldDeviceId,
-      newDeviceId: data.newDeviceId,
-      status: data.status,
-      oldIpAddress: data.oldIpAddress,
-      reason: data.reason,
-      notes: data.notes,
+      status: data.status || 'COMPLETED',
+      oldIpAddress: data.oldIpAddress || null,
+      reason: data.reason || null,
+      notes: data.notes || null,
     };
 
     const attempts = [
-      relationCreateWithUser,
-      relationCreateWithoutUser,
-      scalarCreateWithSnapshots,
-      scalarCreateWithoutUser,
-      relationMinimal,
-      scalarMinimal,
+      fullDataWithUser,
+      fullDataWithoutUser,
+      minimalData,
     ];
 
     let lastError: any;
@@ -460,7 +408,7 @@ export class DeviceReplacementsService {
     for (const attempt of attempts) {
       try {
         Object.keys(attempt).forEach((key) => {
-          if (attempt[key] === undefined || attempt[key] === null) {
+          if (attempt[key] === undefined) {
             delete attempt[key];
           }
         });
