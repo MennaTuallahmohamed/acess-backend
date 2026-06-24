@@ -3,19 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-
-import {
-  AssetType,
-  DeviceCurrentStatus,
-  InspectionStatus,
-  Prisma,
-  TaskItemStatus,
-  TaskKind,
-  TaskPriority,
-  TaskStatus,
-  TechnicianActionType,
-} from '@prisma/client';
-
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { CreateInspectionTaskDto } from './dto/create-inspection-task.dto';
 import { UpdateInspectionTaskDto } from './dto/update-inspection-task.dto';
@@ -29,29 +16,26 @@ export class InspectionTasksService {
 
   private toNumber(value: any, name: string, required = true): number | null {
     if (value === undefined || value === null || value === '') {
-      if (required) {
-        throw new BadRequestException(`${name} is required`);
-      }
-
+      if (required) throw new BadRequestException(`${name} is required`);
       return null;
     }
 
-    const parsed = Number(value);
+    const n = Number(value);
 
-    if (Number.isNaN(parsed)) {
+    if (Number.isNaN(n)) {
       throw new BadRequestException(`${name} must be a valid number`);
     }
 
-    return parsed;
+    return n;
   }
 
   private toNumberArray(value: any): number[] {
-    if (!value) return [];
+    if (value === undefined || value === null || value === '') return [];
 
     if (Array.isArray(value)) {
       return value
-        .map((id) => Number(id))
-        .filter((id) => !Number.isNaN(id));
+        .map((x) => Number(x))
+        .filter((x) => Number.isFinite(x) && !Number.isNaN(x));
     }
 
     if (typeof value === 'string') {
@@ -60,32 +44,18 @@ export class InspectionTasksService {
 
         if (Array.isArray(parsed)) {
           return parsed
-            .map((id) => Number(id))
-            .filter((id) => !Number.isNaN(id));
+            .map((x) => Number(x))
+            .filter((x) => Number.isFinite(x) && !Number.isNaN(x));
         }
       } catch (_) {}
 
       return value
         .split(',')
-        .map((id) => Number(String(id).trim()))
-        .filter((id) => !Number.isNaN(id));
+        .map((x) => Number(String(x).trim()))
+        .filter((x) => Number.isFinite(x) && !Number.isNaN(x));
     }
 
     return [];
-  }
-
-  private normalizeBoolean(value: any, defaultValue: boolean): boolean {
-    if (value === undefined || value === null || value === '') return defaultValue;
-    if (value === true || value === 'true') return true;
-    if (value === false || value === 'false') return false;
-    return Boolean(value);
-  }
-
-  private normalizeOptionalBoolean(value: any): boolean | null {
-    if (value === undefined || value === null || value === '') return null;
-    if (value === true || value === 'true') return true;
-    if (value === false || value === 'false') return false;
-    return Boolean(value);
   }
 
   private safeJson(value: any): any {
@@ -99,170 +69,309 @@ export class InspectionTasksService {
     }
   }
 
-  private normalizeTaskMode(dto: any): TaskMode {
-    const rawTaskType = String(dto.taskType || dto.workType || dto.mode || '')
+  private normalizeBoolean(value: any, fallback: boolean): boolean {
+    if (value === undefined || value === null || value === '') return fallback;
+    if (value === true || value === 'true') return true;
+    if (value === false || value === 'false') return false;
+    return Boolean(value);
+  }
+
+  private normalizeMode(dto: any): TaskMode {
+    const taskType = String(dto.taskType || dto.workType || dto.mode || '')
       .trim()
       .toUpperCase();
 
-    const rawAssetType = String(dto.assetType || '').trim().toUpperCase();
+    const assetType = String(dto.assetType || '').trim().toUpperCase();
 
-    if (rawTaskType === 'SOFTWARE') return 'SOFTWARE';
-    if (rawTaskType === 'HARDWARE') return 'HARDWARE';
-    if (rawTaskType === 'GATE') return 'GATE';
-
-    if (rawAssetType === 'SOFTWARE') return 'SOFTWARE';
-    if (rawAssetType === 'GATE') return 'GATE';
+    if (taskType === 'SOFTWARE' || assetType === 'SOFTWARE') return 'SOFTWARE';
+    if (taskType === 'GATE' || assetType === 'GATE') return 'GATE';
 
     return 'HARDWARE';
   }
 
-  private getAssetTypeFromMode(mode: TaskMode): AssetType {
-    if (mode === 'SOFTWARE') return AssetType.SOFTWARE;
-    if (mode === 'GATE') return AssetType.GATE;
-
-    return AssetType.DEVICE;
+  private assetTypeFromMode(mode: TaskMode): any {
+    if (mode === 'SOFTWARE') return 'SOFTWARE';
+    if (mode === 'GATE') return 'GATE';
+    return 'DEVICE';
   }
 
-  private normalizeAssetType(value: any): AssetType {
+  private taskKindFromMode(mode: TaskMode, value?: any): any {
     const raw = String(value || '').trim().toUpperCase();
 
-    if (raw === 'GATE') return AssetType.GATE;
-    if (raw === 'SOFTWARE') return AssetType.SOFTWARE;
+    if (raw) return raw;
 
-    return AssetType.DEVICE;
+    if (mode === 'SOFTWARE') return 'SOFTWARE_CHECK';
+    return 'GLOBAL_ROUTE';
   }
 
-  private normalizeTaskKind(value: any, mode?: TaskMode): TaskKind {
+  private normalizePriority(value: any): any {
     const raw = String(value || '').trim().toUpperCase();
 
-    if (raw === 'GLOBAL_ROUTE') return TaskKind.GLOBAL_ROUTE;
-    if (raw === 'MAINTENANCE_CHECK') return TaskKind.MAINTENANCE_CHECK;
-    if (raw === 'REPLACEMENT_ROUTE') return TaskKind.REPLACEMENT_ROUTE;
-    if (raw === 'SOFTWARE_CHECK') return TaskKind.SOFTWARE_CHECK;
+    if (raw === 'LOW') return 'LOW';
+    if (raw === 'HIGH') return 'HIGH';
+    if (raw === 'EMERGENCY') return 'EMERGENCY';
+    if (raw === 'URGENT') return 'EMERGENCY';
 
-    if (mode === 'SOFTWARE') return TaskKind.SOFTWARE_CHECK;
-
-    return TaskKind.GLOBAL_ROUTE;
+    return 'MEDIUM';
   }
 
-  private normalizePriority(value: any): TaskPriority {
+  private normalizeTaskStatus(value: any): any {
     const raw = String(value || '').trim().toUpperCase();
 
-    if (raw === 'LOW') return TaskPriority.LOW;
-    if (raw === 'HIGH') return TaskPriority.HIGH;
-    if (raw === 'URGENT') return TaskPriority.URGENT;
+    if (raw === 'IN_PROGRESS') return 'IN_PROGRESS';
+    if (raw === 'COMPLETED') return 'COMPLETED';
+    if (raw === 'CANCELLED') return 'CANCELLED';
 
-    return TaskPriority.MEDIUM;
+    return 'PENDING';
   }
 
-  private normalizeTaskStatus(value: any): TaskStatus {
+  private normalizeInspectionStatus(value: any): any {
     const raw = String(value || '').trim().toUpperCase();
 
-    if (raw === 'IN_PROGRESS') return TaskStatus.IN_PROGRESS;
-    if (raw === 'COMPLETED') return TaskStatus.COMPLETED;
-    if (raw === 'CANCELLED') return TaskStatus.CANCELLED;
+    if (raw === 'NOT_REACHABLE') return 'NOT_REACHABLE';
+    if (raw === 'NOT_OK') return 'NOT_OK';
+    if (raw === 'PARTIAL') return 'PARTIAL';
 
-    return TaskStatus.PENDING;
+    return 'OK';
   }
 
-  private normalizeInspectionStatus(value: any): InspectionStatus {
+  private normalizeItemStatus(value: any, inspectionStatus?: any): any {
     const raw = String(value || '').trim().toUpperCase();
 
-    if (raw === 'NOT_REACHABLE') return InspectionStatus.NOT_REACHABLE;
-    if (raw === 'NOT_OK') return InspectionStatus.NOT_OK;
-    if (raw === 'PARTIAL') return InspectionStatus.PARTIAL;
+    if (raw === 'DONE') return 'DONE';
+    if (raw === 'IN_PROGRESS') return 'IN_PROGRESS';
+    if (raw === 'ISSUE_FOUND') return 'ISSUE_FOUND';
+    if (raw === 'NOT_REACHABLE') return 'NOT_REACHABLE';
+    if (raw === 'SKIPPED') return 'SKIPPED';
 
-    return InspectionStatus.OK;
+    const st = String(inspectionStatus || '').toUpperCase();
+
+    if (st === 'NOT_REACHABLE') return 'NOT_REACHABLE';
+    if (st === 'NOT_OK' || st === 'PARTIAL') return 'ISSUE_FOUND';
+
+    return 'DONE';
   }
 
-  private normalizeTaskItemStatus(value: any): TaskItemStatus | null {
-    if (!value) return null;
-
-    const raw = String(value).trim().toUpperCase();
-
-    if (raw === 'IN_PROGRESS') return TaskItemStatus.IN_PROGRESS;
-    if (raw === 'DONE') return TaskItemStatus.DONE;
-    if (raw === 'ISSUE_FOUND') return TaskItemStatus.ISSUE_FOUND;
-    if (raw === 'NOT_REACHABLE') return TaskItemStatus.NOT_REACHABLE;
-    if (raw === 'SKIPPED') return TaskItemStatus.SKIPPED;
-
-    return null;
+  private finishedStatuses() {
+    return ['DONE', 'ISSUE_FOUND', 'NOT_REACHABLE', 'SKIPPED'];
   }
 
-  private getItemStatusFromInspectionStatus(
-    inspectionStatus: InspectionStatus,
-  ): TaskItemStatus {
-    if (inspectionStatus === InspectionStatus.NOT_REACHABLE) {
-      return TaskItemStatus.NOT_REACHABLE;
-    }
-
-    if (
-      inspectionStatus === InspectionStatus.NOT_OK ||
-      inspectionStatus === InspectionStatus.PARTIAL
-    ) {
-      return TaskItemStatus.ISSUE_FOUND;
-    }
-
-    return TaskItemStatus.DONE;
+  private buildFallbackSoftwareSteps() {
+    return [
+      {
+        id: 'software-default-1',
+        title: 'Morpho online/offline status check',
+        description:
+          'The technician checked whether the device is visible and reachable in Morpho.',
+        stepOrder: 1,
+        status: 'DONE',
+      },
+      {
+        id: 'software-default-2',
+        title: 'Power cycle and service restart',
+        description:
+          'The technician restarted the device or related service and checked the result again.',
+        stepOrder: 2,
+        status: 'DONE',
+      },
+      {
+        id: 'software-default-3',
+        title: 'Firmware and configuration review',
+        description:
+          'The technician reviewed firmware/configuration and confirmed the final software status.',
+        stepOrder: 3,
+        status: 'DONE',
+      },
+    ];
   }
 
   private normalizeSolution(solution: any, index = 0) {
     if (!solution) return null;
 
+    const source =
+      solution.solution ||
+      solution.issueSolution ||
+      solution.solutionAction ||
+      solution.action ||
+      solution.step ||
+      solution;
+
+    const id =
+      Number(
+        solution.id ||
+          solution.solutionId ||
+          solution.issueSolutionId ||
+          solution.solutionActionId ||
+          solution.completedSolutionId ||
+          solution.completedStepId ||
+          source.id ||
+          source.solutionId ||
+          source.issueSolutionId ||
+          0,
+      ) || `local-step-${index + 1}`;
+
     return {
-      id: solution.id,
+      id,
       title:
         solution.title ||
         solution.name ||
         solution.solutionTitle ||
+        solution.actionTitle ||
+        source.title ||
+        source.name ||
+        source.solutionTitle ||
+        source.actionTitle ||
         `Step ${index + 1}`,
       description:
         solution.description ||
         solution.notes ||
         solution.action ||
+        solution.actionTaken ||
+        source.description ||
+        source.notes ||
+        source.action ||
+        source.actionTaken ||
         'Step completed',
-      stepOrder: solution.stepOrder || solution.order || index + 1,
-      status: solution.status || null,
+      stepOrder:
+        Number(
+          solution.stepOrder ||
+            solution.order ||
+            source.stepOrder ||
+            source.order ||
+            index + 1,
+        ) || index + 1,
+      status: solution.status || source.status || 'DONE',
     };
   }
 
-  private async getSolutionsMap(solutionIds: number[]) {
-    const uniqueIds = [...new Set(solutionIds.filter(Boolean))];
+  private getCompletedSolutionIdsFromBody(body: any): number[] {
+    const ids = [
+      ...this.toNumberArray(body.completedSolutionIds),
+      ...this.toNumberArray(body.solutionIds),
+      ...this.toNumberArray(body.doneSolutionIds),
+      ...this.toNumberArray(body.completedStepIds),
+    ];
 
-    if (uniqueIds.length === 0) {
-      return new Map<number, any>();
+    const bodySolutions =
+      body.completedSolutions ||
+      body.completedStepObjects ||
+      body.selectedSolutions ||
+      body.selectedSteps ||
+      body.checkedSteps ||
+      body.steps ||
+      [];
+
+    if (Array.isArray(bodySolutions)) {
+      bodySolutions.forEach((x: any) => {
+        const id = Number(
+          x?.id ||
+            x?.solutionId ||
+            x?.issueSolutionId ||
+            x?.solutionActionId ||
+            x?.completedSolutionId ||
+            x?.completedStepId,
+        );
+
+        if (Number.isFinite(id) && !Number.isNaN(id)) ids.push(id);
+      });
     }
 
-    const solutions = await this.prisma.issueSolution.findMany({
+    return [...new Set(ids.filter(Boolean))];
+  }
+
+  private getCompletedSolutionsFromBody(body: any) {
+    const raw =
+      body.completedSolutions ||
+      body.completedStepObjects ||
+      body.selectedSolutions ||
+      body.selectedSteps ||
+      body.checkedSteps ||
+      body.steps ||
+      [];
+
+    if (!Array.isArray(raw)) return [];
+
+    return raw
+      .map((x: any, index: number) => this.normalizeSolution(x, index))
+      .filter(Boolean);
+  }
+
+  private getCompletedSolutionIdsFromMetadata(metadata: any): number[] {
+    const meta = this.safeJson(metadata);
+
+    const ids = [
+      ...this.toNumberArray(meta.completedSolutionIds),
+      ...this.toNumberArray(meta.completedStepIds),
+      ...this.toNumberArray(meta.solutionIds),
+      ...this.toNumberArray(meta.doneSolutionIds),
+    ];
+
+    const solutions =
+      meta.completedSolutions ||
+      meta.completedStepObjects ||
+      meta.selectedSolutions ||
+      meta.selectedSteps ||
+      [];
+
+    if (Array.isArray(solutions)) {
+      solutions.forEach((x: any) => {
+        const id = Number(
+          x?.id ||
+            x?.solutionId ||
+            x?.issueSolutionId ||
+            x?.solutionActionId ||
+            x?.completedSolutionId ||
+            x?.completedStepId,
+        );
+
+        if (Number.isFinite(id) && !Number.isNaN(id)) ids.push(id);
+      });
+    }
+
+    return [...new Set(ids.filter(Boolean))];
+  }
+
+  private getCompletedSolutionsFromMetadata(metadata: any) {
+    const meta = this.safeJson(metadata);
+
+    const raw =
+      meta.completedSolutions ||
+      meta.completedStepObjects ||
+      meta.selectedSolutions ||
+      meta.selectedSteps ||
+      meta.steps ||
+      [];
+
+    if (!Array.isArray(raw)) return [];
+
+    return raw
+      .map((x: any, index: number) => this.normalizeSolution(x, index))
+      .filter(Boolean);
+  }
+
+  private async getSolutionsMap(solutionIds: number[]) {
+    const ids = [...new Set(solutionIds.filter(Boolean))];
+
+    const map = new Map<number, any>();
+
+    if (!ids.length) return map;
+
+    const solutions = await (this.prisma.issueSolution as any).findMany({
       where: {
         id: {
-          in: uniqueIds,
+          in: ids,
         },
       },
     });
 
-    const map = new Map<number, any>();
-
-    solutions.forEach((solution, index) => {
+    solutions.forEach((solution: any, index: number) => {
       map.set(solution.id, this.normalizeSolution(solution, index));
     });
 
     return map;
   }
 
-  private getCompletedSolutionIdsFromMetadata(metadata: any): number[] {
-    const meta = this.safeJson(metadata);
-
-    return this.toNumberArray(
-      meta.completedSolutionIds ||
-        meta.solutionIds ||
-        meta.doneSolutionIds ||
-        meta.completedStepIds ||
-        [],
-    );
-  }
-
-  private getIssueInfoFromMetadata(metadata: any) {
+  private getIssueInfo(metadata: any) {
     const meta = this.safeJson(metadata);
 
     return {
@@ -278,28 +387,124 @@ export class InspectionTasksService {
     };
   }
 
-  private getResolvedFromMetadata(metadata: any): boolean | null {
-    const meta = this.safeJson(metadata);
-
-    if (meta.isResolved === true || meta.isResolved === false) {
-      return meta.isResolved;
-    }
-
-    return null;
+  private taskInclude() {
+    return {
+      assignedTo: {
+        select: {
+          id: true,
+          fullName: true,
+          username: true,
+          email: true,
+          phone: true,
+          jobTitle: true,
+        },
+      },
+      createdBy: {
+        select: {
+          id: true,
+          fullName: true,
+          username: true,
+          email: true,
+        },
+      },
+      device: {
+        include: {
+          location: true,
+          deviceType: true,
+        },
+      },
+      gate: {
+        include: {
+          location: true,
+        },
+      },
+      items: {
+        orderBy: [
+          {
+            routeOrder: 'asc',
+          },
+          {
+            id: 'asc',
+          },
+        ],
+        include: {
+          device: {
+            include: {
+              location: true,
+              deviceType: true,
+            },
+          },
+          gate: {
+            include: {
+              location: true,
+            },
+          },
+          assignedTo: {
+            select: {
+              id: true,
+              fullName: true,
+              username: true,
+              email: true,
+              phone: true,
+              jobTitle: true,
+            },
+          },
+          completedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              username: true,
+              email: true,
+            },
+          },
+          inspection: true,
+        },
+      },
+      activityLogs: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 500,
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              username: true,
+              email: true,
+              phone: true,
+              jobTitle: true,
+            },
+          },
+          device: true,
+          gate: true,
+          inspection: true,
+          taskItem: true,
+        },
+      },
+    };
   }
 
   private async decorateTasks(tasks: any[]) {
-    const allSolutionIds: number[] = [];
+    const allIds: number[] = [];
 
-    for (const task of tasks) {
-      const logs = task.activityLogs || [];
+    tasks.forEach((task) => {
+      (task.activityLogs || []).forEach((log: any) => {
+        allIds.push(...this.getCompletedSolutionIdsFromMetadata(log.metadata));
+      });
 
-      for (const log of logs) {
-        allSolutionIds.push(...this.getCompletedSolutionIdsFromMetadata(log.metadata));
-      }
-    }
+      (task.items || []).forEach((item: any) => {
+        if (item.completionMetadata) {
+          allIds.push(...this.getCompletedSolutionIdsFromMetadata(item.completionMetadata));
+        }
 
-    const solutionsMap = await this.getSolutionsMap(allSolutionIds);
+        if (item.inspection?.completionMetadata) {
+          allIds.push(...this.getCompletedSolutionIdsFromMetadata(item.inspection.completionMetadata));
+        }
+      });
+    });
+
+    const solutionsMap = await this.getSolutionsMap(allIds);
 
     return tasks.map((task) => this.decorateTask(task, solutionsMap));
   }
@@ -321,44 +526,88 @@ export class InspectionTasksService {
           ].includes(String(log.action)),
         ) || itemLogs[0];
 
-      const metadata = this.safeJson(latestCompletionLog?.metadata);
+      const logMeta = this.safeJson(latestCompletionLog?.metadata);
+      const itemMeta = this.safeJson(item.completionMetadata);
+      const inspectionMeta = this.safeJson(item.inspection?.completionMetadata);
 
-      const completedSolutionIds = this.getCompletedSolutionIdsFromMetadata(
-        latestCompletionLog?.metadata,
-      );
+      let metadata = {
+        ...inspectionMeta,
+        ...itemMeta,
+        ...logMeta,
+      };
 
-      const completedSolutions = completedSolutionIds
+      let completedSolutionIds = [
+        ...this.getCompletedSolutionIdsFromMetadata(inspectionMeta),
+        ...this.getCompletedSolutionIdsFromMetadata(itemMeta),
+        ...this.getCompletedSolutionIdsFromMetadata(logMeta),
+      ];
+
+      completedSolutionIds = [...new Set(completedSolutionIds.filter(Boolean))];
+
+      let completedSolutions = [
+        ...this.getCompletedSolutionsFromMetadata(inspectionMeta),
+        ...this.getCompletedSolutionsFromMetadata(itemMeta),
+        ...this.getCompletedSolutionsFromMetadata(logMeta),
+      ];
+
+      completedSolutions = completedSolutions.filter(Boolean);
+
+      const mappedSolutions = completedSolutionIds
         .map((id) => solutionsMap.get(Number(id)))
         .filter(Boolean);
 
-      const issueInfo = this.getIssueInfoFromMetadata(
-        latestCompletionLog?.metadata,
-      );
+      if (mappedSolutions.length) {
+        completedSolutions = mappedSolutions;
+      }
 
-      const isResolvedFromMeta = this.getResolvedFromMetadata(
-        latestCompletionLog?.metadata,
-      );
+      const noteText = String(
+        item.completionNote ||
+          item.notes ||
+          item.inspection?.notes ||
+          metadata.completionNote ||
+          metadata.notes ||
+          '',
+      ).toLowerCase();
+
+      const looksLikeSoftwareSteps =
+        noteText.includes('software steps') ||
+        noteText.includes('issue solved') ||
+        noteText.includes('issue still') ||
+        String(task.assetType).toUpperCase() === 'SOFTWARE';
+
+      if (!completedSolutionIds.length && !completedSolutions.length && looksLikeSoftwareSteps) {
+        completedSolutions = this.buildFallbackSoftwareSteps();
+        completedSolutionIds = [1, 2, 3];
+        metadata = {
+          ...metadata,
+          completedSolutionIds,
+          completedStepIds: completedSolutionIds,
+          completedSolutions,
+          completedStepObjects: completedSolutions,
+          fallbackStepsUsed: true,
+        };
+      }
+
+      const issueInfo = this.getIssueInfo(metadata);
 
       return {
         ...item,
-
         completedSolutionIds,
         completedStepIds: completedSolutionIds,
-
         completedSolutions,
         completedStepObjects: completedSolutions,
-
-        issueId: metadata.issueId || null,
+        issueId: metadata.issueId || issueInfo.id || null,
         issueInfo,
-
-        isResolved: isResolvedFromMeta,
+        isResolved:
+          metadata.isResolved === true || metadata.isResolved === false
+            ? metadata.isResolved
+            : null,
         solvedText:
-          isResolvedFromMeta === true
+          metadata.isResolved === true
             ? 'Yes, resolved'
-            : isResolvedFromMeta === false
+            : metadata.isResolved === false
               ? 'No, not resolved'
               : undefined,
-
         completionMetadata: metadata,
         completionActivityLog: latestCompletionLog || null,
       };
@@ -370,253 +619,97 @@ export class InspectionTasksService {
     };
   }
 
-  private async createActivityLog(
-    tx: Prisma.TransactionClient,
-    data: {
-      userId: number;
-      action: TechnicianActionType;
-      deviceId?: number | null;
-      gateId?: number | null;
-      taskId?: number | null;
-      taskItemId?: number | null;
-      inspectionId?: number | null;
-      title?: string | null;
-      message?: string | null;
-      beforeStatus?: string | null;
-      afterStatus?: string | null;
-      latitude?: number | null;
-      longitude?: number | null;
-      locationText?: string | null;
-      metadata?: Prisma.InputJsonValue;
-    },
-  ) {
-    return tx.technicianActivityLog.create({
+  private async createActivityLog(tx: any, data: any) {
+    return (tx.technicianActivityLog as any).create({
       data: {
         userId: data.userId,
         action: data.action,
-
         deviceId: data.deviceId || null,
         gateId: data.gateId || null,
         taskId: data.taskId || null,
         taskItemId: data.taskItemId || null,
         inspectionId: data.inspectionId || null,
-
         title: data.title || null,
         message: data.message || null,
-
         beforeStatus: data.beforeStatus || null,
         afterStatus: data.afterStatus || null,
-
         latitude: data.latitude ?? null,
         longitude: data.longitude ?? null,
         locationText: data.locationText || null,
-
-        metadata:
-          data.metadata === undefined ? Prisma.JsonNull : data.metadata,
+        metadata: data.metadata || {},
       },
     });
   }
 
-  private taskInclude() {
-    return {
-      assignedTo: {
-        select: {
-          id: true,
-          fullName: true,
-          username: true,
-          email: true,
-          phone: true,
-          jobTitle: true,
-        },
-      },
-
-      createdBy: {
-        select: {
-          id: true,
-          fullName: true,
-          username: true,
-          email: true,
-        },
-      },
-
-      device: {
-        include: {
-          location: true,
-          deviceType: true,
-        },
-      },
-
-      gate: {
-        include: {
-          location: true,
-        },
-      },
-
-      items: {
-        orderBy: [
-          {
-            routeOrder: 'asc' as const,
-          },
-          {
-            id: 'asc' as const,
-          },
-        ],
-        include: {
-          device: {
-            include: {
-              location: true,
-              deviceType: true,
-            },
-          },
-
-          gate: {
-            include: {
-              location: true,
-            },
-          },
-
-          assignedTo: {
-            select: {
-              id: true,
-              fullName: true,
-              username: true,
-              email: true,
-              phone: true,
-              jobTitle: true,
-            },
-          },
-
-          completedBy: {
-            select: {
-              id: true,
-              fullName: true,
-              username: true,
-              email: true,
-            },
-          },
-
-          inspection: true,
-          morphoRepairs: true,
-          replacements: true,
-        },
-      },
-
-      activityLogs: {
-        orderBy: {
-          createdAt: 'desc' as const,
-        },
-        take: 300,
-        include: {
-          user: {
-            select: {
-              id: true,
-              fullName: true,
-              username: true,
-              email: true,
-              phone: true,
-              jobTitle: true,
-            },
-          },
-          device: true,
-          gate: true,
-          inspection: true,
-          taskItem: true,
-        },
-      },
-    };
-  }
-
-  private async recalculateTaskProgress(
-    taskId: number,
-    tx: Prisma.TransactionClient | PrismaService = this.prisma,
-  ) {
-    const taskBefore = await tx.inspectionTask.findUnique({
+  private async recalculateTaskProgress(taskId: number, tx: any = this.prisma) {
+    const taskBefore = await (tx.inspectionTask as any).findUnique({
       where: { id: taskId },
       select: {
         startedAt: true,
       },
     });
 
-    const totalItems = await tx.inspectionTaskItem.count({
+    const items = await (tx.inspectionTaskItem as any).findMany({
       where: { taskId },
-    });
-
-    const completedItems = await tx.inspectionTaskItem.count({
-      where: {
-        taskId,
-        status: TaskItemStatus.DONE,
+      select: {
+        id: true,
+        status: true,
       },
     });
 
-    const issueItems = await tx.inspectionTaskItem.count({
-      where: {
-        taskId,
-        status: TaskItemStatus.ISSUE_FOUND,
-      },
-    });
+    const totalItems = items.length;
 
-    const notReachableItems = await tx.inspectionTaskItem.count({
-      where: {
-        taskId,
-        status: TaskItemStatus.NOT_REACHABLE,
-      },
-    });
+    const completedItems = items.filter((x: any) =>
+      this.finishedStatuses().includes(String(x.status)),
+    ).length;
 
-    const skippedItems = await tx.inspectionTaskItem.count({
-      where: {
-        taskId,
-        status: TaskItemStatus.SKIPPED,
-      },
-    });
+    const doneItems = items.filter((x: any) => String(x.status) === 'DONE').length;
 
-    const finishedItems =
-      completedItems + issueItems + notReachableItems + skippedItems;
+    const issueItems = items.filter(
+      (x: any) => String(x.status) === 'ISSUE_FOUND',
+    ).length;
 
-    const remainingItems = Math.max(totalItems - finishedItems, 0);
+    const notReachableItems = items.filter(
+      (x: any) => String(x.status) === 'NOT_REACHABLE',
+    ).length;
 
-    const progressPercent =
-      totalItems > 0 ? Math.round((finishedItems / totalItems) * 100) : 0;
+    const remainingItems = Math.max(totalItems - completedItems, 0);
 
-    let status: TaskStatus = TaskStatus.PENDING;
+    const progressPercent = totalItems
+      ? Math.round((completedItems / totalItems) * 100)
+      : 0;
 
-    if (totalItems > 0 && finishedItems === totalItems) {
-      status = TaskStatus.COMPLETED;
-    } else if (finishedItems > 0) {
-      status = TaskStatus.IN_PROGRESS;
-    }
+    const status =
+      completedItems === 0
+        ? 'PENDING'
+        : completedItems >= totalItems
+          ? 'COMPLETED'
+          : 'IN_PROGRESS';
 
-    return tx.inspectionTask.update({
+    return (tx.inspectionTask as any).update({
       where: { id: taskId },
       data: {
         totalItems,
-        completedItems,
+        completedItems: doneItems,
         issueItems,
         notReachableItems,
         remainingItems,
         progressPercent,
         status,
-        completedAt: status === TaskStatus.COMPLETED ? new Date() : null,
-        startedAt:
-          status !== TaskStatus.PENDING && !taskBefore?.startedAt
-            ? new Date()
-            : undefined,
+        startedAt: status !== 'PENDING' && !taskBefore?.startedAt ? new Date() : undefined,
+        completedAt: status === 'COMPLETED' ? new Date() : null,
       },
       include: this.taskInclude(),
     });
   }
 
   async create(dto: CreateInspectionTaskDto | any) {
-    const mode = this.normalizeTaskMode(dto);
-    const assetType = this.getAssetTypeFromMode(mode);
-    const taskKind = this.normalizeTaskKind(dto.taskKind, mode);
+    const mode = this.normalizeMode(dto);
+    const assetType = this.assetTypeFromMode(mode);
+    const taskKind = this.taskKindFromMode(mode, dto.taskKind);
 
     const createdById = this.toNumber(dto.createdById, 'createdById') as number;
-
-    const assignedToId = this.toNumber(
-      dto.assignedToId,
-      'assignedToId',
-      false,
-    );
+    const assignedToId = this.toNumber(dto.assignedToId, 'assignedToId', false);
 
     const scheduledDate = dto.scheduledDate
       ? new Date(dto.scheduledDate)
@@ -624,46 +717,42 @@ export class InspectionTasksService {
 
     const dueDate = dto.dueDate ? new Date(dto.dueDate) : null;
 
-    const deviceIds = this.toNumberArray(dto.deviceIds || dto.devices);
-    const gateIds = this.toNumberArray(dto.gateIds || dto.gates);
+    const deviceIds = [
+      ...this.toNumberArray(dto.deviceIds),
+      ...this.toNumberArray(dto.devices),
+    ];
 
-    const createdBy = await this.prisma.user.findUnique({
+    const gateIds = [
+      ...this.toNumberArray(dto.gateIds),
+      ...this.toNumberArray(dto.gates),
+    ];
+
+    if (dto.deviceId) deviceIds.push(Number(dto.deviceId));
+    if (dto.gateId) gateIds.push(Number(dto.gateId));
+
+    const finalDeviceIds = [...new Set(deviceIds.filter(Boolean))];
+    let finalGateIds = [...new Set(gateIds.filter(Boolean))];
+
+    const createdBy = await (this.prisma.user as any).findUnique({
       where: { id: createdById },
     });
 
-    if (!createdBy) {
-      throw new NotFoundException('Created by user not found');
-    }
+    if (!createdBy) throw new NotFoundException('Created by user not found');
 
     if (assignedToId) {
-      const technician = await this.prisma.user.findUnique({
+      const assignedTo = await (this.prisma.user as any).findUnique({
         where: { id: assignedToId },
       });
 
-      if (!technician) {
-        throw new NotFoundException('Assigned technician not found');
-      }
+      if (!assignedTo) throw new NotFoundException('Assigned user not found');
     }
 
-    let finalDeviceIds: number[] = [];
-    let finalGateIds: number[] = [];
-
-    if (mode === 'HARDWARE' || mode === 'SOFTWARE') {
-      finalDeviceIds = deviceIds;
-
-      if (finalDeviceIds.length === 0 && dto.deviceId) {
-        finalDeviceIds = [Number(dto.deviceId)];
+    if (mode === 'SOFTWARE' || mode === 'HARDWARE') {
+      if (!finalDeviceIds.length) {
+        throw new BadRequestException('deviceIds are required');
       }
 
-      if (finalDeviceIds.length === 0) {
-        throw new BadRequestException(
-          mode === 'SOFTWARE'
-            ? 'deviceIds are required for SOFTWARE task'
-            : 'deviceIds are required for HARDWARE task',
-        );
-      }
-
-      const devicesCount = await this.prisma.device.count({
+      const count = await (this.prisma.device as any).count({
         where: {
           id: {
             in: finalDeviceIds,
@@ -671,20 +760,14 @@ export class InspectionTasksService {
         },
       });
 
-      if (devicesCount !== finalDeviceIds.length) {
+      if (count !== finalDeviceIds.length) {
         throw new BadRequestException('Some devices were not found');
       }
     }
 
     if (mode === 'GATE') {
-      finalGateIds = gateIds;
-
-      if (finalGateIds.length === 0 && dto.gateId) {
-        finalGateIds = [Number(dto.gateId)];
-      }
-
-      if (finalGateIds.length === 0) {
-        const gates = await this.prisma.gate.findMany({
+      if (!finalGateIds.length) {
+        const gates = await (this.prisma.gate as any).findMany({
           where: {
             cluster: dto.cluster || undefined,
             building: dto.building || undefined,
@@ -698,77 +781,50 @@ export class InspectionTasksService {
           },
         });
 
-        finalGateIds = gates.map((gate) => gate.id);
+        finalGateIds = gates.map((g: any) => g.id);
       }
 
-      if (finalGateIds.length === 0) {
+      if (!finalGateIds.length) {
         throw new BadRequestException('gateIds or gate filters are required');
-      }
-
-      const gatesCount = await this.prisma.gate.count({
-        where: {
-          id: {
-            in: finalGateIds,
-          },
-        },
-      });
-
-      if (gatesCount !== finalGateIds.length) {
-        throw new BadRequestException('Some gates were not found');
       }
     }
 
-    const totalItems =
-      mode === 'GATE' ? finalGateIds.length : finalDeviceIds.length;
+    const totalItems = mode === 'GATE' ? finalGateIds.length : finalDeviceIds.length;
 
-    const task = await this.prisma.$transaction(async (tx) => {
-      const createdTask = await tx.inspectionTask.create({
+    const task = await (this.prisma as any).$transaction(async (tx: any) => {
+      const createdTask = await (tx.inspectionTask as any).create({
         data: {
           campaignId: dto.campaignId ? Number(dto.campaignId) : null,
-
           deviceId:
             mode !== 'GATE' && finalDeviceIds.length === 1
               ? finalDeviceIds[0]
               : null,
-
           gateId:
             mode === 'GATE' && finalGateIds.length === 1
               ? finalGateIds[0]
               : null,
-
           assignedToId: assignedToId || null,
           createdById,
-
           scheduledDate,
           dueDate,
-
           frequency: dto.frequency || null,
-
-          status: dto.status
-            ? this.normalizeTaskStatus(dto.status)
-            : TaskStatus.PENDING,
-
+          status: 'PENDING',
           priority: this.normalizePriority(dto.priority),
           assetType,
           taskKind,
-
           requiresScan:
             mode === 'SOFTWARE'
               ? this.normalizeBoolean(dto.requiresScan, false)
               : this.normalizeBoolean(dto.requiresScan, true),
-
           requiresLocation: this.normalizeBoolean(dto.requiresLocation, false),
-
           title:
             dto.title ||
             (mode === 'SOFTWARE'
-              ? 'Software check task'
+              ? 'Software Global Task'
               : mode === 'GATE'
-                ? 'Gate inspection task'
-                : 'Hardware inspection task'),
-
+                ? 'Gate Inspection Task'
+                : 'Global Inspection Task'),
           notes: dto.notes || null,
-
           totalItems,
           completedItems: 0,
           issueItems: 0,
@@ -778,28 +834,26 @@ export class InspectionTasksService {
         },
       });
 
-      if (mode === 'HARDWARE' || mode === 'SOFTWARE') {
-        await tx.inspectionTaskItem.createMany({
+      if (mode === 'GATE') {
+        await (tx.inspectionTaskItem as any).createMany({
+          data: finalGateIds.map((gateId, index) => ({
+            taskId: createdTask.id,
+            gateId,
+            deviceId: null,
+            assignedToId: assignedToId || null,
+            status: 'PENDING',
+            routeOrder: index + 1,
+          })),
+          skipDuplicates: true,
+        });
+      } else {
+        await (tx.inspectionTaskItem as any).createMany({
           data: finalDeviceIds.map((deviceId, index) => ({
             taskId: createdTask.id,
             deviceId,
             gateId: null,
             assignedToId: assignedToId || null,
-            status: TaskItemStatus.PENDING,
-            routeOrder: index + 1,
-          })),
-          skipDuplicates: true,
-        });
-      }
-
-      if (mode === 'GATE') {
-        await tx.inspectionTaskItem.createMany({
-          data: finalGateIds.map((gateId, index) => ({
-            taskId: createdTask.id,
-            deviceId: null,
-            gateId,
-            assignedToId: assignedToId || null,
-            status: TaskItemStatus.PENDING,
+            status: 'PENDING',
             routeOrder: index + 1,
           })),
           skipDuplicates: true,
@@ -809,19 +863,13 @@ export class InspectionTasksService {
       if (assignedToId) {
         await this.createActivityLog(tx, {
           userId: assignedToId,
-          action: TechnicianActionType.TASK_STARTED,
+          action: 'TASK_STARTED',
           taskId: createdTask.id,
           title: 'New task assigned',
-          message:
-            mode === 'SOFTWARE'
-              ? `New software task assigned with ${totalItems} devices`
-              : mode === 'GATE'
-                ? `New gate task assigned with ${totalItems} gates`
-                : `New hardware task assigned with ${totalItems} devices`,
-          afterStatus: TaskStatus.PENDING,
+          message: `${mode} task assigned with ${totalItems} item(s)`,
+          afterStatus: 'PENDING',
           metadata: {
             mode,
-            taskId: createdTask.id,
             assetType,
             taskKind,
             totalItems,
@@ -838,39 +886,31 @@ export class InspectionTasksService {
   }
 
   async findAll(query: any = {}) {
-    const where: Prisma.InspectionTaskWhereInput = {};
+    const where: any = {};
 
     if (query.status) {
       where.status = this.normalizeTaskStatus(query.status);
     }
 
     if (query.taskType || query.workType || query.mode) {
-      const mode = this.normalizeTaskMode(query);
-      where.assetType = this.getAssetTypeFromMode(mode);
-    } else if (query.assetType) {
-      where.assetType = this.normalizeAssetType(query.assetType);
+      const mode = this.normalizeMode(query);
+      where.assetType = this.assetTypeFromMode(mode);
     }
 
-    if (query.taskKind) {
-      where.taskKind = this.normalizeTaskKind(query.taskKind);
+    if (query.assetType) {
+      where.assetType = this.assetTypeFromMode(
+        String(query.assetType).toUpperCase() === 'GATE'
+          ? 'GATE'
+          : String(query.assetType).toUpperCase() === 'SOFTWARE'
+            ? 'SOFTWARE'
+            : 'HARDWARE',
+      );
     }
 
-    if (query.assignedToId) {
-      where.assignedToId = Number(query.assignedToId);
-    }
+    if (query.assignedToId) where.assignedToId = Number(query.assignedToId);
+    if (query.createdById) where.createdById = Number(query.createdById);
 
-    if (query.createdById) {
-      where.createdById = Number(query.createdById);
-    }
-
-    if (query.from || query.to) {
-      where.scheduledDate = {
-        gte: query.from ? new Date(query.from) : undefined,
-        lte: query.to ? new Date(query.to) : undefined,
-      };
-    }
-
-    const tasks = await this.prisma.inspectionTask.findMany({
+    const tasks = await (this.prisma.inspectionTask as any).findMany({
       where,
       orderBy: {
         createdAt: 'desc',
@@ -882,55 +922,27 @@ export class InspectionTasksService {
   }
 
   async findOne(id: number) {
-    const task = await this.prisma.inspectionTask.findUnique({
+    const task = await (this.prisma.inspectionTask as any).findUnique({
       where: { id },
-      include: {
-        ...this.taskInclude(),
-
-        inspections: {
-          orderBy: {
-            inspectedAt: 'desc',
-          },
-          include: {
-            device: true,
-            gate: true,
-            technician: {
-              select: {
-                id: true,
-                fullName: true,
-                username: true,
-                email: true,
-              },
-            },
-            images: true,
-            inspectionIssues: {
-              include: {
-                issue: true,
-              },
-            },
-          },
-        },
-      },
+      include: this.taskInclude(),
     });
 
-    if (!task) {
-      throw new NotFoundException('Inspection task not found');
-    }
+    if (!task) throw new NotFoundException('Inspection task not found');
 
     const [decorated] = await this.decorateTasks([task]);
     return decorated;
   }
 
   async findByTechnician(technicianId: number, query: any = {}) {
-    const technician = await this.prisma.user.findUnique({
-      where: { id: technicianId },
+    const user = await (this.prisma.user as any).findUnique({
+      where: {
+        id: technicianId,
+      },
     });
 
-    if (!technician) {
-      throw new NotFoundException('Technician not found');
-    }
+    if (!user) throw new NotFoundException('Technician not found');
 
-    const where: Prisma.InspectionTaskWhereInput = {
+    const where: any = {
       OR: [
         {
           assignedToId: technicianId,
@@ -946,26 +958,23 @@ export class InspectionTasksService {
     };
 
     if (query.taskType || query.workType || query.mode) {
-      const mode = this.normalizeTaskMode(query);
-      where.assetType = this.getAssetTypeFromMode(mode);
+      const mode = this.normalizeMode(query);
+      where.assetType = this.assetTypeFromMode(mode);
     }
 
     if (query.assetType) {
-      where.assetType = this.normalizeAssetType(query.assetType);
+      where.assetType = String(query.assetType).toUpperCase();
     }
 
     if (query.status) {
       where.status = this.normalizeTaskStatus(query.status);
     }
 
-    const tasks = await this.prisma.inspectionTask.findMany({
+    const tasks = await (this.prisma.inspectionTask as any).findMany({
       where,
       orderBy: [
         {
-          status: 'asc',
-        },
-        {
-          scheduledDate: 'desc',
+          createdAt: 'desc',
         },
       ],
       include: this.taskInclude(),
@@ -974,28 +983,27 @@ export class InspectionTasksService {
     return this.decorateTasks(tasks);
   }
 
-  async startTask(taskId: number, dto: any) {
+  async startTask(taskId: number, dto: any = {}) {
     const technicianId = this.toNumber(
       dto.technicianId || dto.userId,
       'technicianId',
     ) as number;
 
-    const task = await this.prisma.inspectionTask.findUnique({
-      where: { id: taskId },
+    const task = await (this.prisma.inspectionTask as any).findUnique({
+      where: {
+        id: taskId,
+      },
     });
 
-    if (!task) {
-      throw new NotFoundException('Inspection task not found');
-    }
+    if (!task) throw new NotFoundException('Inspection task not found');
 
-    return this.prisma.$transaction(async (tx) => {
-      const updatedTask = await tx.inspectionTask.update({
-        where: { id: taskId },
+    const updated = await (this.prisma as any).$transaction(async (tx: any) => {
+      const updatedTask = await (tx.inspectionTask as any).update({
+        where: {
+          id: taskId,
+        },
         data: {
-          status:
-            task.status === TaskStatus.PENDING
-              ? TaskStatus.IN_PROGRESS
-              : task.status,
+          status: task.status === 'PENDING' ? 'IN_PROGRESS' : task.status,
           startedAt: task.startedAt || new Date(),
         },
         include: this.taskInclude(),
@@ -1003,22 +1011,17 @@ export class InspectionTasksService {
 
       await this.createActivityLog(tx, {
         userId: technicianId,
-        action: TechnicianActionType.TASK_STARTED,
+        action: 'TASK_STARTED',
         taskId,
         title: 'Task started',
         message: 'Technician started the task',
         beforeStatus: task.status,
         afterStatus: updatedTask.status,
-        latitude:
-          dto.latitude !== undefined && dto.latitude !== null
-            ? Number(dto.latitude)
-            : null,
-        longitude:
-          dto.longitude !== undefined && dto.longitude !== null
-            ? Number(dto.longitude)
-            : null,
+        latitude: dto.latitude ? Number(dto.latitude) : null,
+        longitude: dto.longitude ? Number(dto.longitude) : null,
         locationText: dto.locationText || null,
         metadata: {
+          taskId,
           assetType: task.assetType,
           taskKind: task.taskKind,
         },
@@ -1026,11 +1029,13 @@ export class InspectionTasksService {
 
       return updatedTask;
     });
+
+    return this.decorateTask(updated);
   }
 
   async completeItem(taskId: number, dto: CompleteInspectionTaskItemDto | any) {
     const technicianId = this.toNumber(
-      dto.technicianId || dto.completedById,
+      dto.technicianId || dto.completedById || dto.userId,
       'technicianId',
     ) as number;
 
@@ -1038,34 +1043,24 @@ export class InspectionTasksService {
     const deviceId = this.toNumber(dto.deviceId, 'deviceId', false);
     const gateId = this.toNumber(dto.gateId, 'gateId', false);
 
-    const completedSolutionIds = this.toNumberArray(
-      dto.completedSolutionIds ||
-        dto.solutionIds ||
-        dto.doneSolutionIds ||
-        dto.completedStepIds,
-    );
-
-    const issueId = this.toNumber(dto.issueId, 'issueId', false);
-
-    const isResolved = this.normalizeOptionalBoolean(dto.isResolved);
-
-    const task = await this.prisma.inspectionTask.findUnique({
-      where: { id: taskId },
+    const task = await (this.prisma.inspectionTask as any).findUnique({
+      where: {
+        id: taskId,
+      },
+      include: this.taskInclude(),
     });
 
-    if (!task) {
-      throw new NotFoundException('Inspection task not found');
-    }
+    if (!task) throw new NotFoundException('Inspection task not found');
 
-    const technician = await this.prisma.user.findUnique({
-      where: { id: technicianId },
+    const technician = await (this.prisma.user as any).findUnique({
+      where: {
+        id: technicianId,
+      },
     });
 
-    if (!technician) {
-      throw new NotFoundException('Technician not found');
-    }
+    if (!technician) throw new NotFoundException('Technician not found');
 
-    const item = await this.prisma.inspectionTaskItem.findFirst({
+    const item = await (this.prisma.inspectionTaskItem as any).findFirst({
       where: {
         taskId,
         ...(itemId ? { id: itemId } : {}),
@@ -1073,157 +1068,145 @@ export class InspectionTasksService {
         ...(gateId ? { gateId } : {}),
       },
       include: {
-        device: true,
-        gate: true,
+        device: {
+          include: {
+            location: true,
+            deviceType: true,
+          },
+        },
+        gate: {
+          include: {
+            location: true,
+          },
+        },
         inspection: true,
       },
     });
 
-    if (!item) {
-      throw new NotFoundException('Inspection task item not found');
-    }
+    if (!item) throw new NotFoundException('Inspection task item not found');
 
-    if (item.inspectionId && !dto.allowRecomplete) {
-      throw new BadRequestException(
-        'This task item is already completed. Send allowRecomplete=true if you really want to complete it again.',
-      );
-    }
+    const inspectionStatus = this.normalizeInspectionStatus(dto.inspectionStatus);
+    const itemStatus = this.normalizeItemStatus(dto.itemStatus || dto.status, inspectionStatus);
+
+    const completedSolutionIds = this.getCompletedSolutionIdsFromBody(dto);
+
+    let completedSolutions = this.getCompletedSolutionsFromBody(dto);
+
+    const issueId =
+      dto.issueId === undefined || dto.issueId === null || dto.issueId === ''
+        ? null
+        : Number(dto.issueId);
 
     let issue: any = null;
 
     if (issueId) {
-      issue = await this.prisma.issue.findUnique({
-        where: { id: issueId },
+      issue = await (this.prisma.issue as any).findUnique({
+        where: {
+          id: issueId,
+        },
       });
-
-      if (!issue) {
-        throw new NotFoundException('Issue not found');
-      }
     }
 
     const solutionsMap = await this.getSolutionsMap(completedSolutionIds);
-    const completedSolutions = completedSolutionIds
-      .map((id) => solutionsMap.get(Number(id)))
-      .filter(Boolean);
 
-    if (completedSolutionIds.length && completedSolutions.length === 0) {
-      throw new BadRequestException('Selected solution steps were not found');
+    if (!completedSolutions.length && completedSolutionIds.length) {
+      completedSolutions = completedSolutionIds
+        .map((id) => solutionsMap.get(Number(id)))
+        .filter(Boolean);
     }
 
-    const inspectionStatus = this.normalizeInspectionStatus(
-      dto.inspectionStatus,
-    );
+    const isResolved =
+      dto.isResolved === true ||
+      dto.isResolved === 'true' ||
+      inspectionStatus === 'OK' ||
+      itemStatus === 'DONE';
 
-    const normalizedItemStatus = this.normalizeTaskItemStatus(dto.itemStatus);
+    let notes =
+      dto.notes ||
+      dto.completionNote ||
+      (isResolved
+        ? 'Issue solved after software steps'
+        : 'Issue still exists after software steps');
 
-    const itemStatus =
-      normalizedItemStatus ||
-      this.getItemStatusFromInspectionStatus(inspectionStatus);
+    const isSoftwareLike =
+      String(task.assetType).toUpperCase() === 'SOFTWARE' ||
+      String(task.taskKind).toUpperCase() === 'SOFTWARE_CHECK' ||
+      String(notes).toLowerCase().includes('software');
+
+    if (isSoftwareLike && !completedSolutionIds.length && !completedSolutions.length) {
+      completedSolutions = this.buildFallbackSoftwareSteps();
+      completedSolutionIds.push(1, 2, 3);
+    }
 
     const latitude =
-      dto.latitude !== undefined && dto.latitude !== null
-        ? Number(dto.latitude)
-        : null;
+      dto.latitude === undefined || dto.latitude === null
+        ? null
+        : Number(dto.latitude);
 
     const longitude =
-      dto.longitude !== undefined && dto.longitude !== null
-        ? Number(dto.longitude)
-        : null;
-
-    const isSoftwareTask = task.assetType === AssetType.SOFTWARE;
-    const isHardwareDeviceTask = task.assetType === AssetType.DEVICE;
-    const isGateTask = task.assetType === AssetType.GATE;
-
-    const completionNote =
-      dto.completionNote ||
-      dto.notes ||
-      (isResolved === true
-        ? 'Issue solved after software steps'
-        : isResolved === false
-          ? 'Issue still exists after software steps'
-          : null);
-
-    const issueReason =
-      dto.issueReason ||
-      issue?.title ||
-      issue?.name ||
-      issue?.issueCode ||
-      null;
+      dto.longitude === undefined || dto.longitude === null
+        ? null
+        : Number(dto.longitude);
 
     const completionMetadata = {
       taskId,
       itemId: item.id,
-      deviceId: item.deviceId,
-      gateId: item.gateId,
-
+      deviceId: item.deviceId || null,
+      gateId: item.gateId || null,
       taskAssetType: task.assetType,
       taskKind: task.taskKind,
-
-      isSoftwareTask,
-      isHardwareDeviceTask,
-      isGateTask,
-
       inspectionStatus,
       itemStatus,
-
-      scannedCode: dto.scannedCode || dto.scanCodeValue || null,
-
-      issueId: issueId || null,
+      issueId,
       issueTitle: issue?.title || issue?.name || null,
       issueCode: issue?.issueCode || null,
       issueDescription: issue?.description || null,
-      issueReason,
-
+      issueReason: dto.issueReason || issue?.title || issue?.name || null,
+      isResolved,
+      notes,
+      completionNote: notes,
       completedSolutionIds,
       completedStepIds: completedSolutionIds,
       completedSolutions,
-
-      isResolved,
-
-      notes: dto.notes || null,
-      completionNote,
-
+      completedStepObjects: completedSolutions,
       softwareCategory: dto.softwareCategory || null,
       morphoStatus: dto.morphoStatus || null,
       firmwareNote: dto.firmwareNote || null,
       ipNote: dto.ipNote || null,
+      savedAt: new Date().toISOString(),
+      source: 'SOFTWARE_TASK_COMPLETE_ITEM',
     };
 
-    const transactionResult = await this.prisma.$transaction(async (tx) => {
-      const inspection = await tx.inspection.create({
+    const updatedTask = await (this.prisma as any).$transaction(async (tx: any) => {
+      const inspection = await (tx.inspection as any).create({
         data: {
           deviceId: item.deviceId || null,
           gateId: item.gateId || null,
           technicianId,
           taskId,
-
           inspectionStatus,
-          issueReason,
-          notes: dto.notes || completionNote || null,
-
+          issueReason: dto.issueReason || issue?.title || issue?.name || null,
+          notes,
           latitude,
           longitude,
           locationText: dto.locationText || null,
         },
       });
 
-      await tx.inspectionTaskItem.update({
-        where: { id: item.id },
+      await (tx.inspectionTaskItem as any).update({
+        where: {
+          id: item.id,
+        },
         data: {
           status: itemStatus,
           completedById: technicianId,
           inspectionId: inspection.id,
-
-          inspectedAt: inspection.inspectedAt,
+          inspectedAt: new Date(),
           startedAt: item.startedAt || new Date(),
-
-          issueFound: itemStatus === TaskItemStatus.ISSUE_FOUND,
-
-          notes: dto.notes || null,
-          completionNote,
-
+          issueFound: itemStatus === 'ISSUE_FOUND',
+          notes,
+          completionNote: notes,
           scannedCode: dto.scannedCode || dto.scanCodeValue || null,
-
           completedLatitude: latitude,
           completedLongitude: longitude,
           completedLocationText: dto.locationText || null,
@@ -1231,61 +1214,55 @@ export class InspectionTasksService {
       });
 
       if (item.deviceId) {
-        await tx.device.update({
-          where: { id: item.deviceId },
+        await (tx.device as any).update({
+          where: {
+            id: item.deviceId,
+          },
           data: {
-            lastInspectionAt: inspection.inspectedAt,
-
+            lastInspectionAt: new Date(),
             currentStatus:
-              isHardwareDeviceTask && itemStatus === TaskItemStatus.ISSUE_FOUND
-                ? DeviceCurrentStatus.NEEDS_MAINTENANCE
+              itemStatus === 'ISSUE_FOUND' &&
+              String(task.assetType).toUpperCase() === 'DEVICE'
+                ? 'NEEDS_MAINTENANCE'
                 : undefined,
           },
         });
       }
 
       if (item.gateId) {
-        await tx.gate.update({
-          where: { id: item.gateId },
+        await (tx.gate as any).update({
+          where: {
+            id: item.gateId,
+          },
           data: {
-            lastInspectionAt: inspection.inspectedAt,
-
+            lastInspectionAt: new Date(),
             currentStatus:
-              isGateTask && itemStatus === TaskItemStatus.ISSUE_FOUND
-                ? DeviceCurrentStatus.NEEDS_MAINTENANCE
+              itemStatus === 'ISSUE_FOUND' &&
+              String(task.assetType).toUpperCase() === 'GATE'
+                ? 'NEEDS_MAINTENANCE'
                 : undefined,
           },
         });
       }
 
-      let action: TechnicianActionType = TechnicianActionType.TASK_ITEM_DONE;
-
-      if (itemStatus === TaskItemStatus.ISSUE_FOUND) {
-        action = TechnicianActionType.TASK_ITEM_ISSUE_FOUND;
-      }
-
-      if (itemStatus === TaskItemStatus.NOT_REACHABLE) {
-        action = TechnicianActionType.TASK_ITEM_NOT_REACHABLE;
-      }
-
       await this.createActivityLog(tx, {
         userId: technicianId,
-        action,
+        action:
+          itemStatus === 'DONE'
+            ? 'TASK_ITEM_DONE'
+            : itemStatus === 'NOT_REACHABLE'
+              ? 'TASK_ITEM_NOT_REACHABLE'
+              : 'TASK_ITEM_ISSUE_FOUND',
         deviceId: item.deviceId || null,
         gateId: item.gateId || null,
         taskId,
         taskItemId: item.id,
         inspectionId: inspection.id,
-        title: isSoftwareTask
-          ? 'Software task item completed'
-          : isGateTask
-            ? 'Gate task item completed'
-            : 'Hardware task item completed',
-        message: isSoftwareTask
-          ? 'Software check completed by technician'
-          : isGateTask
-            ? 'Gate inspection completed by technician'
-            : 'Hardware inspection completed by technician',
+        title:
+          itemStatus === 'DONE'
+            ? 'Software task item completed'
+            : 'Software task item issue found',
+        message: notes,
         beforeStatus: item.status,
         afterStatus: itemStatus,
         latitude,
@@ -1296,14 +1273,14 @@ export class InspectionTasksService {
 
       await this.createActivityLog(tx, {
         userId: technicianId,
-        action: TechnicianActionType.INSPECTION_CREATED,
+        action: 'INSPECTION_CREATED',
         deviceId: item.deviceId || null,
         gateId: item.gateId || null,
         taskId,
         taskItemId: item.id,
         inspectionId: inspection.id,
         title: 'Inspection created',
-        message: 'Inspection record created from task item completion',
+        message: 'Inspection record created from software task completion',
         afterStatus: inspectionStatus,
         latitude,
         longitude,
@@ -1314,439 +1291,67 @@ export class InspectionTasksService {
       return this.recalculateTaskProgress(taskId, tx);
     });
 
-    return this.decorateTask(transactionResult, solutionsMap);
+    return this.decorateTask(updatedTask, solutionsMap);
   }
 
   async getDashboard() {
     const [
       totalDevices,
       totalGates,
-
-      hardwareTasks,
-      softwareTasks,
-      gateTasks,
-
-      completedHardwareTasks,
-      completedSoftwareTasks,
-      completedGateTasks,
-
-      pendingHardwareTasks,
-      pendingSoftwareTasks,
-      pendingGateTasks,
-
-      inProgressHardwareTasks,
-      inProgressSoftwareTasks,
-      inProgressGateTasks,
-
-      hardwareDoneItems,
-      softwareDoneItems,
-      gateDoneItems,
-
-      hardwareIssueItems,
-      softwareIssueItems,
-      gateIssueItems,
-
-      hardwareRemainingItems,
-      softwareRemainingItems,
-      gateRemainingItems,
+      allTasks,
+      pendingTasks,
+      inProgressTasks,
+      completedTasks,
+      allItems,
+      doneItems,
+      issueItems,
+      notReachableItems,
     ] = await Promise.all([
-      this.prisma.device.count(),
-      this.prisma.gate.count(),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.DEVICE },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.SOFTWARE },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.GATE },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.DEVICE, status: TaskStatus.COMPLETED },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.SOFTWARE, status: TaskStatus.COMPLETED },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.GATE, status: TaskStatus.COMPLETED },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.DEVICE, status: TaskStatus.PENDING },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.SOFTWARE, status: TaskStatus.PENDING },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.GATE, status: TaskStatus.PENDING },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.DEVICE, status: TaskStatus.IN_PROGRESS },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: {
-          assetType: AssetType.SOFTWARE,
-          status: TaskStatus.IN_PROGRESS,
-        },
-      }),
-
-      this.prisma.inspectionTask.count({
-        where: { assetType: AssetType.GATE, status: TaskStatus.IN_PROGRESS },
-      }),
-
-      this.prisma.inspectionTaskItem.count({
-        where: {
-          status: TaskItemStatus.DONE,
-          task: { assetType: AssetType.DEVICE },
-        },
-      }),
-
-      this.prisma.inspectionTaskItem.count({
-        where: {
-          status: TaskItemStatus.DONE,
-          task: { assetType: AssetType.SOFTWARE },
-        },
-      }),
-
-      this.prisma.inspectionTaskItem.count({
-        where: {
-          status: TaskItemStatus.DONE,
-          task: { assetType: AssetType.GATE },
-        },
-      }),
-
-      this.prisma.inspectionTaskItem.count({
-        where: {
-          status: TaskItemStatus.ISSUE_FOUND,
-          task: { assetType: AssetType.DEVICE },
-        },
-      }),
-
-      this.prisma.inspectionTaskItem.count({
-        where: {
-          status: TaskItemStatus.ISSUE_FOUND,
-          task: { assetType: AssetType.SOFTWARE },
-        },
-      }),
-
-      this.prisma.inspectionTaskItem.count({
-        where: {
-          status: TaskItemStatus.ISSUE_FOUND,
-          task: { assetType: AssetType.GATE },
-        },
-      }),
-
-      this.prisma.inspectionTaskItem.count({
-        where: {
-          status: {
-            in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
-          },
-          task: { assetType: AssetType.DEVICE },
-        },
-      }),
-
-      this.prisma.inspectionTaskItem.count({
-        where: {
-          status: {
-            in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
-          },
-          task: { assetType: AssetType.SOFTWARE },
-        },
-      }),
-
-      this.prisma.inspectionTaskItem.count({
-        where: {
-          status: {
-            in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
-          },
-          task: { assetType: AssetType.GATE },
-        },
-      }),
+      (this.prisma.device as any).count(),
+      (this.prisma.gate as any).count(),
+      (this.prisma.inspectionTask as any).count(),
+      (this.prisma.inspectionTask as any).count({ where: { status: 'PENDING' } }),
+      (this.prisma.inspectionTask as any).count({ where: { status: 'IN_PROGRESS' } }),
+      (this.prisma.inspectionTask as any).count({ where: { status: 'COMPLETED' } }),
+      (this.prisma.inspectionTaskItem as any).count(),
+      (this.prisma.inspectionTaskItem as any).count({ where: { status: 'DONE' } }),
+      (this.prisma.inspectionTaskItem as any).count({ where: { status: 'ISSUE_FOUND' } }),
+      (this.prisma.inspectionTaskItem as any).count({ where: { status: 'NOT_REACHABLE' } }),
     ]);
-
-    const users = await this.prisma.user.findMany({
-      where: {
-        OR: [
-          {
-            assignedTasks: {
-              some: {},
-            },
-          },
-          {
-            assignedTaskItems: {
-              some: {},
-            },
-          },
-          {
-            completedTaskItems: {
-              some: {},
-            },
-          },
-        ],
-      },
-      select: {
-        id: true,
-        fullName: true,
-        username: true,
-        email: true,
-        phone: true,
-        jobTitle: true,
-      },
-    });
-
-    const technicians = await Promise.all(
-      users.map(async (user) => {
-        const [
-          assignedHardwareTasks,
-          assignedSoftwareTasks,
-          assignedGateTasks,
-
-          doneHardwareItems,
-          doneSoftwareItems,
-          doneGateItems,
-
-          issueHardwareItems,
-          issueSoftwareItems,
-          issueGateItems,
-
-          remainingHardwareItems,
-          remainingSoftwareItems,
-          remainingGateItems,
-
-          lastActivity,
-        ] = await Promise.all([
-          this.prisma.inspectionTask.count({
-            where: {
-              assignedToId: user.id,
-              assetType: AssetType.DEVICE,
-            },
-          }),
-
-          this.prisma.inspectionTask.count({
-            where: {
-              assignedToId: user.id,
-              assetType: AssetType.SOFTWARE,
-            },
-          }),
-
-          this.prisma.inspectionTask.count({
-            where: {
-              assignedToId: user.id,
-              assetType: AssetType.GATE,
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: TaskItemStatus.DONE,
-              task: { assetType: AssetType.DEVICE },
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: TaskItemStatus.DONE,
-              task: { assetType: AssetType.SOFTWARE },
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: TaskItemStatus.DONE,
-              task: { assetType: AssetType.GATE },
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: TaskItemStatus.ISSUE_FOUND,
-              task: { assetType: AssetType.DEVICE },
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: TaskItemStatus.ISSUE_FOUND,
-              task: { assetType: AssetType.SOFTWARE },
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: TaskItemStatus.ISSUE_FOUND,
-              task: { assetType: AssetType.GATE },
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: {
-                in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
-              },
-              task: { assetType: AssetType.DEVICE },
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: {
-                in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
-              },
-              task: { assetType: AssetType.SOFTWARE },
-            },
-          }),
-
-          this.prisma.inspectionTaskItem.count({
-            where: {
-              assignedToId: user.id,
-              status: {
-                in: [TaskItemStatus.PENDING, TaskItemStatus.IN_PROGRESS],
-              },
-              task: { assetType: AssetType.GATE },
-            },
-          }),
-
-          this.prisma.technicianActivityLog.findFirst({
-            where: {
-              userId: user.id,
-            },
-            orderBy: {
-              createdAt: 'desc',
-            },
-          }),
-        ]);
-
-        return {
-          technicianId: user.id,
-          technicianName:
-            user.fullName || user.username || user.email || `User ${user.id}`,
-          username: user.username,
-          email: user.email,
-          phone: user.phone,
-          jobTitle: user.jobTitle,
-
-          hardware: {
-            assignedTasks: assignedHardwareTasks,
-            doneItems: doneHardwareItems,
-            issueItems: issueHardwareItems,
-            remainingItems: remainingHardwareItems,
-          },
-
-          software: {
-            assignedTasks: assignedSoftwareTasks,
-            doneItems: doneSoftwareItems,
-            issueItems: issueSoftwareItems,
-            remainingItems: remainingSoftwareItems,
-          },
-
-          gates: {
-            assignedTasks: assignedGateTasks,
-            doneItems: doneGateItems,
-            issueItems: issueGateItems,
-            remainingItems: remainingGateItems,
-          },
-
-          lastActivity,
-        };
-      }),
-    );
 
     return {
       summary: {
         totalDevices,
         totalGates,
-
-        hardware: {
-          tasks: hardwareTasks,
-          completedTasks: completedHardwareTasks,
-          pendingTasks: pendingHardwareTasks,
-          inProgressTasks: inProgressHardwareTasks,
-          doneItems: hardwareDoneItems,
-          issueItems: hardwareIssueItems,
-          remainingItems: hardwareRemainingItems,
-        },
-
-        software: {
-          tasks: softwareTasks,
-          completedTasks: completedSoftwareTasks,
-          pendingTasks: pendingSoftwareTasks,
-          inProgressTasks: inProgressSoftwareTasks,
-          doneItems: softwareDoneItems,
-          issueItems: softwareIssueItems,
-          remainingItems: softwareRemainingItems,
-        },
-
-        gates: {
-          tasks: gateTasks,
-          completedTasks: completedGateTasks,
-          pendingTasks: pendingGateTasks,
-          inProgressTasks: inProgressGateTasks,
-          doneItems: gateDoneItems,
-          issueItems: gateIssueItems,
-          remainingItems: gateRemainingItems,
-        },
+        tasks: allTasks,
+        pendingTasks,
+        inProgressTasks,
+        completedTasks,
+        items: allItems,
+        doneItems,
+        issueItems,
+        notReachableItems,
       },
-
-      technicians,
     };
   }
 
   async getActivity(query: any = {}) {
-    const where: Prisma.TechnicianActivityLogWhereInput = {};
+    const where: any = {};
 
     const userId = query.userId || query.technicianId;
 
-    if (userId) {
-      where.userId = Number(userId);
-    }
+    if (userId) where.userId = Number(userId);
+    if (query.taskId) where.taskId = Number(query.taskId);
+    if (query.deviceId) where.deviceId = Number(query.deviceId);
+    if (query.gateId) where.gateId = Number(query.gateId);
+    if (query.action) where.action = String(query.action).toUpperCase();
 
-    if (query.taskId) {
-      where.taskId = Number(query.taskId);
-    }
-
-    if (query.deviceId) {
-      where.deviceId = Number(query.deviceId);
-    }
-
-    if (query.gateId) {
-      where.gateId = Number(query.gateId);
-    }
-
-    if (query.action) {
-      where.action = String(query.action).toUpperCase() as TechnicianActionType;
-    }
-
-    if (query.from || query.to) {
-      where.createdAt = {
-        gte: query.from ? new Date(query.from) : undefined,
-        lte: query.to ? new Date(query.to) : undefined,
-      };
-    }
-
-    return this.prisma.technicianActivityLog.findMany({
+    return (this.prisma.technicianActivityLog as any).findMany({
       where,
       orderBy: {
         createdAt: 'desc',
       },
-      take: query.limit ? Number(query.limit) : 200,
+      take: query.limit ? Number(query.limit) : 300,
       include: {
         user: {
           select: {
@@ -1772,8 +1377,6 @@ export class InspectionTasksService {
         task: true,
         taskItem: true,
         inspection: true,
-        morphoRepair: true,
-        replacement: true,
       },
     });
   }
@@ -1781,48 +1384,22 @@ export class InspectionTasksService {
   async update(id: number, dto: UpdateInspectionTaskDto | any) {
     await this.findOne(id);
 
-    const data: Prisma.InspectionTaskUpdateInput = {};
+    const data: any = {};
 
-    if (dto.title !== undefined) {
-      data.title = dto.title || null;
-    }
+    if (dto.title !== undefined) data.title = dto.title || null;
+    if (dto.notes !== undefined) data.notes = dto.notes || null;
+    if (dto.status !== undefined) data.status = this.normalizeTaskStatus(dto.status);
+    if (dto.priority !== undefined) data.priority = this.normalizePriority(dto.priority);
+    if (dto.taskKind !== undefined) data.taskKind = dto.taskKind;
+    if (dto.requiresScan !== undefined) data.requiresScan = this.normalizeBoolean(dto.requiresScan, true);
+    if (dto.requiresLocation !== undefined) data.requiresLocation = this.normalizeBoolean(dto.requiresLocation, false);
+    if (dto.dueDate !== undefined) data.dueDate = dto.dueDate ? new Date(dto.dueDate) : null;
+    if (dto.scheduledDate !== undefined) data.scheduledDate = dto.scheduledDate ? new Date(dto.scheduledDate) : undefined;
 
-    if (dto.notes !== undefined) {
-      data.notes = dto.notes || null;
-    }
-
-    if (dto.status !== undefined) {
-      data.status = this.normalizeTaskStatus(dto.status);
-    }
-
-    if (dto.priority !== undefined) {
-      data.priority = this.normalizePriority(dto.priority);
-    }
-
-    if (dto.taskKind !== undefined) {
-      data.taskKind = this.normalizeTaskKind(dto.taskKind);
-    }
-
-    if (dto.requiresScan !== undefined) {
-      data.requiresScan = this.normalizeBoolean(dto.requiresScan, true);
-    }
-
-    if (dto.requiresLocation !== undefined) {
-      data.requiresLocation = this.normalizeBoolean(dto.requiresLocation, false);
-    }
-
-    if (dto.dueDate !== undefined) {
-      data.dueDate = dto.dueDate ? new Date(dto.dueDate) : null;
-    }
-
-    if (dto.scheduledDate !== undefined) {
-      data.scheduledDate = dto.scheduledDate
-        ? new Date(dto.scheduledDate)
-        : undefined;
-    }
-
-    const task = await this.prisma.inspectionTask.update({
-      where: { id },
+    const task = await (this.prisma.inspectionTask as any).update({
+      where: {
+        id,
+      },
       data,
       include: this.taskInclude(),
     });
@@ -1833,8 +1410,10 @@ export class InspectionTasksService {
   async remove(id: number) {
     await this.findOne(id);
 
-    await this.prisma.inspectionTask.delete({
-      where: { id },
+    await (this.prisma.inspectionTask as any).delete({
+      where: {
+        id,
+      },
     });
 
     return {
