@@ -18,7 +18,6 @@ import {
 
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { CreateInspectionTaskDto } from './dto/create-inspection-task.dto';
-
 import { UpdateInspectionTaskDto } from './dto/update-inspection-task.dto';
 import { CompleteInspectionTaskItemDto } from './dto/complete-inspection-task-item.dto';
 
@@ -82,16 +81,30 @@ export class InspectionTasksService {
     return Boolean(value);
   }
 
+  private normalizeOptionalBoolean(value: any): boolean | null {
+    if (value === undefined || value === null || value === '') return null;
+    if (value === true || value === 'true') return true;
+    if (value === false || value === 'false') return false;
+    return Boolean(value);
+  }
+
+  private safeJson(value: any): any {
+    if (!value) return {};
+    if (typeof value === 'object') return value;
+
+    try {
+      return JSON.parse(value);
+    } catch (_) {
+      return {};
+    }
+  }
+
   private normalizeTaskMode(dto: any): TaskMode {
-    const rawTaskType = String(
-      dto.taskType || dto.workType || dto.mode || '',
-    )
+    const rawTaskType = String(dto.taskType || dto.workType || dto.mode || '')
       .trim()
       .toUpperCase();
 
-    const rawAssetType = String(dto.assetType || '')
-      .trim()
-      .toUpperCase();
+    const rawAssetType = String(dto.assetType || '').trim().toUpperCase();
 
     if (rawTaskType === 'SOFTWARE') return 'SOFTWARE';
     if (rawTaskType === 'HARDWARE') return 'HARDWARE';
@@ -191,6 +204,170 @@ export class InspectionTasksService {
     }
 
     return TaskItemStatus.DONE;
+  }
+
+  private normalizeSolution(solution: any, index = 0) {
+    if (!solution) return null;
+
+    return {
+      id: solution.id,
+      title:
+        solution.title ||
+        solution.name ||
+        solution.solutionTitle ||
+        `Step ${index + 1}`,
+      description:
+        solution.description ||
+        solution.notes ||
+        solution.action ||
+        'Step completed',
+      stepOrder: solution.stepOrder || solution.order || index + 1,
+      status: solution.status || null,
+    };
+  }
+
+  private async getSolutionsMap(solutionIds: number[]) {
+    const uniqueIds = [...new Set(solutionIds.filter(Boolean))];
+
+    if (uniqueIds.length === 0) {
+      return new Map<number, any>();
+    }
+
+    const solutions = await this.prisma.issueSolution.findMany({
+      where: {
+        id: {
+          in: uniqueIds,
+        },
+      },
+    });
+
+    const map = new Map<number, any>();
+
+    solutions.forEach((solution, index) => {
+      map.set(solution.id, this.normalizeSolution(solution, index));
+    });
+
+    return map;
+  }
+
+  private getCompletedSolutionIdsFromMetadata(metadata: any): number[] {
+    const meta = this.safeJson(metadata);
+
+    return this.toNumberArray(
+      meta.completedSolutionIds ||
+        meta.solutionIds ||
+        meta.doneSolutionIds ||
+        meta.completedStepIds ||
+        [],
+    );
+  }
+
+  private getIssueInfoFromMetadata(metadata: any) {
+    const meta = this.safeJson(metadata);
+
+    return {
+      id: meta.issueId || meta.issue?.id || null,
+      title:
+        meta.issueTitle ||
+        meta.issue?.title ||
+        meta.issue?.name ||
+        meta.issueReason ||
+        '',
+      code: meta.issueCode || meta.issue?.issueCode || '',
+      description: meta.issueDescription || meta.issue?.description || '',
+    };
+  }
+
+  private getResolvedFromMetadata(metadata: any): boolean | null {
+    const meta = this.safeJson(metadata);
+
+    if (meta.isResolved === true || meta.isResolved === false) {
+      return meta.isResolved;
+    }
+
+    return null;
+  }
+
+  private async decorateTasks(tasks: any[]) {
+    const allSolutionIds: number[] = [];
+
+    for (const task of tasks) {
+      const logs = task.activityLogs || [];
+
+      for (const log of logs) {
+        allSolutionIds.push(...this.getCompletedSolutionIdsFromMetadata(log.metadata));
+      }
+    }
+
+    const solutionsMap = await this.getSolutionsMap(allSolutionIds);
+
+    return tasks.map((task) => this.decorateTask(task, solutionsMap));
+  }
+
+  private decorateTask(task: any, solutionsMap = new Map<number, any>()) {
+    const logs = task.activityLogs || [];
+
+    const items = (task.items || []).map((item: any) => {
+      const itemLogs = logs.filter(
+        (log: any) => Number(log.taskItemId) === Number(item.id),
+      );
+
+      const latestCompletionLog =
+        itemLogs.find((log: any) =>
+          [
+            'TASK_ITEM_DONE',
+            'TASK_ITEM_ISSUE_FOUND',
+            'TASK_ITEM_NOT_REACHABLE',
+          ].includes(String(log.action)),
+        ) || itemLogs[0];
+
+      const metadata = this.safeJson(latestCompletionLog?.metadata);
+
+      const completedSolutionIds = this.getCompletedSolutionIdsFromMetadata(
+        latestCompletionLog?.metadata,
+      );
+
+      const completedSolutions = completedSolutionIds
+        .map((id) => solutionsMap.get(Number(id)))
+        .filter(Boolean);
+
+      const issueInfo = this.getIssueInfoFromMetadata(
+        latestCompletionLog?.metadata,
+      );
+
+      const isResolvedFromMeta = this.getResolvedFromMetadata(
+        latestCompletionLog?.metadata,
+      );
+
+      return {
+        ...item,
+
+        completedSolutionIds,
+        completedStepIds: completedSolutionIds,
+
+        completedSolutions,
+        completedStepObjects: completedSolutions,
+
+        issueId: metadata.issueId || null,
+        issueInfo,
+
+        isResolved: isResolvedFromMeta,
+        solvedText:
+          isResolvedFromMeta === true
+            ? 'Yes, resolved'
+            : isResolvedFromMeta === false
+              ? 'No, not resolved'
+              : undefined,
+
+        completionMetadata: metadata,
+        completionActivityLog: latestCompletionLog || null,
+      };
+    });
+
+    return {
+      ...task,
+      items,
+    };
   }
 
   private async createActivityLog(
@@ -321,6 +498,29 @@ export class InspectionTasksService {
           inspection: true,
           morphoRepairs: true,
           replacements: true,
+        },
+      },
+
+      activityLogs: {
+        orderBy: {
+          createdAt: 'desc' as const,
+        },
+        take: 300,
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              username: true,
+              email: true,
+              phone: true,
+              jobTitle: true,
+            },
+          },
+          device: true,
+          gate: true,
+          inspection: true,
+          taskItem: true,
         },
       },
     };
@@ -521,8 +721,8 @@ export class InspectionTasksService {
     const totalItems =
       mode === 'GATE' ? finalGateIds.length : finalDeviceIds.length;
 
-    return this.prisma.$transaction(async (tx) => {
-      const task = await tx.inspectionTask.create({
+    const task = await this.prisma.$transaction(async (tx) => {
+      const createdTask = await tx.inspectionTask.create({
         data: {
           campaignId: dto.campaignId ? Number(dto.campaignId) : null,
 
@@ -581,7 +781,7 @@ export class InspectionTasksService {
       if (mode === 'HARDWARE' || mode === 'SOFTWARE') {
         await tx.inspectionTaskItem.createMany({
           data: finalDeviceIds.map((deviceId, index) => ({
-            taskId: task.id,
+            taskId: createdTask.id,
             deviceId,
             gateId: null,
             assignedToId: assignedToId || null,
@@ -595,7 +795,7 @@ export class InspectionTasksService {
       if (mode === 'GATE') {
         await tx.inspectionTaskItem.createMany({
           data: finalGateIds.map((gateId, index) => ({
-            taskId: task.id,
+            taskId: createdTask.id,
             deviceId: null,
             gateId,
             assignedToId: assignedToId || null,
@@ -610,7 +810,7 @@ export class InspectionTasksService {
         await this.createActivityLog(tx, {
           userId: assignedToId,
           action: TechnicianActionType.TASK_STARTED,
-          taskId: task.id,
+          taskId: createdTask.id,
           title: 'New task assigned',
           message:
             mode === 'SOFTWARE'
@@ -621,7 +821,7 @@ export class InspectionTasksService {
           afterStatus: TaskStatus.PENDING,
           metadata: {
             mode,
-            taskId: task.id,
+            taskId: createdTask.id,
             assetType,
             taskKind,
             totalItems,
@@ -631,8 +831,10 @@ export class InspectionTasksService {
         });
       }
 
-      return this.recalculateTaskProgress(task.id, tx);
+      return this.recalculateTaskProgress(createdTask.id, tx);
     });
+
+    return this.decorateTask(task);
   }
 
   async findAll(query: any = {}) {
@@ -668,13 +870,15 @@ export class InspectionTasksService {
       };
     }
 
-    return this.prisma.inspectionTask.findMany({
+    const tasks = await this.prisma.inspectionTask.findMany({
       where,
       orderBy: {
         createdAt: 'desc',
       },
       include: this.taskInclude(),
     });
+
+    return this.decorateTasks(tasks);
   }
 
   async findOne(id: number) {
@@ -706,25 +910,6 @@ export class InspectionTasksService {
             },
           },
         },
-
-        activityLogs: {
-          orderBy: {
-            createdAt: 'desc',
-          },
-          take: 100,
-          include: {
-            user: {
-              select: {
-                id: true,
-                fullName: true,
-                username: true,
-                email: true,
-              },
-            },
-            device: true,
-            gate: true,
-          },
-        },
       },
     });
 
@@ -732,7 +917,8 @@ export class InspectionTasksService {
       throw new NotFoundException('Inspection task not found');
     }
 
-    return task;
+    const [decorated] = await this.decorateTasks([task]);
+    return decorated;
   }
 
   async findByTechnician(technicianId: number, query: any = {}) {
@@ -772,7 +958,7 @@ export class InspectionTasksService {
       where.status = this.normalizeTaskStatus(query.status);
     }
 
-    return this.prisma.inspectionTask.findMany({
+    const tasks = await this.prisma.inspectionTask.findMany({
       where,
       orderBy: [
         {
@@ -784,6 +970,8 @@ export class InspectionTasksService {
       ],
       include: this.taskInclude(),
     });
+
+    return this.decorateTasks(tasks);
   }
 
   async startTask(taskId: number, dto: any) {
@@ -850,6 +1038,17 @@ export class InspectionTasksService {
     const deviceId = this.toNumber(dto.deviceId, 'deviceId', false);
     const gateId = this.toNumber(dto.gateId, 'gateId', false);
 
+    const completedSolutionIds = this.toNumberArray(
+      dto.completedSolutionIds ||
+        dto.solutionIds ||
+        dto.doneSolutionIds ||
+        dto.completedStepIds,
+    );
+
+    const issueId = this.toNumber(dto.issueId, 'issueId', false);
+
+    const isResolved = this.normalizeOptionalBoolean(dto.isResolved);
+
     const task = await this.prisma.inspectionTask.findUnique({
       where: { id: taskId },
     });
@@ -890,6 +1089,27 @@ export class InspectionTasksService {
       );
     }
 
+    let issue: any = null;
+
+    if (issueId) {
+      issue = await this.prisma.issue.findUnique({
+        where: { id: issueId },
+      });
+
+      if (!issue) {
+        throw new NotFoundException('Issue not found');
+      }
+    }
+
+    const solutionsMap = await this.getSolutionsMap(completedSolutionIds);
+    const completedSolutions = completedSolutionIds
+      .map((id) => solutionsMap.get(Number(id)))
+      .filter(Boolean);
+
+    if (completedSolutionIds.length && completedSolutions.length === 0) {
+      throw new BadRequestException('Selected solution steps were not found');
+    }
+
     const inspectionStatus = this.normalizeInspectionStatus(
       dto.inspectionStatus,
     );
@@ -914,7 +1134,62 @@ export class InspectionTasksService {
     const isHardwareDeviceTask = task.assetType === AssetType.DEVICE;
     const isGateTask = task.assetType === AssetType.GATE;
 
-    return this.prisma.$transaction(async (tx) => {
+    const completionNote =
+      dto.completionNote ||
+      dto.notes ||
+      (isResolved === true
+        ? 'Issue solved after software steps'
+        : isResolved === false
+          ? 'Issue still exists after software steps'
+          : null);
+
+    const issueReason =
+      dto.issueReason ||
+      issue?.title ||
+      issue?.name ||
+      issue?.issueCode ||
+      null;
+
+    const completionMetadata = {
+      taskId,
+      itemId: item.id,
+      deviceId: item.deviceId,
+      gateId: item.gateId,
+
+      taskAssetType: task.assetType,
+      taskKind: task.taskKind,
+
+      isSoftwareTask,
+      isHardwareDeviceTask,
+      isGateTask,
+
+      inspectionStatus,
+      itemStatus,
+
+      scannedCode: dto.scannedCode || dto.scanCodeValue || null,
+
+      issueId: issueId || null,
+      issueTitle: issue?.title || issue?.name || null,
+      issueCode: issue?.issueCode || null,
+      issueDescription: issue?.description || null,
+      issueReason,
+
+      completedSolutionIds,
+      completedStepIds: completedSolutionIds,
+      completedSolutions,
+
+      isResolved,
+
+      notes: dto.notes || null,
+      completionNote,
+
+      softwareCategory: dto.softwareCategory || null,
+      morphoStatus: dto.morphoStatus || null,
+      firmwareNote: dto.firmwareNote || null,
+      ipNote: dto.ipNote || null,
+    };
+
+    const transactionResult = await this.prisma.$transaction(async (tx) => {
       const inspection = await tx.inspection.create({
         data: {
           deviceId: item.deviceId || null,
@@ -923,8 +1198,8 @@ export class InspectionTasksService {
           taskId,
 
           inspectionStatus,
-          issueReason: dto.issueReason || null,
-          notes: dto.notes || dto.completionNote || null,
+          issueReason,
+          notes: dto.notes || completionNote || null,
 
           latitude,
           longitude,
@@ -945,7 +1220,7 @@ export class InspectionTasksService {
           issueFound: itemStatus === TaskItemStatus.ISSUE_FOUND,
 
           notes: dto.notes || null,
-          completionNote: dto.completionNote || dto.notes || null,
+          completionNote,
 
           scannedCode: dto.scannedCode || dto.scanCodeValue || null,
 
@@ -961,9 +1236,6 @@ export class InspectionTasksService {
           data: {
             lastInspectionAt: inspection.inspectedAt,
 
-            // مهم:
-            // لو التاسك SOFTWARE لا نغير حالة الجهاز هاردوير.
-            // لو التاسك HARDWARE وفيه مشكلة نغير الجهاز لـ NEEDS_MAINTENANCE.
             currentStatus:
               isHardwareDeviceTask && itemStatus === TaskItemStatus.ISSUE_FOUND
                 ? DeviceCurrentStatus.NEEDS_MAINTENANCE
@@ -1019,26 +1291,7 @@ export class InspectionTasksService {
         latitude,
         longitude,
         locationText: dto.locationText || null,
-        metadata: {
-          taskId,
-          itemId: item.id,
-          deviceId: item.deviceId,
-          gateId: item.gateId,
-          taskAssetType: task.assetType,
-          taskKind: task.taskKind,
-          isSoftwareTask,
-          isHardwareDeviceTask,
-          isGateTask,
-          inspectionStatus,
-          itemStatus,
-          scannedCode: dto.scannedCode || dto.scanCodeValue || null,
-          issueReason: dto.issueReason || null,
-          notes: dto.notes || dto.completionNote || null,
-          softwareCategory: dto.softwareCategory || null,
-          morphoStatus: dto.morphoStatus || null,
-          firmwareNote: dto.firmwareNote || null,
-          ipNote: dto.ipNote || null,
-        },
+        metadata: completionMetadata,
       });
 
       await this.createActivityLog(tx, {
@@ -1055,14 +1308,13 @@ export class InspectionTasksService {
         latitude,
         longitude,
         locationText: dto.locationText || null,
-        metadata: {
-          taskAssetType: task.assetType,
-          taskKind: task.taskKind,
-        },
+        metadata: completionMetadata,
       });
 
       return this.recalculateTaskProgress(taskId, tx);
     });
+
+    return this.decorateTask(transactionResult, solutionsMap);
   }
 
   async getDashboard() {
@@ -1460,8 +1712,10 @@ export class InspectionTasksService {
   async getActivity(query: any = {}) {
     const where: Prisma.TechnicianActivityLogWhereInput = {};
 
-    if (query.userId) {
-      where.userId = Number(query.userId);
+    const userId = query.userId || query.technicianId;
+
+    if (userId) {
+      where.userId = Number(userId);
     }
 
     if (query.taskId) {
@@ -1567,11 +1821,13 @@ export class InspectionTasksService {
         : undefined;
     }
 
-    return this.prisma.inspectionTask.update({
+    const task = await this.prisma.inspectionTask.update({
       where: { id },
       data,
       include: this.taskInclude(),
     });
+
+    return this.decorateTask(task);
   }
 
   async remove(id: number) {
