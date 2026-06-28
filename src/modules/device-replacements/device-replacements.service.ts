@@ -40,41 +40,86 @@ export class DeviceReplacementsService {
     );
   }
 
-  private snapshotDevice(device: any) {
-    if (!device) return null;
+  private locationFromDevice(device: any) {
+    const loc = device?.location || {};
 
     return {
-      id: device.id ?? null,
-      deviceCode: device.deviceCode ?? null,
-      deviceName: device.deviceName ?? null,
-      barcode: device.barcode ?? null,
-      serialNumber: device.serialNumber ?? null,
-      manufacturer: device.manufacturer ?? null,
-      modelNumber: device.modelNumber ?? null,
-      firmware: device.firmware ?? null,
-      ipAddress: device.ipAddress ?? null,
-      currentStatus: device.currentStatus ?? null,
-      lifecycleStatus: device.lifecycleStatus ?? null,
-      assetType: device.assetType ?? null,
-      deviceTypeId: device.deviceTypeId ?? null,
-      locationId: device.locationId ?? null,
-
-      gateNo: device.gateNo ?? null,
-      gateCluster: device.gateCluster ?? null,
-      gateBuilding: device.gateBuilding ?? null,
-      gateZone: device.gateZone ?? null,
-      gateDirection: device.gateDirection ?? null,
-
-      cluster: device.cluster ?? null,
-      building: device.building ?? null,
-      zone: device.zone ?? null,
-      direction: device.direction ?? null,
-      lane: device.lane ?? null,
-
-      location: device.location ?? null,
-      createdAt: device.createdAt ?? null,
-      updatedAt: device.updatedAt ?? null,
+      id: loc.id ?? device?.locationId ?? null,
+      cluster:
+        this.clean(loc.cluster) ??
+        this.clean(device?.gateCluster) ??
+        this.clean(device?.cluster),
+      building:
+        this.clean(loc.building) ??
+        this.clean(device?.gateBuilding) ??
+        this.clean(device?.building),
+      zone:
+        this.clean(loc.zone) ??
+        this.clean(device?.gateZone) ??
+        this.clean(device?.zone),
+      direction:
+        this.clean(loc.direction) ??
+        this.clean(device?.gateDirection) ??
+        this.clean(device?.direction),
+      lane:
+        this.clean(loc.lane) ??
+        this.clean(device?.gateNo) ??
+        this.clean(device?.lane),
+      type: this.clean(loc.type) ?? this.clean(device?.type),
+      excelId: this.clean(loc.excelId) ?? null,
     };
+  }
+
+  private locationLabel(location: any) {
+    if (!location) return '—';
+
+    return [
+      location.cluster,
+      location.building,
+      location.zone,
+      location.direction,
+      location.lane,
+    ]
+      .filter(Boolean)
+      .join(' - ') || '—';
+  }
+
+  private applyLocationToDevice(device: any, location: any) {
+    if (!device) return null;
+    if (!location) return device;
+
+    return {
+      ...device,
+      locationId: location.id ?? device.locationId,
+      location: {
+        ...(device.location || {}),
+        ...location,
+      },
+
+      // مهم جدًا عشان الفرونت لو بيقرأ gate fields يلاقيها صح
+      gateCluster: location.cluster ?? device.gateCluster,
+      gateBuilding: location.building ?? device.gateBuilding,
+      gateZone: location.zone ?? device.gateZone,
+      gateDirection: location.direction ?? device.gateDirection,
+      gateNo: location.lane ?? device.gateNo,
+    };
+  }
+
+  private makeAutoExcelId(location: any) {
+    const safe = [
+      location.cluster,
+      location.building,
+      location.zone,
+      location.direction,
+      location.lane,
+    ]
+      .filter(Boolean)
+      .join('-')
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\u0600-\u06FF-]/g, '')
+      .slice(0, 70);
+
+    return `AUTO-${safe || 'LOCATION'}-${Date.now()}`;
   }
 
   private async findDeviceSafe(id: number) {
@@ -98,6 +143,74 @@ export class DeviceReplacementsService {
         where: { id },
       });
     }
+  }
+
+  private async findLocationByIdSafe(id?: number | null) {
+    if (!id) return null;
+
+    try {
+      return await (this.prisma as any).location.findUnique({
+        where: { id },
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  private async findOrCreateLocationSafe(input: {
+    cluster?: string | null;
+    building?: string | null;
+    zone?: string | null;
+    direction?: string | null;
+    lane?: string | null;
+    type?: string | null;
+  }) {
+    const cluster = this.clean(input.cluster);
+    const building = this.clean(input.building);
+    const zone = this.clean(input.zone);
+    const direction = this.clean(input.direction);
+    const lane = this.clean(input.lane);
+    const type = this.clean(input.type);
+
+    if (!cluster || !building) {
+      throw new BadRequestException(
+        'New location must have at least cluster and building.',
+      );
+    }
+
+    const where = {
+      cluster,
+      building,
+      zone,
+      direction,
+      lane,
+    };
+
+    const existing = await (this.prisma as any).location.findFirst({
+      where,
+    });
+
+    if (existing) {
+      return existing;
+    }
+
+    return (this.prisma as any).location.create({
+      data: {
+        cluster,
+        building,
+        zone,
+        direction,
+        lane,
+        type,
+        excelId: this.makeAutoExcelId({
+          cluster,
+          building,
+          zone,
+          direction,
+          lane,
+        }),
+      },
+    });
   }
 
   private async findUserSafe(id?: number | null) {
@@ -159,14 +272,44 @@ export class DeviceReplacementsService {
     const newDeviceId = Number(record.newDeviceId || 0);
     const replacedById = Number(record.replacedById || record.userId || 0);
 
-    const [oldDevice, newDevice, replacedBy] = await Promise.all([
+    const [
+      oldDeviceLive,
+      newDeviceLive,
+      replacedBy,
+      fromLocation,
+      toLocation,
+    ] = await Promise.all([
       oldDeviceId ? this.findDeviceSafe(oldDeviceId) : null,
       newDeviceId ? this.findDeviceSafe(newDeviceId) : null,
       replacedById ? this.findUserSafe(replacedById) : null,
+      record.fromLocationId
+        ? this.findLocationByIdSafe(Number(record.fromLocationId))
+        : null,
+      record.toLocationId
+        ? this.findLocationByIdSafe(Number(record.toLocationId))
+        : null,
     ]);
+
+    const oldDevice = this.applyLocationToDevice(
+      oldDeviceLive,
+      fromLocation || oldDeviceLive?.location,
+    );
+
+    const newDevice = this.applyLocationToDevice(
+      newDeviceLive,
+      toLocation || newDeviceLive?.location,
+    );
 
     return {
       ...record,
+
+      // دول المهمين للفرونت
+      fromLocation: fromLocation || oldDevice?.location || null,
+      toLocation: toLocation || newDevice?.location || null,
+
+      oldLocation: fromLocation || oldDevice?.location || null,
+      newLocation: toLocation || newDevice?.location || null,
+
       oldDevice,
       newDevice,
       replacedBy,
@@ -182,13 +325,21 @@ export class DeviceReplacementsService {
 
     try {
       const rows = await model.findMany({
-        orderBy: { createdAt: 'desc' },
+        orderBy: { replacedAt: 'desc' },
       });
 
       return Promise.all(rows.map((row: any) => this.enrich(row)));
     } catch {
-      const rows = await model.findMany();
-      return Promise.all(rows.map((row: any) => this.enrich(row)));
+      try {
+        const rows = await model.findMany({
+          orderBy: { createdAt: 'desc' },
+        });
+
+        return Promise.all(rows.map((row: any) => this.enrich(row)));
+      } catch {
+        const rows = await model.findMany();
+        return Promise.all(rows.map((row: any) => this.enrich(row)));
+      }
     }
   }
 
@@ -227,48 +378,41 @@ export class DeviceReplacementsService {
       throw new BadRequestException('oldDeviceId must be a valid device id.');
     }
 
+    // 1) نجيب الجهاز قبل أي update
     const oldDevice = await this.findDeviceSafe(deviceId);
 
     if (!oldDevice) {
       throw new NotFoundException('Device not found');
     }
 
-    const replacedById = await this.resolveReplacedById(dto.replacedById || null);
+    const replacedById = await this.resolveReplacedById(
+      dto.replacedById || null,
+    );
 
-    const oldSnapshot = this.snapshotDevice(oldDevice);
+    // 2) دي أهم خطوة: نحفظ المكان القديم قبل ما نلمس الجهاز
+    const oldLocation = this.locationFromDevice(oldDevice);
+
+    // 3) المكان الجديد من الداتا اللي جاية من الفرونت
+    const newCluster = this.clean(dto.newCluster) ?? oldLocation.cluster;
+    const newBuilding = this.clean(dto.newBuilding) ?? oldLocation.building;
+    const newZone = this.clean(dto.newZone) ?? oldLocation.zone;
+    const newDirection = this.clean(dto.newDirection) ?? oldLocation.direction;
+    const newLane = this.clean(dto.newLane) ?? oldLocation.lane;
+
+    const newLocation = await this.findOrCreateLocationSafe({
+      cluster: newCluster,
+      building: newBuilding,
+      zone: newZone,
+      direction: newDirection,
+      lane: newLane,
+      type: oldLocation.type,
+    });
+
     const sameIp = oldDevice.ipAddress || null;
 
-    const newCluster =
-      this.clean(dto.newCluster) ??
-      oldDevice.gateCluster ??
-      oldDevice.cluster ??
-      null;
-
-    const newBuilding =
-      this.clean(dto.newBuilding) ??
-      oldDevice.gateBuilding ??
-      oldDevice.building ??
-      null;
-
-    const newZone =
-      this.clean(dto.newZone) ??
-      oldDevice.gateZone ??
-      oldDevice.zone ??
-      null;
-
-    const newDirection =
-      this.clean(dto.newDirection) ??
-      oldDevice.gateDirection ??
-      oldDevice.direction ??
-      null;
-
-    const newLane =
-      this.clean(dto.newLane) ??
-      oldDevice.gateNo ??
-      oldDevice.lane ??
-      null;
-
+    // 4) نحدث الجهاز للمكان الجديد
     await this.updateSameDeviceLocationSafe(oldDevice.id, {
+      newLocationId: newLocation.id,
       newCluster,
       newBuilding,
       newZone,
@@ -277,19 +421,31 @@ export class DeviceReplacementsService {
     });
 
     const freshDevice = await this.findDeviceSafe(oldDevice.id);
-    const newSnapshot = this.snapshotDevice(freshDevice || oldDevice);
 
+    // 5) نسجل replacement وفيه fromLocationId و toLocationId
     const replacementRecord = await this.createReplacementRecordSafe({
       oldDeviceId: oldDevice.id,
       newDeviceId: oldDevice.id,
       replacedById,
-      status: 'COMPLETED',
+      fromLocationId: oldLocation.id,
+      toLocationId: newLocation.id,
       oldIpAddress: sameIp,
-      oldSnapshot,
-      newSnapshot,
+      newIpAddress: sameIp,
+      keepSameIp: true,
+      status: 'COMPLETED',
       reason: this.clean(dto.reason),
       notes: this.clean(dto.notes),
-      replacementDate: new Date(),
+    });
+
+    // 6) نسجل movement كمان عشان يبقى فيه history واضح
+    await this.writeDeviceMovementSafe({
+      deviceId: oldDevice.id,
+      movedById: replacedById,
+      fromLocationId: oldLocation.id,
+      toLocationId: newLocation.id,
+      fromText: this.locationLabel(oldLocation),
+      toText: this.locationLabel(newLocation),
+      reason: this.clean(dto.reason),
     });
 
     await this.writeAuditLogSafe({
@@ -297,10 +453,14 @@ export class DeviceReplacementsService {
       action: 'DEVICE_LOCATION_REPLACED',
       message: `Device ${this.getDeviceCode(
         oldDevice,
-      )} updated as same device with same IP ${sameIp || '—'}`,
+      )} moved from ${this.locationLabel(oldLocation)} to ${this.locationLabel(
+        newLocation,
+      )}`,
       oldDeviceId: oldDevice.id,
-      newDeviceId: oldDevice.id,
+      newDeviceId: freshDevice?.id || oldDevice.id,
       replacementId: replacementRecord.id,
+      fromLocationId: oldLocation.id,
+      toLocationId: newLocation.id,
     });
 
     return this.enrich(replacementRecord);
@@ -309,6 +469,7 @@ export class DeviceReplacementsService {
   private async updateSameDeviceLocationSafe(
     deviceId: number,
     locationData: {
+      newLocationId?: number | null;
       newCluster?: string | null;
       newBuilding?: string | null;
       newZone?: string | null;
@@ -316,76 +477,39 @@ export class DeviceReplacementsService {
       newLane?: string | null;
     },
   ) {
-    const { newCluster, newBuilding, newZone, newDirection, newLane } =
-      locationData;
+    const {
+      newLocationId,
+      newCluster,
+      newBuilding,
+      newZone,
+      newDirection,
+      newLane,
+    } = locationData;
 
-    const attempts = [
-      {
-        gateCluster: newCluster,
-        gateBuilding: newBuilding,
-        gateZone: newZone,
-        gateDirection: newDirection,
-        gateNo: newLane,
-        lifecycleStatus: 'ACTIVE',
-      },
-      {
-        gateCluster: newCluster,
-        gateBuilding: newBuilding,
-        gateZone: newZone,
-        gateDirection: newDirection,
-        gateNo: newLane,
-      },
-      {
-        cluster: newCluster,
-        building: newBuilding,
-        zone: newZone,
-        direction: newDirection,
-        lane: newLane,
-        lifecycleStatus: 'ACTIVE',
-      },
-      {
-        cluster: newCluster,
-        building: newBuilding,
-        zone: newZone,
-        direction: newDirection,
-        lane: newLane,
-      },
-      {
-        gateCluster: newCluster,
-        gateBuilding: newBuilding,
-        gateZone: newZone,
-        gateDirection: newDirection,
-      },
-      {
-        cluster: newCluster,
-        building: newBuilding,
-        zone: newZone,
-        direction: newDirection,
-      },
-    ];
+    const data = this.removeEmpty({
+      locationId: newLocationId,
+      gateCluster: newCluster,
+      gateBuilding: newBuilding,
+      gateZone: newZone,
+      gateDirection: newDirection,
+      gateNo: newLane,
+      lifecycleStatus: 'ACTIVE',
+    });
 
-    let lastError: any;
-
-    for (const data of attempts) {
-      try {
-        const cleaned = this.removeEmpty(data);
-
-        if (!Object.keys(cleaned).length) {
-          continue;
-        }
-
-        return await (this.prisma as any).device.update({
-          where: { id: deviceId },
-          data: cleaned,
-        });
-      } catch (error) {
-        lastError = error;
-      }
+    if (!Object.keys(data).length) {
+      throw new BadRequestException('No location data sent to update device.');
     }
 
-    throw new BadRequestException(
-      lastError?.message || 'Failed to update the same device location',
-    );
+    try {
+      return await (this.prisma as any).device.update({
+        where: { id: deviceId },
+        data,
+      });
+    } catch (error: any) {
+      throw new BadRequestException(
+        error?.message || 'Failed to update the same device location',
+      );
+    }
   }
 
   private async createReplacementRecordSafe(data: any) {
@@ -399,7 +523,7 @@ export class DeviceReplacementsService {
     const newId = Number(data.newDeviceId);
     const userId = await this.resolveReplacedById(data.replacedById);
 
-    const withSnapshots: any = {
+    const withLocations: any = {
       oldDevice: {
         connect: { id: oldId },
       },
@@ -409,16 +533,30 @@ export class DeviceReplacementsService {
       replacedBy: {
         connect: { id: userId },
       },
+      ...(data.fromLocationId
+        ? {
+            fromLocation: {
+              connect: { id: Number(data.fromLocationId) },
+            },
+          }
+        : {}),
+      ...(data.toLocationId
+        ? {
+            toLocation: {
+              connect: { id: Number(data.toLocationId) },
+            },
+          }
+        : {}),
       status: data.status || 'COMPLETED',
       oldIpAddress: data.oldIpAddress || null,
-      oldSnapshot: data.oldSnapshot,
-      newSnapshot: data.newSnapshot,
+      newIpAddress: data.newIpAddress || null,
+      keepSameIp: data.keepSameIp ?? true,
       reason: data.reason || null,
       notes: data.notes || null,
-      replacementDate: data.replacementDate || new Date(),
+      replacedAt: new Date(),
     };
 
-    const withoutSnapshots: any = {
+    const withoutLocations: any = {
       oldDevice: {
         connect: { id: oldId },
       },
@@ -430,31 +568,16 @@ export class DeviceReplacementsService {
       },
       status: data.status || 'COMPLETED',
       oldIpAddress: data.oldIpAddress || null,
+      newIpAddress: data.newIpAddress || null,
+      keepSameIp: data.keepSameIp ?? true,
       reason: data.reason || null,
       notes: data.notes || null,
-      replacementDate: data.replacementDate || new Date(),
-    };
-
-    const minimal: any = {
-      oldDevice: {
-        connect: { id: oldId },
-      },
-      newDevice: {
-        connect: { id: newId },
-      },
-      replacedBy: {
-        connect: { id: userId },
-      },
-      status: data.status || 'COMPLETED',
-      oldIpAddress: data.oldIpAddress || null,
-      reason: data.reason || null,
-      notes: data.notes || null,
+      replacedAt: new Date(),
     };
 
     const attempts = [
-      this.removeEmpty(withSnapshots),
-      this.removeEmpty(withoutSnapshots),
-      this.removeEmpty(minimal),
+      this.removeEmpty(withLocations),
+      this.removeEmpty(withoutLocations),
     ];
 
     let lastError: any;
@@ -474,6 +597,33 @@ export class DeviceReplacementsService {
     );
   }
 
+  private async writeDeviceMovementSafe(data: {
+    deviceId: number;
+    movedById: number;
+    fromLocationId?: number | null;
+    toLocationId?: number | null;
+    fromText?: string | null;
+    toText?: string | null;
+    reason?: string | null;
+  }) {
+    try {
+      await (this.prisma as any).deviceMovement.create({
+        data: this.removeEmpty({
+          deviceId: data.deviceId,
+          movedById: data.movedById,
+          movementType: 'RELOCATED',
+          fromLocationId: data.fromLocationId || null,
+          toLocationId: data.toLocationId || null,
+          fromText: data.fromText || null,
+          toText: data.toText || null,
+          reason: data.reason || null,
+        }),
+      });
+    } catch {
+      // movement log is optional
+    }
+  }
+
   private async writeAuditLogSafe(data: {
     userId?: number | null;
     action: string;
@@ -481,6 +631,8 @@ export class DeviceReplacementsService {
     oldDeviceId?: number;
     newDeviceId?: number;
     replacementId?: number;
+    fromLocationId?: number | null;
+    toLocationId?: number | null;
   }) {
     try {
       await (this.prisma as any).auditLog.create({
@@ -489,13 +641,15 @@ export class DeviceReplacementsService {
           action: data.action,
           entityType: 'DEVICE_REPLACEMENT',
           entityId: data.replacementId || null,
-          description: data.message,
-          metadata: {
+          details: JSON.stringify({
+            message: data.message,
             oldDeviceId: data.oldDeviceId,
             newDeviceId: data.newDeviceId,
             replacementId: data.replacementId,
+            fromLocationId: data.fromLocationId,
+            toLocationId: data.toLocationId,
             sameDevice: true,
-          },
+          }),
         },
       });
     } catch {
