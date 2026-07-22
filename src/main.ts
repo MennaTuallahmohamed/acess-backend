@@ -26,7 +26,8 @@ import {
 } from './app.module';
 
 async function bootstrap(): Promise<void> {
-  const logger = new Logger('Bootstrap');
+  const logger =
+    new Logger('Bootstrap');
 
   const app =
     await NestFactory.create<NestExpressApplication>(
@@ -56,16 +57,22 @@ async function bootstrap(): Promise<void> {
   const defaultOrigins = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+
+    'http://localhost:5174',
+    'http://127.0.0.1:5174',
+
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+
     'https://smart-it-15.vercel.app',
   ];
 
   /*
-   * يمكن إضافة أكثر من رابط داخل Railway Variables:
+   * يمكن إضافة أكثر من رابط في Railway Variables:
    *
    * FRONTEND_URLS=https://site1.vercel.app,https://site2.vercel.app
    */
+
   const environmentOrigins =
     process.env.FRONTEND_URLS
       ?.split(',')
@@ -73,13 +80,19 @@ async function bootstrap(): Promise<void> {
         (origin) =>
           origin.trim(),
       )
-      .filter(Boolean) ?? [];
+      .filter(
+        (
+          origin,
+        ): origin is string =>
+          Boolean(origin),
+      ) ?? [];
 
   /*
-   * دعم متغير واحد أيضًا:
+   * دعم رابط واحد أيضًا:
    *
    * FRONTEND_URL=https://smart-it-15.vercel.app
    */
+
   const singleFrontendOrigin =
     process.env.FRONTEND_URL
       ?.trim();
@@ -87,8 +100,11 @@ async function bootstrap(): Promise<void> {
   const allowedOrigins = [
     ...defaultOrigins,
     ...environmentOrigins,
+
     ...(singleFrontendOrigin
-      ? [singleFrontendOrigin]
+      ? [
+          singleFrontendOrigin,
+        ]
       : []),
   ];
 
@@ -98,17 +114,51 @@ async function bootstrap(): Promise<void> {
     ),
   ];
 
+  /*
+   * يسمح لأي بورت Localhost أثناء التطوير:
+   *
+   * http://localhost:5173
+   * http://localhost:5174
+   * http://localhost:5175
+   * http://127.0.0.1:5174
+   */
+
+  const isLocalDevelopmentOrigin = (
+    origin: string,
+  ): boolean => {
+    return (
+      /^http:\/\/localhost:\d+$/.test(
+        origin,
+      ) ||
+      /^http:\/\/127\.0\.0\.1:\d+$/.test(
+        origin,
+      )
+    );
+  };
+
   app.enableCors({
     origin: (
-      origin,
-      callback,
+      origin:
+        | string
+        | undefined,
+
+      callback: (
+        error:
+          | Error
+          | null,
+
+        allow?:
+          boolean,
+      ) => void,
     ) => {
       /*
-       * الطلبات بدون Origin تشمل:
+       * الطلبات التي لا تحتوي على Origin:
+       *
        * Postman
        * Server-to-server
-       * بعض طلبات Railway الداخلية
+       * Railway internal requests
        */
+
       if (!origin) {
         callback(
           null,
@@ -118,10 +168,19 @@ async function bootstrap(): Promise<void> {
         return;
       }
 
-      if (
+      const isExplicitlyAllowed =
         uniqueAllowedOrigins.includes(
           origin,
-        )
+        );
+
+      const isLocalOrigin =
+        isLocalDevelopmentOrigin(
+          origin,
+        );
+
+      if (
+        isExplicitlyAllowed ||
+        isLocalOrigin
       ) {
         callback(
           null,
@@ -166,7 +225,8 @@ async function bootstrap(): Promise<void> {
       'Content-Disposition',
     ],
 
-    optionsSuccessStatus: 204,
+    optionsSuccessStatus:
+      204,
   });
 
   /*
@@ -201,8 +261,9 @@ async function bootstrap(): Promise<void> {
   /*
    * مثال رابط الصورة:
    *
-   * https://backend.up.railway.app/uploads/glass-inspections/image.jpg
+   * https://backend.up.railway.app/uploads/image.jpg
    */
+
   app.useStaticAssets(
     uploadsPath,
     {
@@ -313,12 +374,18 @@ async function bootstrap(): Promise<void> {
   );
 
   logger.log(
+    'Localhost origins: any local port is allowed',
+  );
+
+  logger.log(
     '====================================',
   );
 }
 
 bootstrap().catch(
-  (error: unknown) => {
+  (
+    error: unknown,
+  ) => {
     const logger =
       new Logger(
         'Bootstrap',
@@ -326,6 +393,7 @@ bootstrap().catch(
 
     logger.error(
       'Application failed to start',
+
       error instanceof Error
         ? error.stack
         : String(error),
