@@ -8,128 +8,229 @@ import {
   Patch,
   Post,
   Query,
+  Res,
+  StreamableFile,
+  UploadedFile,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
 
-import { glassInspectionUploadOptions } from './config/glass-upload.config';
+import {
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 
-import { CreateGlassDto } from './dto/create-glass.dto';
-import { UpdateGlassDto } from './dto/update-glass.dto';
-import { GetGlassesQueryDto } from './dto/get-glasses-query.dto';
-import { CreateGlassInspectionDto } from './dto/create-glass-inspection.dto';
-import { GetGlassInspectionsQueryDto } from './dto/get-glass-inspections-query.dto';
-import { SyncGlassesFromLocationsDto } from './dto/sync-glasses-from-locations.dto';
+import express from 'express';
 
-import { GlassesService } from './glasses.service';
+import {
+  memoryStorage,
+} from 'multer';
+
+import {
+  glassInspectionUploadOptions,
+} from './config/glass-upload.config';
+
+import {
+  CreateGlassInspectionDto,
+} from './dto/create-glass-inspection.dto';
+
+import {
+  CreateGlassDto,
+} from './dto/create-glass.dto';
+
+import {
+  GetGlassInspectionsQueryDto,
+} from './dto/get-glass-inspections-query.dto';
+
+import {
+  GetGlassesQueryDto,
+} from './dto/get-glasses-query.dto';
+
+import {
+  SyncGlassesFromLocationsDto,
+} from './dto/sync-glasses-from-locations.dto';
+
+import {
+  UpdateGlassDto,
+} from './dto/update-glass.dto';
+
+import {
+  GlassesImportService,
+} from './glasses-import.service';
+
+import {
+  GlassesService,
+} from './glasses.service';
 
 @Controller('glasses')
 export class GlassesController {
   constructor(
-    private readonly glassesService: GlassesService,
+    private readonly glassesService:
+      GlassesService,
+
+    private readonly glassesImportService:
+      GlassesImportService,
   ) {}
 
-  /**
-   * إضافة زجاج يدويًا.
-   *
-   * الزجاج ليس له كود.
-   * يتم تحديده بواسطة:
-   * cluster + building + zone + direction
-   */
-  @Post()
-  create(@Body() dto: CreateGlassDto) {
-    return this.glassesService.create(dto);
-  }
+  /*
+  =========================================================
+  Excel Import
+  يجب وضع المسارات الثابتة قبل :id
+  =========================================================
+  */
 
-  /**
-   * إنشاء سجلات الزجاج تلقائيًا
-   * من المواقع الموجودة في جدول Location.
-   */
-  @Post('sync-from-locations')
-  syncFromLocations(
-    @Body() dto: SyncGlassesFromLocationsDto,
+  @Post('import-excel')
+  @UseInterceptors(
+    FileInterceptor(
+      'file',
+      {
+        storage:
+          memoryStorage(),
+
+        limits: {
+          fileSize:
+            15 * 1024 * 1024,
+        },
+
+        fileFilter: (
+          _request,
+          file,
+          callback,
+        ) => {
+          const validExtension =
+            /\.(xlsx|xls)$/i.test(
+              file.originalname,
+            );
+
+          if (!validExtension) {
+            callback(
+              new Error(
+                'يجب رفع ملف Excel بصيغة xlsx أو xls',
+              ),
+              false,
+            );
+
+            return;
+          }
+
+          callback(
+            null,
+            true,
+          );
+        },
+      },
+    ),
+  )
+  importExcel(
+    @UploadedFile()
+    file?: Express.Multer.File,
   ) {
-    return this.glassesService.syncFromLocations(dto);
+    return this.glassesImportService
+      .importExcel(file);
   }
 
-  /**
-   * إحصائيات صفحة إدارة الزجاج.
-   */
-  @Get('summary')
-  getSummary(
-    @Query() query: GetGlassesQueryDto,
+  @Get('import-template')
+  downloadImportTemplate(
+    @Res({
+      passthrough: true,
+    })
+    response: express.Response,
   ) {
-    return this.glassesService.getSummary(query);
-  }
+    const template =
+      this.glassesImportService
+        .createTemplate();
 
-  /**
-   * جلب الكلاسترات والمباني والزونات
-   * والاتجاهات لاستخدامها في الفلاتر.
-   */
-  @Get('filters')
-  getFilters() {
-    return this.glassesService.getFilters();
-  }
+    response.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
 
-  /**
-   * قائمة الزجاج مع البحث والتصفية.
-   */
-  @Get()
-  findAll(
-    @Query() query: GetGlassesQueryDto,
-  ) {
-    return this.glassesService.findAll(query);
-  }
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${template.fileName}"`,
+    );
 
-  /**
-   * تفاصيل زجاج واحد مع جميع تفتيشاته.
-   */
-  @Get(':id')
-  findOne(
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.glassesService.findOne(id);
-  }
+    response.setHeader(
+      'Content-Length',
+      String(
+        template.buffer.length,
+      ),
+    );
 
-  /**
-   * تعديل بيانات مكان الزجاج.
-   */
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateGlassDto,
-  ) {
-    return this.glassesService.update(
-      id,
-      dto,
+    return new StreamableFile(
+      template.buffer,
     );
   }
 
-  /**
-   * حذف الزجاج.
-   *
-   * لو مرتبط بتفتيشات أو مهام
-   * سيتم تحويله إلى INACTIVE.
-   */
-  @Delete(':id')
-  remove(
-    @Param('id', ParseIntPipe) id: number,
+  /*
+  =========================================================
+  Static GET Routes
+  يجب أن تظل قبل @Get(':id')
+  =========================================================
+  */
+
+  @Get('summary')
+  getSummary(
+    @Query()
+    query: GetGlassesQueryDto,
   ) {
-    return this.glassesService.remove(id);
+    return this.glassesService
+      .getSummary(query);
   }
 
-  /**
-   * تسجيل تفتيش للزجاج.
-   *
-   * يقبل:
-   * application/json
-   * أو
-   * multipart/form-data
-   *
-   * اسم حقل الصور:
-   * images
-   */
+  @Get('filters')
+  getFilters() {
+    return this.glassesService
+      .getFilters();
+  }
+
+  /*
+  =========================================================
+  Sync
+  =========================================================
+  */
+
+  @Post('sync-from-locations')
+  syncFromLocations(
+    @Body()
+    dto:
+      SyncGlassesFromLocationsDto,
+  ) {
+    return this.glassesService
+      .syncFromLocations(dto);
+  }
+
+  /*
+  =========================================================
+  Create and List
+  =========================================================
+  */
+
+  @Post()
+  create(
+    @Body()
+    dto: CreateGlassDto,
+  ) {
+    return this.glassesService
+      .create(dto);
+  }
+
+  @Get()
+  findAll(
+    @Query()
+    query: GetGlassesQueryDto,
+  ) {
+    return this.glassesService
+      .findAll(query);
+  }
+
+  /*
+  =========================================================
+  Inspection Routes
+  توضع قبل @Get(':id') أيضًا
+  =========================================================
+  */
+
   @Post(':id/inspections')
   @UseInterceptors(
     FilesInterceptor(
@@ -139,45 +240,109 @@ export class GlassesController {
     ),
   )
   createInspection(
-    @Param('id', ParseIntPipe) id: number,
+    @Param(
+      'id',
+      ParseIntPipe,
+    )
+    id: number,
 
     @Body()
-    dto: CreateGlassInspectionDto,
+    dto:
+      CreateGlassInspectionDto,
 
     @UploadedFiles()
-    files: Express.Multer.File[] = [],
+    files:
+      Express.Multer.File[] = [],
   ) {
-    const uploadedImageUrls = files.map(
-      (file) =>
-        `/uploads/glass-inspections/${file.filename}`,
-    );
+    const uploadedImageUrls =
+      files.map(
+        (file) =>
+          `/uploads/glass-inspections/${file.filename}`,
+      );
 
-    return this.glassesService.createInspection(
-      id,
-      {
-        ...dto,
+    return this.glassesService
+      .createInspection(
+        id,
+        {
+          ...dto,
 
-        imageUrls: [
-          ...(dto.imageUrls ?? []),
-          ...uploadedImageUrls,
-        ],
-      },
-    );
+          imageUrls: [
+            ...(
+              dto.imageUrls ??
+              []
+            ),
+
+            ...uploadedImageUrls,
+          ],
+        },
+      );
   }
 
-  /**
-   * تاريخ تفتيشات زجاج معين.
-   */
   @Get(':id/inspections')
   getInspections(
-    @Param('id', ParseIntPipe) id: number,
+    @Param(
+      'id',
+      ParseIntPipe,
+    )
+    id: number,
 
     @Query()
-    query: GetGlassInspectionsQueryDto,
+    query:
+      GetGlassInspectionsQueryDto,
   ) {
-    return this.glassesService.getInspections(
-      id,
-      query,
-    );
+    return this.glassesService
+      .getInspections(
+        id,
+        query,
+      );
+  }
+
+  /*
+  =========================================================
+  Dynamic ID Routes
+  لازم تكون في آخر الـController
+  =========================================================
+  */
+
+  @Get(':id')
+  findOne(
+    @Param(
+      'id',
+      ParseIntPipe,
+    )
+    id: number,
+  ) {
+    return this.glassesService
+      .findOne(id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param(
+      'id',
+      ParseIntPipe,
+    )
+    id: number,
+
+    @Body()
+    dto: UpdateGlassDto,
+  ) {
+    return this.glassesService
+      .update(
+        id,
+        dto,
+      );
+  }
+
+  @Delete(':id')
+  remove(
+    @Param(
+      'id',
+      ParseIntPipe,
+    )
+    id: number,
+  ) {
+    return this.glassesService
+      .remove(id);
   }
 }
