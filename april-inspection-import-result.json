@@ -1,0 +1,28 @@
+{
+  "totalExcelRows": 1581,
+  "inserted": 1567,
+  "skippedExisting": 0,
+  "deviceNotFound": 3,
+  "failed": 11,
+  "matchedBySerialAndIp": 1474,
+  "matchedBySerial": 3,
+  "matchedByIp": 38,
+  "matchedByDeviceCode": 43,
+  "matchedByBarcode": 0,
+  "matchedByDeviceIdFallback": 9,
+  "totalInspectionsBefore": 1311,
+  "aprilInspectionsBefore": 7,
+  "totalInspectionsAfter": 2878,
+  "aprilInspectionsAfter": 1311,
+  "technician": {
+    "id": 46,
+    "fullName": "Mohamed  Tohami",
+    "username": "mohamedtohami14",
+    "email": "mohamed.tohami@gmail.com",
+    "isActive": true
+  },
+  "startedAt": "2026-07-13T10:07:37.633Z",
+  "finishedAt": "2026-07-13T10:34:39.266Z",
+  "notUploaded": 14,
+  "successful": 1567
+}

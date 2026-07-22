@@ -1,0 +1,13 @@
+{
+  "totalExcelRows": 1581,
+  "inserted": 1581,
+  "updated": 0,
+  "failed": 0,
+  "processed": 1581,
+  "startedAt": "2026-07-12T14:53:23.069Z",
+  "finishedAt": "2026-07-12T15:02:35.166Z",
+  "tableName": "april_2026_inspections_import",
+  "successful": 1581,
+  "notUploaded": 0,
+  "totalRowsNowInDatabase": 1581
+}

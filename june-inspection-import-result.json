@@ -1,0 +1,21 @@
+{
+  "totalExcelRows": 1581,
+  "inserted": 1316,
+  "skippedExisting": 0,
+  "deviceNotFound": 1,
+  "failed": 264,
+  "matchedBySerialAndIp": 1257,
+  "matchedBySerial": 3,
+  "matchedByIp": 11,
+  "matchedByDeviceCode": 36,
+  "matchedByBarcode": 0,
+  "matchedByDeviceId": 9,
+  "totalInspectionsBefore": 2878,
+  "juneInspectionsBefore": 29,
+  "totalInspectionsAfter": 4194,
+  "juneInspectionsAfter": 1345,
+  "startedAt": "2026-07-13T11:10:07.957Z",
+  "finishedAt": "2026-07-13T11:29:23.498Z",
+  "successful": 1316,
+  "notUploaded": 265
+}

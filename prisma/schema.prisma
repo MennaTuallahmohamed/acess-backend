@@ -87,6 +87,7 @@ model Location {
 
   devices   Device[]
   gates     Gate[]
+  glasses   Glass[]
 
   replacementFrom DeviceReplacement[] @relation("ReplacementFromLocation")
   replacementTo   DeviceReplacement[] @relation("ReplacementToLocation")
@@ -223,6 +224,51 @@ model Gate {
   @@index([lastInspectionAt])
 }
 
+model Glass {
+  id               Int                @id @default(autoincrement())
+
+  // الزجاج ليس له QR أو Secret Code أو Barcode.
+  // يتم تحديده من الكلاستر والمبنى والزون والاتجاه IN/OUT.
+  cluster          String
+  building         String
+  zone             String
+  direction        String
+  lane             String?
+
+  glassType        String?
+  thickness        String?
+
+  locationId       Int?
+
+  status           GlassAssetStatus   @default(ACTIVE)
+  currentStatus    GlassCurrentStatus @default(NOT_INSPECTED)
+
+  installDate      DateTime?
+  lastInspectionAt DateTime?
+
+  notes            String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  location         Location?          @relation(fields: [locationId], references: [id])
+
+  inspections      Inspection[]
+  tasks            InspectionTask[]
+  taskItems        InspectionTaskItem[]
+  activityLogs     TechnicianActivityLog[]
+
+  @@unique([cluster, building, zone, direction])
+  @@index([cluster])
+  @@index([building])
+  @@index([zone])
+  @@index([direction])
+  @@index([lane])
+  @@index([locationId])
+  @@index([status])
+  @@index([currentStatus])
+  @@index([lastInspectionAt])
+}
+
 model InspectionCampaign {
   id            Int              @id @default(autoincrement())
   title         String
@@ -258,6 +304,7 @@ model InspectionTask {
   campaignId          Int?
   deviceId            Int?
   gateId              Int?
+  glassId             Int?
 
   assignedToId        Int?
   createdById         Int
@@ -299,6 +346,7 @@ model InspectionTask {
 
   device              Device?          @relation(fields: [deviceId], references: [id])
   gate                Gate?            @relation(fields: [gateId], references: [id])
+  glass               Glass?           @relation(fields: [glassId], references: [id])
 
   inspections         Inspection[]
   items               InspectionTaskItem[]
@@ -308,6 +356,7 @@ model InspectionTask {
   @@index([campaignId])
   @@index([deviceId])
   @@index([gateId])
+  @@index([glassId])
   @@index([assignedToId])
   @@index([createdById])
   @@index([status])
@@ -323,6 +372,7 @@ model InspectionTaskItem {
   taskId                Int
   deviceId              Int?
   gateId                Int?
+  glassId               Int?
 
   assignedToId          Int?
   completedById         Int?
@@ -351,6 +401,7 @@ model InspectionTaskItem {
   task                  InspectionTask       @relation(fields: [taskId], references: [id], onDelete: Cascade)
   device                Device?              @relation(fields: [deviceId], references: [id])
   gate                  Gate?                @relation(fields: [gateId], references: [id])
+  glass                 Glass?               @relation(fields: [glassId], references: [id])
 
   assignedTo            User?                @relation("TaskItemAssignedTo", fields: [assignedToId], references: [id])
   completedBy           User?                @relation("TaskItemCompletedBy", fields: [completedById], references: [id])
@@ -363,10 +414,12 @@ model InspectionTaskItem {
 
   @@unique([taskId, deviceId])
   @@unique([taskId, gateId])
+  @@unique([taskId, glassId])
 
   @@index([taskId])
   @@index([deviceId])
   @@index([gateId])
+  @@index([glassId])
   @@index([assignedToId])
   @@index([completedById])
   @@index([status])
@@ -379,6 +432,7 @@ model Inspection {
 
   deviceId         Int?
   gateId           Int?
+  glassId          Int?
   technicianId     Int
   taskId           Int?
 
@@ -396,6 +450,7 @@ model Inspection {
 
   device           Device?                         @relation(fields: [deviceId], references: [id])
   gate             Gate?                           @relation(fields: [gateId], references: [id])
+  glass            Glass?                          @relation(fields: [glassId], references: [id])
   task             InspectionTask?                 @relation(fields: [taskId], references: [id])
   technician       User                            @relation(fields: [technicianId], references: [id])
 
@@ -411,6 +466,7 @@ model Inspection {
 
   @@index([deviceId])
   @@index([gateId])
+  @@index([glassId])
   @@index([technicianId])
   @@index([taskId])
   @@index([inspectionStatus])
@@ -597,6 +653,7 @@ model IssueSolution {
   @@index([issueId])
   @@index([stepOrder])
   @@index([status])
+  
 }
 
 model InspectionIssue {
@@ -664,6 +721,7 @@ model TechnicianActivityLog {
 
   deviceId       Int?
   gateId         Int?
+  glassId        Int?
   taskId         Int?
   taskItemId     Int?
   inspectionId   Int?
@@ -687,6 +745,7 @@ model TechnicianActivityLog {
   user           User                 @relation(fields: [userId], references: [id])
   device         Device?              @relation(fields: [deviceId], references: [id])
   gate           Gate?                @relation(fields: [gateId], references: [id])
+  glass          Glass?               @relation(fields: [glassId], references: [id])
   task           InspectionTask?      @relation(fields: [taskId], references: [id])
   taskItem       InspectionTaskItem?  @relation(fields: [taskItemId], references: [id])
   inspection     Inspection?          @relation(fields: [inspectionId], references: [id])
@@ -697,6 +756,7 @@ model TechnicianActivityLog {
   @@index([action])
   @@index([deviceId])
   @@index([gateId])
+  @@index([glassId])
   @@index([taskId])
   @@index([taskItemId])
   @@index([inspectionId])
@@ -810,6 +870,7 @@ enum UserStatus {
 enum AssetType {
   DEVICE
   GATE
+  GLASS
   SOFTWARE
 }
 
@@ -817,6 +878,19 @@ enum GateStatus {
   ACTIVE
   INACTIVE
   MAINTENANCE
+}
+
+enum GlassAssetStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum GlassCurrentStatus {
+  NOT_INSPECTED
+  OK
+  NOT_OK
+  NEEDS_FOLLOW_UP
 }
 
 enum DeviceCurrentStatus {

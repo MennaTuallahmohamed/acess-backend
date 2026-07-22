@@ -20,6 +20,7 @@ import { ReportsModule } from './modules/reports/reports.module';
 
 import { GatesModule } from './gates/gates.module';
 import { InspectionWorkflowModule } from './modules/inspection-workflow/inspection-workflow.module';
+import { GlassesModule } from './glasses/glasses.module';
 
 @Module({
   imports: [
@@ -44,6 +45,8 @@ import { InspectionWorkflowModule } from './modules/inspection-workflow/inspecti
     GatesModule,
 
     InspectionWorkflowModule,
+
+    GlassesModule,
   ],
 })
 export class AppModule {}

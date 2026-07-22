@@ -1,0 +1,128 @@
+[
+  {
+    "excelRow": 132,
+    "inspectionId": "APR26-INSP-000131",
+    "deviceId": "131",
+    "deviceCode": "131",
+    "serialNumber": "2234SMP0002623",
+    "ipAddress": "10.254.206.61",
+    "reason": "Serial Number and IP Address point to different devices."
+  },
+  {
+    "excelRow": 555,
+    "inspectionId": "APR26-INSP-000554",
+    "deviceId": "554",
+    "serialNumber": "2111SMP0002180",
+    "ipAddress": "10.254.214.152",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 556,
+    "inspectionId": "APR26-INSP-000555",
+    "deviceId": "555",
+    "serialNumber": "2124SMP0000649",
+    "ipAddress": "10.254.214.153",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 557,
+    "inspectionId": "APR26-INSP-000556",
+    "deviceId": "556",
+    "serialNumber": "2143SMP0001539",
+    "ipAddress": "10.254.214.154",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 558,
+    "inspectionId": "APR26-INSP-000557",
+    "deviceId": "557",
+    "serialNumber": "2143SMP0001546",
+    "ipAddress": "10.254.214.132",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 559,
+    "inspectionId": "APR26-INSP-000558",
+    "deviceId": "558",
+    "serialNumber": "2237SMP0000392",
+    "ipAddress": "10.254.214.163",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 560,
+    "inspectionId": "APR26-INSP-000559",
+    "deviceId": "559",
+    "serialNumber": "2142SMP0002696",
+    "ipAddress": "10.254.214.133",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 561,
+    "inspectionId": "APR26-INSP-000560",
+    "deviceId": "560",
+    "serialNumber": "2136SMP0000857",
+    "ipAddress": "10.254.214.134",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 562,
+    "inspectionId": "APR26-INSP-000561",
+    "deviceId": "561",
+    "serialNumber": "2142SMP0002627",
+    "ipAddress": "10.254.214.135",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 883,
+    "inspectionId": "APR26-INSP-000882",
+    "deviceId": "882",
+    "serialNumber": "2125SMP0000624",
+    "ipAddress": "10.254.210.57",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 884,
+    "inspectionId": "APR26-INSP-000883",
+    "deviceId": "883",
+    "serialNumber": "2111SMP0002487",
+    "ipAddress": "10.254.210.59",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 885,
+    "inspectionId": "APR26-INSP-000884",
+    "deviceId": "884",
+    "serialNumber": "2234SMP0001963",
+    "ipAddress": "10.254.210.61",
+    "reason": "Transaction API error: Unable to start a transaction in the given time.",
+    "prismaCode": "P2028"
+  },
+  {
+    "excelRow": 914,
+    "inspectionId": "APR26-INSP-000913",
+    "deviceId": "913",
+    "deviceCode": "913",
+    "serialNumber": null,
+    "ipAddress": "10.254.210.223",
+    "reason": "No matching device found in PostgreSQL."
+  },
+  {
+    "excelRow": 1466,
+    "inspectionId": "APR26-INSP-001465",
+    "deviceId": "1465",
+    "deviceCode": "1465",
+    "serialNumber": "2237smp0001533",
+    "ipAddress": "10.254.214.94",
+    "reason": "Serial Number and IP Address point to different devices."
+  }
+]
