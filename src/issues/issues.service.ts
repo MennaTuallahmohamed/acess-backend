@@ -979,12 +979,26 @@ export class IssuesService {
   }
 
   async createProblemTicket(dto: CreateProblemTicketDto) {
+    const type = dto.type;
     const locationText = dto.locationText?.trim();
     const description = dto.description?.trim();
     const createdById = Number(dto.createdById);
-    const assignedToId = dto.assignedToId
-      ? Number(dto.assignedToId)
-      : createdById;
+
+    if (!type) {
+      throw new BadRequestException(
+        'Problem type is required',
+      );
+    }
+
+    if (
+      type !== 'SOFTWARE' &&
+      type !== 'GATE' &&
+      type !== 'READER'
+    ) {
+      throw new BadRequestException(
+        'Problem type must be SOFTWARE, GATE, or READER',
+      );
+    }
 
     if (!locationText) {
       throw new BadRequestException(
@@ -997,6 +1011,10 @@ export class IssuesService {
         'Problem description is required',
       );
     }
+
+    const assignedToId = dto.assignedToId
+      ? Number(dto.assignedToId)
+      : createdById;
 
     await this.ensureProblemTicketUserExists(
       createdById,
@@ -1012,24 +1030,26 @@ export class IssuesService {
 
     const now = new Date();
 
-    const ticket = await this.prisma.problemTicket.create({
-      data: {
-        type: dto.type,
-        locationText,
-        description,
-        priority: dto.priority || 'MEDIUM',
-        status: 'OPEN',
+    const ticket =
+      await this.prisma.problemTicket.create({
+        data: {
+          type,
+          locationText,
+          description,
+          priority: dto.priority || 'MEDIUM',
+          status: 'OPEN',
 
-        problemDate: dto.problemDate
-          ? new Date(dto.problemDate)
-          : now,
-        statusDate: now,
+          problemDate: dto.problemDate
+            ? new Date(dto.problemDate)
+            : now,
 
-        createdById,
-        assignedToId,
-      },
-      include: this.problemTicketIncludeOptions,
-    });
+          statusDate: now,
+          createdById,
+          assignedToId,
+        },
+
+        include: this.problemTicketIncludeOptions,
+      });
 
     return this.mapProblemTicket(ticket);
   }

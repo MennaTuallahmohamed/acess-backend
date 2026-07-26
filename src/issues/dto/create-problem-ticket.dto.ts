@@ -12,17 +12,17 @@ import {
 
 export class CreateProblemTicketDto {
   @IsIn(['SOFTWARE', 'GATE', 'READER'])
-  type: 'SOFTWARE' | 'GATE' | 'READER' | undefined;
+  type!: 'SOFTWARE' | 'GATE' | 'READER';
 
   @IsString()
   @MinLength(2)
   @MaxLength(500)
-  locationText: string | undefined;
+  locationText!: string;
 
   @IsString()
   @MinLength(3)
   @MaxLength(5000)
-  description: string | undefined;
+  description!: string;
 
   @IsOptional()
   @IsIn(['LOW', 'MEDIUM', 'HIGH', 'URGENT'])
@@ -35,7 +35,7 @@ export class CreateProblemTicketDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  createdById: number | undefined;
+  createdById!: number;
 
   @IsOptional()
   @Type(() => Number)
