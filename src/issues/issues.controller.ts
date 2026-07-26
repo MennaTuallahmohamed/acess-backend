@@ -23,6 +23,7 @@ import { CreateProblemTicketDto } from './dto/create-problem-ticket.dto';
 import { GetProblemTicketsQueryDto } from './dto/get-problem-tickets-query.dto';
 import { StartProblemTicketDto } from './dto/start-problem-ticket.dto';
 import { ResolveProblemTicketDto } from './dto/resolve-problem-ticket.dto';
+import { UpdateProblemTicketDto } from './dto/update-problem-ticket.dto';
 
 @Controller('issues')
 export class IssuesController {
@@ -104,6 +105,14 @@ export class IssuesController {
     @Body() dto: ResolveProblemTicketDto,
   ) {
     return this.issuesService.resolveProblemTicket(id, dto);
+  }
+
+  @Patch('tickets/:id')
+  updateProblemTicket(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateProblemTicketDto,
+  ) {
+    return this.issuesService.updateProblemTicket(id, dto);
   }
 
   /*

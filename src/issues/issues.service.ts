@@ -17,6 +17,7 @@ import { CreateProblemTicketDto } from './dto/create-problem-ticket.dto';
 import { GetProblemTicketsQueryDto } from './dto/get-problem-tickets-query.dto';
 import { StartProblemTicketDto } from './dto/start-problem-ticket.dto';
 import { ResolveProblemTicketDto } from './dto/resolve-problem-ticket.dto';
+import { UpdateProblemTicketDto } from './dto/update-problem-ticket.dto';
 
 @Injectable()
 export class IssuesService {
@@ -983,20 +984,13 @@ export class IssuesService {
     const locationText = dto.locationText?.trim();
     const description = dto.description?.trim();
     const createdById = Number(dto.createdById);
+    const assignedToId = dto.assignedToId
+      ? Number(dto.assignedToId)
+      : createdById;
 
     if (!type) {
       throw new BadRequestException(
         'Problem type is required',
-      );
-    }
-
-    if (
-      type !== 'SOFTWARE' &&
-      type !== 'GATE' &&
-      type !== 'READER'
-    ) {
-      throw new BadRequestException(
-        'Problem type must be SOFTWARE, GATE, or READER',
       );
     }
 
@@ -1012,10 +1006,6 @@ export class IssuesService {
       );
     }
 
-    const assignedToId = dto.assignedToId
-      ? Number(dto.assignedToId)
-      : createdById;
-
     await this.ensureProblemTicketUserExists(
       createdById,
       'createdById',
@@ -1030,26 +1020,24 @@ export class IssuesService {
 
     const now = new Date();
 
-    const ticket =
-      await this.prisma.problemTicket.create({
-        data: {
-          type,
-          locationText,
-          description,
-          priority: dto.priority || 'MEDIUM',
-          status: 'OPEN',
+    const ticket = await this.prisma.problemTicket.create({
+      data: {
+        type,
+        locationText,
+        description,
+        priority: dto.priority || 'MEDIUM',
+        status: 'OPEN',
 
-          problemDate: dto.problemDate
-            ? new Date(dto.problemDate)
-            : now,
+        problemDate: dto.problemDate
+          ? new Date(dto.problemDate)
+          : now,
+        statusDate: now,
 
-          statusDate: now,
-          createdById,
-          assignedToId,
-        },
-
-        include: this.problemTicketIncludeOptions,
-      });
+        createdById,
+        assignedToId,
+      },
+      include: this.problemTicketIncludeOptions,
+    });
 
     return this.mapProblemTicket(ticket);
   }
@@ -1217,6 +1205,118 @@ export class IssuesService {
         'Problem ticket not found',
       );
     }
+
+    return this.mapProblemTicket(ticket);
+  }
+
+
+  async updateProblemTicket(
+    id: number,
+    dto: UpdateProblemTicketDto,
+  ) {
+    const existing =
+      await this.prisma.problemTicket.findUnique({
+        where: {
+          id,
+        },
+        include: this.problemTicketIncludeOptions,
+      });
+
+    if (!existing) {
+      throw new NotFoundException(
+        'Problem ticket not found',
+      );
+    }
+
+    const data: any = {};
+
+    if (dto.type !== undefined) {
+      data.type = dto.type;
+    }
+
+    if (dto.locationText !== undefined) {
+      const locationText = dto.locationText.trim();
+
+      if (!locationText) {
+        throw new BadRequestException(
+          'Problem location is required',
+        );
+      }
+
+      data.locationText = locationText;
+    }
+
+    if (dto.description !== undefined) {
+      const description = dto.description.trim();
+
+      if (!description) {
+        throw new BadRequestException(
+          'Problem description is required',
+        );
+      }
+
+      data.description = description;
+    }
+
+    if (dto.priority !== undefined) {
+      data.priority = dto.priority;
+    }
+
+    if (dto.problemDate !== undefined) {
+      data.problemDate = new Date(dto.problemDate);
+    }
+
+    if (dto.solutionText !== undefined) {
+      const solutionText = dto.solutionText.trim();
+
+      if (
+        existing.status === 'RESOLVED' &&
+        !solutionText
+      ) {
+        throw new BadRequestException(
+          'Resolved tickets must keep a solution text',
+        );
+      }
+
+      data.solutionText = solutionText || null;
+    }
+
+    if (dto.solutionSteps !== undefined) {
+      const solutionSteps = dto.solutionSteps
+        .map((step) => step.trim())
+        .filter(Boolean);
+
+      if (
+        existing.status === 'RESOLVED' &&
+        !solutionSteps.length
+      ) {
+        throw new BadRequestException(
+          'Resolved tickets must keep at least one solution step',
+        );
+      }
+
+      data.solutionSteps = solutionSteps;
+    }
+
+    if (dto.resultNotes !== undefined) {
+      data.resultNotes =
+        dto.resultNotes.trim() || null;
+    }
+
+    if (!Object.keys(data).length) {
+      return this.mapProblemTicket(existing);
+    }
+
+    data.statusDate = new Date();
+
+    const ticket =
+      await this.prisma.problemTicket.update({
+        where: {
+          id,
+        },
+        data,
+        include: this.problemTicketIncludeOptions,
+      });
 
     return this.mapProblemTicket(ticket);
   }
