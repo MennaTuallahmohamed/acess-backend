@@ -64,6 +64,10 @@ model User {
   createdReplacements      DeviceReplacement[]             @relation("DeviceReplacementBy")
   approvedReplacements     DeviceReplacement[]             @relation("DeviceReplacementApprovedBy")
 
+  createdProblemTickets    ProblemTicket[]                 @relation("ProblemTicketCreatedBy")
+  assignedProblemTickets   ProblemTicket[]                 @relation("ProblemTicketAssignedTo")
+  resolvedProblemTickets   ProblemTicket[]                 @relation("ProblemTicketResolvedBy")
+
   role                     Role                            @relation(fields: [roleId], references: [id])
 
   @@index([roleId])
@@ -862,6 +866,53 @@ model DeviceReplacement {
   @@index([replacedAt])
 }
 
+
+model ProblemTicket {
+  id            Int                   @id @default(autoincrement())
+
+  
+  type          ProblemTicketType
+
+ 
+  locationText  String
+  description   String
+
+  priority      ProblemTicketPriority @default(MEDIUM)
+  status        ProblemTicketStatus   @default(OPEN)
+
+  // بيانات الحل تُسجل عند إنهاء المشكلة
+  solutionText  String?
+  solutionSteps Json?
+  resultNotes   String?
+
+  // تواريخ دورة المشكلة
+  problemDate   DateTime              @default(now())
+  statusDate    DateTime              @default(now())
+  startedAt     DateTime?
+  resolvedAt    DateTime?
+
+  // المستخدمون المرتبطون بالمشكلة
+  createdById   Int
+  assignedToId  Int?
+  resolvedById  Int?
+
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  createdBy     User                  @relation("ProblemTicketCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  assignedTo    User?                 @relation("ProblemTicketAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+  resolvedBy    User?                 @relation("ProblemTicketResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([status])
+  @@index([priority])
+  @@index([problemDate])
+  @@index([statusDate])
+  @@index([createdById])
+  @@index([assignedToId])
+  @@index([resolvedById])
+}
+
 enum UserStatus {
   ACTIVE
   INACTIVE
@@ -1035,3 +1086,23 @@ enum DeviceReplacementStatus {
   APPROVED
   CANCELLED
 }
+
+enum ProblemTicketType {
+  SOFTWARE
+  GATE
+  READER
+}
+
+enum ProblemTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum ProblemTicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+

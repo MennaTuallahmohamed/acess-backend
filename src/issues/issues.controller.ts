@@ -19,6 +19,10 @@ import { UpdateIssueSolutionDto } from './dto/update-issue-solution.dto';
 import { ReportInspectionIssueDto } from './dto/report-inspection-issue.dto';
 import { ExecuteSolutionActionDto } from './dto/execute-solution-action.dto';
 import { UpdateInspectionIssueStatusDto } from './dto/update-inspection-issue-status.dto';
+import { CreateProblemTicketDto } from './dto/create-problem-ticket.dto';
+import { GetProblemTicketsQueryDto } from './dto/get-problem-tickets-query.dto';
+import { StartProblemTicketDto } from './dto/start-problem-ticket.dto';
+import { ResolveProblemTicketDto } from './dto/resolve-problem-ticket.dto';
 
 @Controller('issues')
 export class IssuesController {
@@ -50,6 +54,56 @@ export class IssuesController {
   @Delete('categories/:id')
   deleteCategory(@Param('id', ParseIntPipe) id: number) {
     return this.issuesService.deleteCategory(id);
+  }
+
+
+  /*
+   * سجل المشكلات اليومية
+   * مهم: كل Routes الخاصة بـ tickets تكون قبل @Get(':id')
+   */
+
+  @Get('tickets/summary')
+  getProblemTicketsSummary(
+    @Query() query: GetProblemTicketsQueryDto,
+  ) {
+    return this.issuesService.getProblemTicketsSummary(query);
+  }
+
+  @Get('tickets')
+  getProblemTickets(
+    @Query() query: GetProblemTicketsQueryDto,
+  ) {
+    return this.issuesService.getProblemTickets(query);
+  }
+
+  @Get('tickets/:id')
+  getProblemTicket(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.issuesService.getProblemTicket(id);
+  }
+
+  @Post('tickets')
+  createProblemTicket(
+    @Body() dto: CreateProblemTicketDto,
+  ) {
+    return this.issuesService.createProblemTicket(dto);
+  }
+
+  @Patch('tickets/:id/start')
+  startProblemTicket(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: StartProblemTicketDto,
+  ) {
+    return this.issuesService.startProblemTicket(id, dto);
+  }
+
+  @Patch('tickets/:id/resolve')
+  resolveProblemTicket(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ResolveProblemTicketDto,
+  ) {
+    return this.issuesService.resolveProblemTicket(id, dto);
   }
 
   /*

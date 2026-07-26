@@ -13,6 +13,10 @@ import { UpdateIssueSolutionDto } from './dto/update-issue-solution.dto';
 import { ReportInspectionIssueDto } from './dto/report-inspection-issue.dto';
 import { ExecuteSolutionActionDto } from './dto/execute-solution-action.dto';
 import { UpdateInspectionIssueStatusDto } from './dto/update-inspection-issue-status.dto';
+import { CreateProblemTicketDto } from './dto/create-problem-ticket.dto';
+import { GetProblemTicketsQueryDto } from './dto/get-problem-tickets-query.dto';
+import { StartProblemTicketDto } from './dto/start-problem-ticket.dto';
+import { ResolveProblemTicketDto } from './dto/resolve-problem-ticket.dto';
 
 @Injectable()
 export class IssuesService {
@@ -91,6 +95,171 @@ export class IssuesService {
       },
     },
   };
+
+
+  private problemTicketUserSelect = {
+    id: true,
+    fullName: true,
+    username: true,
+    email: true,
+    phone: true,
+    jobTitle: true,
+  };
+
+  private problemTicketIncludeOptions = {
+    createdBy: {
+      select: this.problemTicketUserSelect,
+    },
+    assignedTo: {
+      select: this.problemTicketUserSelect,
+    },
+    resolvedBy: {
+      select: this.problemTicketUserSelect,
+    },
+  };
+
+  private normalizeProblemTicketSteps(value: unknown): string[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((step) => String(step ?? '').trim())
+      .filter(Boolean);
+  }
+
+  private mapProblemTicket(ticket: any) {
+    return {
+      id: ticket.id,
+      type: ticket.type,
+      locationText: ticket.locationText,
+      description: ticket.description,
+      priority: ticket.priority,
+      status: ticket.status,
+
+      solutionText: ticket.solutionText,
+      solutionSteps: this.normalizeProblemTicketSteps(
+        ticket.solutionSteps,
+      ),
+      resultNotes: ticket.resultNotes,
+
+      problemDate: ticket.problemDate,
+      statusDate: ticket.statusDate,
+      startedAt: ticket.startedAt,
+      resolvedAt: ticket.resolvedAt,
+
+      createdById: ticket.createdById,
+      assignedToId: ticket.assignedToId,
+      resolvedById: ticket.resolvedById,
+
+      createdAt: ticket.createdAt,
+      updatedAt: ticket.updatedAt,
+
+      createdBy: ticket.createdBy ?? null,
+      assignedTo: ticket.assignedTo ?? null,
+      resolvedBy: ticket.resolvedBy ?? null,
+    };
+  }
+
+  private buildProblemTicketWhere(
+    filters: GetProblemTicketsQueryDto,
+  ) {
+    const where: any = {};
+
+    if (filters.type) {
+      where.type = filters.type;
+    }
+
+    if (filters.status) {
+      where.status = filters.status;
+    }
+
+    if (filters.priority) {
+      where.priority = filters.priority;
+    }
+
+    if (filters.createdById) {
+      where.createdById = Number(filters.createdById);
+    }
+
+    if (filters.assignedToId) {
+      where.assignedToId = Number(filters.assignedToId);
+    }
+
+    if (filters.from || filters.to) {
+      where.problemDate = {};
+
+      if (filters.from) {
+        where.problemDate.gte = new Date(filters.from);
+      }
+
+      if (filters.to) {
+        where.problemDate.lte = new Date(filters.to);
+      }
+    }
+
+    if (filters.search?.trim()) {
+      const search = filters.search.trim();
+
+      where.OR = [
+        {
+          locationText: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          description: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          solutionText: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          resultNotes: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      ];
+    }
+
+    return where;
+  }
+
+  private async ensureProblemTicketUserExists(
+    userId: number,
+    fieldName: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        isActive: true,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException(
+        `${fieldName} does not reference an existing user`,
+      );
+    }
+
+    if (!user.isActive) {
+      throw new BadRequestException(
+        `${fieldName} references an inactive user`,
+      );
+    }
+
+    return user;
+  }
 
   private mapIssue(issue: any) {
     return {
@@ -808,4 +977,374 @@ export class IssuesService {
 
     return this.mapInspectionIssue(item);
   }
+
+  async createProblemTicket(dto: CreateProblemTicketDto) {
+    const locationText = dto.locationText?.trim();
+    const description = dto.description?.trim();
+    const createdById = Number(dto.createdById);
+    const assignedToId = dto.assignedToId
+      ? Number(dto.assignedToId)
+      : createdById;
+
+    if (!locationText) {
+      throw new BadRequestException(
+        'Problem location is required',
+      );
+    }
+
+    if (!description) {
+      throw new BadRequestException(
+        'Problem description is required',
+      );
+    }
+
+    await this.ensureProblemTicketUserExists(
+      createdById,
+      'createdById',
+    );
+
+    if (assignedToId !== createdById) {
+      await this.ensureProblemTicketUserExists(
+        assignedToId,
+        'assignedToId',
+      );
+    }
+
+    const now = new Date();
+
+    const ticket = await this.prisma.problemTicket.create({
+      data: {
+        type: dto.type,
+        locationText,
+        description,
+        priority: dto.priority || 'MEDIUM',
+        status: 'OPEN',
+
+        problemDate: dto.problemDate
+          ? new Date(dto.problemDate)
+          : now,
+        statusDate: now,
+
+        createdById,
+        assignedToId,
+      },
+      include: this.problemTicketIncludeOptions,
+    });
+
+    return this.mapProblemTicket(ticket);
+  }
+
+  async getProblemTickets(
+    filters: GetProblemTicketsQueryDto,
+  ) {
+    const page = Math.max(
+      1,
+      Number(filters.page) || 1,
+    );
+
+    const limit = Math.min(
+      100,
+      Math.max(1, Number(filters.limit) || 20),
+    );
+
+    const skip = (page - 1) * limit;
+    const where = this.buildProblemTicketWhere(filters);
+
+    const [total, tickets] = await this.prisma.$transaction([
+      this.prisma.problemTicket.count({
+        where,
+      }),
+      this.prisma.problemTicket.findMany({
+        where,
+        include: this.problemTicketIncludeOptions,
+        orderBy: [
+          {
+            problemDate: 'desc',
+          },
+          {
+            id: 'desc',
+          },
+        ],
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    return {
+      data: tickets.map((ticket) =>
+        this.mapProblemTicket(ticket),
+      ),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.max(
+          1,
+          Math.ceil(total / limit),
+        ),
+      },
+    };
+  }
+
+  async getProblemTicketsSummary(
+    filters: GetProblemTicketsQueryDto,
+  ) {
+    const where = this.buildProblemTicketWhere({
+      ...filters,
+      page: undefined,
+      limit: undefined,
+    });
+
+    const unresolvedWhere: any = {
+      ...where,
+      status: {
+        in: ['OPEN', 'IN_PROGRESS'],
+      },
+    };
+
+    const urgentUnresolvedWhere: any = {
+      ...where,
+      priority: 'URGENT',
+      status: {
+        in: ['OPEN', 'IN_PROGRESS'],
+      },
+    };
+
+    const [
+      total,
+      open,
+      inProgress,
+      resolved,
+      urgentUnresolved,
+      software,
+      gate,
+      reader,
+    ] = await this.prisma.$transaction([
+      this.prisma.problemTicket.count({
+        where,
+      }),
+      this.prisma.problemTicket.count({
+        where: {
+          ...where,
+          status: 'OPEN',
+        },
+      }),
+      this.prisma.problemTicket.count({
+        where: {
+          ...where,
+          status: 'IN_PROGRESS',
+        },
+      }),
+      this.prisma.problemTicket.count({
+        where: {
+          ...where,
+          status: 'RESOLVED',
+        },
+      }),
+      this.prisma.problemTicket.count({
+        where: urgentUnresolvedWhere,
+      }),
+      this.prisma.problemTicket.count({
+        where: {
+          ...where,
+          type: 'SOFTWARE',
+        },
+      }),
+      this.prisma.problemTicket.count({
+        where: {
+          ...where,
+          type: 'GATE',
+        },
+      }),
+      this.prisma.problemTicket.count({
+        where: {
+          ...where,
+          type: 'READER',
+        },
+      }),
+    ]);
+
+    const unresolved = await this.prisma.problemTicket.count({
+      where: unresolvedWhere,
+    });
+
+    return {
+      total,
+      open,
+      inProgress,
+      resolved,
+      unresolved,
+      urgentUnresolved,
+      byType: {
+        software,
+        gate,
+        reader,
+      },
+    };
+  }
+
+  async getProblemTicket(id: number) {
+    const ticket =
+      await this.prisma.problemTicket.findUnique({
+        where: {
+          id,
+        },
+        include: this.problemTicketIncludeOptions,
+      });
+
+    if (!ticket) {
+      throw new NotFoundException(
+        'Problem ticket not found',
+      );
+    }
+
+    return this.mapProblemTicket(ticket);
+  }
+
+  async startProblemTicket(
+    id: number,
+    dto: StartProblemTicketDto,
+  ) {
+    const existing =
+      await this.prisma.problemTicket.findUnique({
+        where: {
+          id,
+        },
+        include: this.problemTicketIncludeOptions,
+      });
+
+    if (!existing) {
+      throw new NotFoundException(
+        'Problem ticket not found',
+      );
+    }
+
+    if (existing.status === 'RESOLVED') {
+      throw new BadRequestException(
+        'Resolved problem tickets cannot be started again',
+      );
+    }
+
+    const assignedToId = Number(
+      dto.assignedToId ??
+        dto.technicianId ??
+        existing.assignedToId ??
+        existing.createdById,
+    );
+
+    await this.ensureProblemTicketUserExists(
+      assignedToId,
+      'assignedToId',
+    );
+
+    if (existing.status === 'IN_PROGRESS') {
+      if (existing.assignedToId === assignedToId) {
+        return this.mapProblemTicket(existing);
+      }
+    }
+
+    const now = new Date();
+
+    const ticket =
+      await this.prisma.problemTicket.update({
+        where: {
+          id,
+        },
+        data: {
+          status: 'IN_PROGRESS',
+          assignedToId,
+          startedAt: existing.startedAt || now,
+          statusDate: now,
+        },
+        include: this.problemTicketIncludeOptions,
+      });
+
+    return this.mapProblemTicket(ticket);
+  }
+
+  async resolveProblemTicket(
+    id: number,
+    dto: ResolveProblemTicketDto,
+  ) {
+    const existing =
+      await this.prisma.problemTicket.findUnique({
+        where: {
+          id,
+        },
+        include: this.problemTicketIncludeOptions,
+      });
+
+    if (!existing) {
+      throw new NotFoundException(
+        'Problem ticket not found',
+      );
+    }
+
+    if (existing.status === 'RESOLVED') {
+      return this.mapProblemTicket(existing);
+    }
+
+    const solutionText = dto.solutionText?.trim();
+
+    const solutionSteps = Array.isArray(
+      dto.solutionSteps,
+    )
+      ? dto.solutionSteps
+          .map((step) => step.trim())
+          .filter(Boolean)
+      : [];
+
+    if (!solutionText) {
+      throw new BadRequestException(
+        'Solution text is required',
+      );
+    }
+
+    if (!solutionSteps.length) {
+      throw new BadRequestException(
+        'At least one solution step is required',
+      );
+    }
+
+    const resolvedById = Number(
+      dto.resolvedById ??
+        existing.assignedToId ??
+        existing.createdById,
+    );
+
+    await this.ensureProblemTicketUserExists(
+      resolvedById,
+      'resolvedById',
+    );
+
+    const now = new Date();
+
+    const ticket =
+      await this.prisma.problemTicket.update({
+        where: {
+          id,
+        },
+        data: {
+          status: 'RESOLVED',
+
+          solutionText,
+          solutionSteps,
+          resultNotes:
+            dto.resultNotes?.trim() || null,
+
+          assignedToId:
+            existing.assignedToId || resolvedById,
+          resolvedById,
+
+          startedAt: existing.startedAt || now,
+          resolvedAt: now,
+          statusDate: now,
+        },
+        include: this.problemTicketIncludeOptions,
+      });
+
+    return this.mapProblemTicket(ticket);
+  }
+
+
 }

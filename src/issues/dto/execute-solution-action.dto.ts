@@ -4,22 +4,22 @@ import { IsIn, IsInt, IsOptional, IsString } from 'class-validator';
 export class ExecuteSolutionActionDto {
   @Type(() => Number)
   @IsInt()
-  inspectionId: number;
+  inspectionId: number | undefined;
 
   @Type(() => Number)
   @IsInt()
-  inspectionIssueId: number;
+  inspectionIssueId: number | undefined;
 
   @Type(() => Number)
   @IsInt()
-  solutionId: number;
+  solutionId: number | undefined;
 
   @Type(() => Number)
   @IsInt()
-  technicianId: number;
+  technicianId: number | undefined;
 
   @IsIn(['PENDING', 'DONE', 'FAILED', 'SKIPPED'])
-  status: 'PENDING' | 'DONE' | 'FAILED' | 'SKIPPED';
+  status: 'PENDING' | 'DONE' | 'FAILED' | 'SKIPPED' | undefined;
 
   @IsOptional()
   @IsString()
