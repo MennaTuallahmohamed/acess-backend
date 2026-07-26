@@ -129,20 +129,118 @@ export class IssuesService {
       .filter(Boolean);
   }
 
+  private normalizeProblemTicketBuildings(value: unknown): string[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return [
+      ...new Set(
+        value
+          .map((building) =>
+            String(building ?? '')
+              .trim()
+              .replace(/\s+/g, ' '),
+          )
+          .filter(Boolean),
+      ),
+    ];
+  }
+
+  private async validateProblemTicketBuildings(
+    value: unknown,
+  ): Promise<string[]> {
+    const requested = this.normalizeProblemTicketBuildings(value);
+
+    if (!requested.length) {
+      return [];
+    }
+
+    const locations = await this.prisma.location.findMany({
+      select: {
+        building: true,
+      },
+      distinct: ['building'],
+      orderBy: {
+        building: 'asc',
+      },
+    });
+
+    const canonicalBuildings = new Map<string, string>();
+
+    for (const location of locations) {
+      const building = String(location.building ?? '')
+        .trim()
+        .replace(/\s+/g, ' ');
+
+      if (building) {
+        canonicalBuildings.set(building.toLocaleLowerCase(), building);
+      }
+    }
+
+    const valid: string[] = [];
+    const missing: string[] = [];
+
+    for (const requestedBuilding of requested) {
+      const canonical = canonicalBuildings.get(
+        requestedBuilding.toLocaleLowerCase(),
+      );
+
+      if (canonical) {
+        valid.push(canonical);
+      } else {
+        missing.push(requestedBuilding);
+      }
+    }
+
+    if (missing.length) {
+      throw new BadRequestException(
+        `These buildings do not exist in Location: ${missing.join(', ')}`,
+      );
+    }
+
+    return [...new Set(valid)];
+  }
+
+  private composeProblemTicketLocationText(
+    locationTextValue: unknown,
+    locationBuildings: string[],
+  ): string {
+    const locationText = String(locationTextValue ?? '')
+      .trim()
+      .replace(/\s+/g, ' ');
+
+    if (locationText) {
+      return locationText;
+    }
+
+    return locationBuildings.join(' + ');
+  }
+
   private mapProblemTicket(ticket: any) {
+    const solutionSteps = this.normalizeProblemTicketSteps(
+      ticket.solutionSteps,
+    );
+
+    const locationBuildings = this.normalizeProblemTicketBuildings(
+      ticket.locationBuildings,
+    );
+
     return {
       id: ticket.id,
       type: ticket.type,
+      title: ticket.title ?? null,
       locationText: ticket.locationText,
+      locationBuildings,
       description: ticket.description,
       priority: ticket.priority,
       status: ticket.status,
 
       solutionText: ticket.solutionText,
-      solutionSteps: this.normalizeProblemTicketSteps(
-        ticket.solutionSteps,
-      ),
+      solutionSteps,
+      steps: solutionSteps,
       resultNotes: ticket.resultNotes,
+      finalResult: ticket.resultNotes ?? '',
 
       problemDate: ticket.problemDate,
       statusDate: ticket.statusDate,
@@ -195,7 +293,9 @@ export class IssuesService {
       }
 
       if (filters.to) {
-        where.problemDate.lte = new Date(filters.to);
+        const endDate = new Date(filters.to);
+        endDate.setUTCHours(23, 59, 59, 999);
+        where.problemDate.lte = endDate;
       }
     }
 
@@ -203,6 +303,12 @@ export class IssuesService {
       const search = filters.search.trim();
 
       where.OR = [
+        {
+          title: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
         {
           locationText: {
             contains: search,
@@ -979,31 +1085,89 @@ export class IssuesService {
     return this.mapInspectionIssue(item);
   }
 
+  async getProblemTicketBuildings(
+    searchValue?: string,
+    limitValue?: number,
+  ) {
+    const search = String(searchValue ?? '').trim();
+    const limit = Math.min(
+      5000,
+      Math.max(1, Number(limitValue) || 1000),
+    );
+
+    const groupedLocations = await this.prisma.location.groupBy({
+      by: ['building'],
+      where: search
+        ? {
+            building: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          }
+        : undefined,
+      _count: {
+        _all: true,
+      },
+      orderBy: {
+        building: 'asc',
+      },
+      take: limit,
+    });
+
+    const items = groupedLocations
+      .map((location) => {
+        const building = String(location.building ?? '')
+          .trim()
+          .replace(/\s+/g, ' ');
+
+        return {
+          name: building,
+          building,
+          locationCount: location._count._all,
+        };
+      })
+      .filter((item) => item.building);
+
+    return {
+      items,
+      data: items,
+      total: items.length,
+    };
+  }
+
   async createProblemTicket(dto: CreateProblemTicketDto) {
-    const type = dto.type;
-    const locationText = dto.locationText?.trim();
-    const description = dto.description?.trim();
-    const createdById = Number(dto.createdById);
-    const assignedToId = dto.assignedToId
-      ? Number(dto.assignedToId)
+    const source = dto as any;
+    const type = source.type;
+    const title = String(source.title ?? '').trim() || null;
+    const locationBuildings = await this.validateProblemTicketBuildings(
+      source.locationBuildings,
+    );
+    const locationText = this.composeProblemTicketLocationText(
+      source.locationText,
+      locationBuildings,
+    );
+    const description = String(source.description ?? '').trim();
+    const createdById = Number(source.createdById);
+    const assignedToId = source.assignedToId
+      ? Number(source.assignedToId)
       : createdById;
 
     if (!type) {
-      throw new BadRequestException(
-        'Problem type is required',
-      );
+      throw new BadRequestException('Problem type is required');
     }
 
     if (!locationText) {
       throw new BadRequestException(
-        'Problem location is required',
+        'Select at least one building or enter a problem location',
       );
     }
 
     if (!description) {
-      throw new BadRequestException(
-        'Problem description is required',
-      );
+      throw new BadRequestException('Problem description is required');
+    }
+
+    if (!createdById || Number.isNaN(createdById)) {
+      throw new BadRequestException('Valid createdById is required');
     }
 
     await this.ensureProblemTicketUserExists(
@@ -1019,17 +1183,30 @@ export class IssuesService {
     }
 
     const now = new Date();
+    const solutionSteps = this.normalizeProblemTicketSteps(
+      source.solutionSteps ?? source.steps,
+    );
+    const resultNotes = String(
+      source.resultNotes ?? source.finalResult ?? '',
+    ).trim();
+    const solutionText = String(source.solutionText ?? '').trim();
 
     const ticket = await this.prisma.problemTicket.create({
       data: {
         type,
+        title,
         locationText,
+        locationBuildings,
         description,
-        priority: dto.priority || 'MEDIUM',
+        priority: source.priority || 'MEDIUM',
         status: 'OPEN',
 
-        problemDate: dto.problemDate
-          ? new Date(dto.problemDate)
+        solutionText: solutionText || null,
+        solutionSteps,
+        resultNotes: resultNotes || null,
+
+        problemDate: source.problemDate
+          ? new Date(source.problemDate)
           : now,
         statusDate: now,
 
@@ -1051,7 +1228,7 @@ export class IssuesService {
     );
 
     const limit = Math.min(
-      100,
+      1000,
       Math.max(1, Number(filters.limit) || 20),
     );
 
@@ -1223,31 +1400,55 @@ export class IssuesService {
       });
 
     if (!existing) {
-      throw new NotFoundException(
-        'Problem ticket not found',
-      );
+      throw new NotFoundException('Problem ticket not found');
     }
 
+    const source = dto as any;
     const data: any = {};
 
-    if (dto.type !== undefined) {
-      data.type = dto.type;
+    if (source.type !== undefined) {
+      data.type = source.type;
     }
 
-    if (dto.locationText !== undefined) {
-      const locationText = dto.locationText.trim();
+    if (source.title !== undefined) {
+      data.title = String(source.title ?? '').trim() || null;
+    }
+
+    if (source.locationBuildings !== undefined) {
+      data.locationBuildings =
+        await this.validateProblemTicketBuildings(
+          source.locationBuildings,
+        );
+    }
+
+    if (source.locationText !== undefined) {
+      const buildingsForLocationText =
+        data.locationBuildings ??
+        this.normalizeProblemTicketBuildings(
+          existing.locationBuildings,
+        );
+
+      const locationText = this.composeProblemTicketLocationText(
+        source.locationText,
+        buildingsForLocationText,
+      );
 
       if (!locationText) {
         throw new BadRequestException(
-          'Problem location is required',
+          'Select at least one building or enter a problem location',
         );
       }
 
       data.locationText = locationText;
+    } else if (
+      source.locationBuildings !== undefined &&
+      !String(existing.locationText ?? '').trim()
+    ) {
+      data.locationText = data.locationBuildings.join(' + ');
     }
 
-    if (dto.description !== undefined) {
-      const description = dto.description.trim();
+    if (source.description !== undefined) {
+      const description = String(source.description ?? '').trim();
 
       if (!description) {
         throw new BadRequestException(
@@ -1258,21 +1459,18 @@ export class IssuesService {
       data.description = description;
     }
 
-    if (dto.priority !== undefined) {
-      data.priority = dto.priority;
+    if (source.priority !== undefined) {
+      data.priority = source.priority;
     }
 
-    if (dto.problemDate !== undefined) {
-      data.problemDate = new Date(dto.problemDate);
+    if (source.problemDate !== undefined) {
+      data.problemDate = new Date(source.problemDate);
     }
 
-    if (dto.solutionText !== undefined) {
-      const solutionText = dto.solutionText.trim();
+    if (source.solutionText !== undefined) {
+      const solutionText = String(source.solutionText ?? '').trim();
 
-      if (
-        existing.status === 'RESOLVED' &&
-        !solutionText
-      ) {
+      if (existing.status === 'RESOLVED' && !solutionText) {
         throw new BadRequestException(
           'Resolved tickets must keep a solution text',
         );
@@ -1281,10 +1479,14 @@ export class IssuesService {
       data.solutionText = solutionText || null;
     }
 
-    if (dto.solutionSteps !== undefined) {
-      const solutionSteps = dto.solutionSteps
-        .map((step) => step.trim())
-        .filter(Boolean);
+    const incomingSteps =
+      source.solutionSteps !== undefined
+        ? source.solutionSteps
+        : source.steps;
+
+    if (incomingSteps !== undefined) {
+      const solutionSteps =
+        this.normalizeProblemTicketSteps(incomingSteps);
 
       if (
         existing.status === 'RESOLVED' &&
@@ -1298,9 +1500,30 @@ export class IssuesService {
       data.solutionSteps = solutionSteps;
     }
 
-    if (dto.resultNotes !== undefined) {
+    const incomingResultNotes =
+      source.resultNotes !== undefined
+        ? source.resultNotes
+        : source.finalResult;
+
+    if (incomingResultNotes !== undefined) {
       data.resultNotes =
-        dto.resultNotes.trim() || null;
+        String(incomingResultNotes ?? '').trim() || null;
+    }
+
+    if (source.assignedToId !== undefined) {
+      const assignedToId = Number(source.assignedToId);
+
+      if (!assignedToId || Number.isNaN(assignedToId)) {
+        throw new BadRequestException(
+          'Valid assignedToId is required',
+        );
+      }
+
+      await this.ensureProblemTicketUserExists(
+        assignedToId,
+        'assignedToId',
+      );
+      data.assignedToId = assignedToId;
     }
 
     if (!Object.keys(data).length) {
@@ -1309,14 +1532,13 @@ export class IssuesService {
 
     data.statusDate = new Date();
 
-    const ticket =
-      await this.prisma.problemTicket.update({
-        where: {
-          id,
-        },
-        data,
-        include: this.problemTicketIncludeOptions,
-      });
+    const ticket = await this.prisma.problemTicket.update({
+      where: {
+        id,
+      },
+      data,
+      include: this.problemTicketIncludeOptions,
+    });
 
     return this.mapProblemTicket(ticket);
   }
@@ -1334,9 +1556,7 @@ export class IssuesService {
       });
 
     if (!existing) {
-      throw new NotFoundException(
-        'Problem ticket not found',
-      );
+      throw new NotFoundException('Problem ticket not found');
     }
 
     if (existing.status === 'RESOLVED') {
@@ -1345,39 +1565,45 @@ export class IssuesService {
       );
     }
 
+    const source = dto as any;
     const assignedToId = Number(
-      dto.assignedToId ??
-        dto.technicianId ??
+      source.assignedToId ??
+        source.technicianId ??
+        source.createdById ??
         existing.assignedToId ??
         existing.createdById,
     );
+
+    if (!assignedToId || Number.isNaN(assignedToId)) {
+      throw new BadRequestException('Valid assignedToId is required');
+    }
 
     await this.ensureProblemTicketUserExists(
       assignedToId,
       'assignedToId',
     );
 
-    if (existing.status === 'IN_PROGRESS') {
-      if (existing.assignedToId === assignedToId) {
-        return this.mapProblemTicket(existing);
-      }
+    if (
+      existing.status === 'IN_PROGRESS' &&
+      existing.assignedToId === assignedToId
+    ) {
+      return this.mapProblemTicket(existing);
     }
 
     const now = new Date();
 
-    const ticket =
-      await this.prisma.problemTicket.update({
-        where: {
-          id,
-        },
-        data: {
-          status: 'IN_PROGRESS',
-          assignedToId,
-          startedAt: existing.startedAt || now,
-          statusDate: now,
-        },
-        include: this.problemTicketIncludeOptions,
-      });
+    const ticket = await this.prisma.problemTicket.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'IN_PROGRESS',
+        assignedToId,
+        startedAt: existing.startedAt || now,
+        statusDate: now,
+      },
+      include: this.problemTicketIncludeOptions,
+    });
 
     return this.mapProblemTicket(ticket);
   }
@@ -1395,29 +1621,21 @@ export class IssuesService {
       });
 
     if (!existing) {
-      throw new NotFoundException(
-        'Problem ticket not found',
-      );
+      throw new NotFoundException('Problem ticket not found');
     }
 
     if (existing.status === 'RESOLVED') {
       return this.mapProblemTicket(existing);
     }
 
-    const solutionText = dto.solutionText?.trim();
-
-    const solutionSteps = Array.isArray(
-      dto.solutionSteps,
-    )
-      ? dto.solutionSteps
-          .map((step) => step.trim())
-          .filter(Boolean)
-      : [];
+    const source = dto as any;
+    const solutionText = String(source.solutionText ?? '').trim();
+    const solutionSteps = this.normalizeProblemTicketSteps(
+      source.solutionSteps ?? source.steps,
+    );
 
     if (!solutionText) {
-      throw new BadRequestException(
-        'Solution text is required',
-      );
+      throw new BadRequestException('Solution text is required');
     }
 
     if (!solutionSteps.length) {
@@ -1427,44 +1645,44 @@ export class IssuesService {
     }
 
     const resolvedById = Number(
-      dto.resolvedById ??
+      source.resolvedById ??
+        source.createdById ??
         existing.assignedToId ??
         existing.createdById,
     );
+
+    if (!resolvedById || Number.isNaN(resolvedById)) {
+      throw new BadRequestException('Valid resolvedById is required');
+    }
 
     await this.ensureProblemTicketUserExists(
       resolvedById,
       'resolvedById',
     );
 
+    const resultNotes = String(
+      source.resultNotes ?? source.finalResult ?? '',
+    ).trim();
     const now = new Date();
 
-    const ticket =
-      await this.prisma.problemTicket.update({
-        where: {
-          id,
-        },
-        data: {
-          status: 'RESOLVED',
-
-          solutionText,
-          solutionSteps,
-          resultNotes:
-            dto.resultNotes?.trim() || null,
-
-          assignedToId:
-            existing.assignedToId || resolvedById,
-          resolvedById,
-
-          startedAt: existing.startedAt || now,
-          resolvedAt: now,
-          statusDate: now,
-        },
-        include: this.problemTicketIncludeOptions,
-      });
+    const ticket = await this.prisma.problemTicket.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'RESOLVED',
+        solutionText,
+        solutionSteps,
+        resultNotes: resultNotes || null,
+        assignedToId: existing.assignedToId || resolvedById,
+        resolvedById,
+        startedAt: existing.startedAt || now,
+        resolvedAt: now,
+        statusDate: now,
+      },
+      include: this.problemTicketIncludeOptions,
+    });
 
     return this.mapProblemTicket(ticket);
   }
-
-
 }

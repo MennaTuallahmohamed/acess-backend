@@ -19,11 +19,7 @@ import { UpdateIssueSolutionDto } from './dto/update-issue-solution.dto';
 import { ReportInspectionIssueDto } from './dto/report-inspection-issue.dto';
 import { ExecuteSolutionActionDto } from './dto/execute-solution-action.dto';
 import { UpdateInspectionIssueStatusDto } from './dto/update-inspection-issue-status.dto';
-import { CreateProblemTicketDto } from './dto/create-problem-ticket.dto';
 import { GetProblemTicketsQueryDto } from './dto/get-problem-tickets-query.dto';
-import { StartProblemTicketDto } from './dto/start-problem-ticket.dto';
-import { ResolveProblemTicketDto } from './dto/resolve-problem-ticket.dto';
-import { UpdateProblemTicketDto } from './dto/update-problem-ticket.dto';
 
 @Controller('issues')
 export class IssuesController {
@@ -57,11 +53,21 @@ export class IssuesController {
     return this.issuesService.deleteCategory(id);
   }
 
-
   /*
-   * سجل المشكلات اليومية
-   * مهم: كل Routes الخاصة بـ tickets تكون قبل @Get(':id')
+   * Daily problem tickets.
+   * All static ticket GET routes must stay before tickets/:id.
    */
+
+  @Get('tickets/locations/buildings')
+  getProblemTicketBuildings(
+    @Query('search') search?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.issuesService.getProblemTicketBuildings(
+      search,
+      limit ? Number(limit) : undefined,
+    );
+  }
 
   @Get('tickets/summary')
   getProblemTicketsSummary(
@@ -86,7 +92,7 @@ export class IssuesController {
 
   @Post('tickets')
   createProblemTicket(
-    @Body() dto: CreateProblemTicketDto,
+    @Body() dto: any,
   ) {
     return this.issuesService.createProblemTicket(dto);
   }
@@ -94,7 +100,7 @@ export class IssuesController {
   @Patch('tickets/:id/start')
   startProblemTicket(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: StartProblemTicketDto,
+    @Body() dto: any,
   ) {
     return this.issuesService.startProblemTicket(id, dto);
   }
@@ -102,7 +108,7 @@ export class IssuesController {
   @Patch('tickets/:id/resolve')
   resolveProblemTicket(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: ResolveProblemTicketDto,
+    @Body() dto: any,
   ) {
     return this.issuesService.resolveProblemTicket(id, dto);
   }
@@ -110,15 +116,10 @@ export class IssuesController {
   @Patch('tickets/:id')
   updateProblemTicket(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateProblemTicketDto,
+    @Body() dto: any,
   ) {
     return this.issuesService.updateProblemTicket(id, dto);
   }
-
-  /*
-   * مهم جدًا:
-   * Routes دي لازم تكون قبل @Get(':id')
-   */
 
   @Get('device-type/:deviceTypeId')
   getIssuesByDeviceType(
@@ -201,7 +202,7 @@ export class IssuesController {
   }
 
   /*
-   * لازم يكون تحت كل الـ custom GET routes
+   * Keep these generic ID routes under every custom GET route.
    */
   @Get(':id')
   getIssue(@Param('id', ParseIntPipe) id: number) {
