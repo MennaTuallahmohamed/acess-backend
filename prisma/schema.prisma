@@ -868,14 +868,19 @@ model DeviceReplacement {
 
 
 model ProblemTicket {
-  id            Int                   @id @default(autoincrement())
+  id                Int                   @id @default(autoincrement())
 
-  
-  type          ProblemTicketType
+  type              ProblemTicketType
+  title             String?
 
- 
-  locationText  String
-  description   String
+  // النص النهائي الظاهر في الجدول وملف Excel.
+  locationText      String
+
+  // مبانٍ متعددة يتم استدعاؤها والتحقق منها من جدول Location.
+  // مثال: ["وزارة الكهرباء", "وزارة الاتصالات"]
+  locationBuildings String[]              @default([])
+
+  description       String
 
   priority      ProblemTicketPriority @default(MEDIUM)
   status        ProblemTicketStatus   @default(OPEN)
@@ -911,6 +916,9 @@ model ProblemTicket {
   @@index([createdById])
   @@index([assignedToId])
   @@index([resolvedById])
+  @@index([title])
+  @@index([locationText])
+  @@index([locationBuildings], type: Gin)
 }
 
 enum UserStatus {
