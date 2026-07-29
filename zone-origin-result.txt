@@ -1,0 +1,1965 @@
+﻿====================================================
+SMART IT ΓÇö DEVICE / ZONE ORIGIN INVESTIGATION
+READ-ONLY: no rows will be changed or deleted.
+====================================================
+
+Targets:
+- IP: 10.254.198.136
+- Secret / Barcode: ACD-V1-E586-60B6-5FA2-13A5
+- Device name: FULLQR-148-147-10254198136-2026_07_09_13_11_59
+- Serial: FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59
+- Zone compact: zon11right
+- Zone normal: zone11right
+- Building Arabic 1: ┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à
+- Building Arabic 2: ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à
+- Numeric ID: 1852
+
+Relevant database tables:
+[
+  {
+    "table_name": "AuditLog"
+  },
+  {
+    "table_name": "Device"
+  },
+  {
+    "table_name": "DeviceMorphoRepair"
+  },
+  {
+    "table_name": "DeviceMovement"
+  },
+  {
+    "table_name": "DeviceReplacement"
+  },
+  {
+    "table_name": "DeviceStatusHistory"
+  },
+  {
+    "table_name": "DeviceType"
+  },
+  {
+    "table_name": "Location"
+  },
+  {
+    "table_name": "MaintenanceLog"
+  },
+  {
+    "table_name": "TechnicianActivityLog"
+  }
+]
+
+Relevant Device/Location foreign keys:
+[
+  {
+    "source_table": "Device",
+    "source_column": "deviceTypeId",
+    "target_table": "DeviceType",
+    "target_column": "id",
+    "constraint_name": "Device_deviceTypeId_fkey"
+  },
+  {
+    "source_table": "Device",
+    "source_column": "locationId",
+    "target_table": "Location",
+    "target_column": "id",
+    "constraint_name": "Device_locationId_fkey"
+  },
+  {
+    "source_table": "DeviceMorphoRepair",
+    "source_column": "deviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "DeviceMorphoRepair_deviceId_fkey"
+  },
+  {
+    "source_table": "DeviceMorphoRepair",
+    "source_column": "inspectionId",
+    "target_table": "Inspection",
+    "target_column": "id",
+    "constraint_name": "DeviceMorphoRepair_inspectionId_fkey"
+  },
+  {
+    "source_table": "DeviceMorphoRepair",
+    "source_column": "taskItemId",
+    "target_table": "InspectionTaskItem",
+    "target_column": "id",
+    "constraint_name": "DeviceMorphoRepair_taskItemId_fkey"
+  },
+  {
+    "source_table": "DeviceMorphoRepair",
+    "source_column": "technicianId",
+    "target_table": "User",
+    "target_column": "id",
+    "constraint_name": "DeviceMorphoRepair_technicianId_fkey"
+  },
+  {
+    "source_table": "DeviceMovement",
+    "source_column": "deviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "DeviceMovement_deviceId_fkey"
+  },
+  {
+    "source_table": "DeviceMovement",
+    "source_column": "movedById",
+    "target_table": "User",
+    "target_column": "id",
+    "constraint_name": "DeviceMovement_movedById_fkey"
+  },
+  {
+    "source_table": "DeviceReplacement",
+    "source_column": "approvedById",
+    "target_table": "User",
+    "target_column": "id",
+    "constraint_name": "DeviceReplacement_approvedById_fkey"
+  },
+  {
+    "source_table": "DeviceReplacement",
+    "source_column": "fromLocationId",
+    "target_table": "Location",
+    "target_column": "id",
+    "constraint_name": "DeviceReplacement_fromLocationId_fkey"
+  },
+  {
+    "source_table": "DeviceReplacement",
+    "source_column": "inspectionId",
+    "target_table": "Inspection",
+    "target_column": "id",
+    "constraint_name": "DeviceReplacement_inspectionId_fkey"
+  },
+  {
+    "source_table": "DeviceReplacement",
+    "source_column": "newDeviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "DeviceReplacement_newDeviceId_fkey"
+  },
+  {
+    "source_table": "DeviceReplacement",
+    "source_column": "oldDeviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "DeviceReplacement_oldDeviceId_fkey"
+  },
+  {
+    "source_table": "DeviceReplacement",
+    "source_column": "replacedById",
+    "target_table": "User",
+    "target_column": "id",
+    "constraint_name": "DeviceReplacement_replacedById_fkey"
+  },
+  {
+    "source_table": "DeviceReplacement",
+    "source_column": "taskItemId",
+    "target_table": "InspectionTaskItem",
+    "target_column": "id",
+    "constraint_name": "DeviceReplacement_taskItemId_fkey"
+  },
+  {
+    "source_table": "DeviceReplacement",
+    "source_column": "toLocationId",
+    "target_table": "Location",
+    "target_column": "id",
+    "constraint_name": "DeviceReplacement_toLocationId_fkey"
+  },
+  {
+    "source_table": "DeviceStatusHistory",
+    "source_column": "changedById",
+    "target_table": "User",
+    "target_column": "id",
+    "constraint_name": "DeviceStatusHistory_changedById_fkey"
+  },
+  {
+    "source_table": "DeviceStatusHistory",
+    "source_column": "deviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "DeviceStatusHistory_deviceId_fkey"
+  },
+  {
+    "source_table": "Gate",
+    "source_column": "locationId",
+    "target_table": "Location",
+    "target_column": "id",
+    "constraint_name": "Gate_locationId_fkey"
+  },
+  {
+    "source_table": "Glass",
+    "source_column": "locationId",
+    "target_table": "Location",
+    "target_column": "id",
+    "constraint_name": "Glass_locationId_fkey"
+  },
+  {
+    "source_table": "Inspection",
+    "source_column": "deviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "Inspection_deviceId_fkey"
+  },
+  {
+    "source_table": "InspectionTask",
+    "source_column": "deviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "InspectionTask_deviceId_fkey"
+  },
+  {
+    "source_table": "InspectionTaskItem",
+    "source_column": "deviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "InspectionTaskItem_deviceId_fkey"
+  },
+  {
+    "source_table": "Issue",
+    "source_column": "deviceTypeId",
+    "target_table": "DeviceType",
+    "target_column": "id",
+    "constraint_name": "Issue_deviceTypeId_fkey"
+  },
+  {
+    "source_table": "MaintenanceLog",
+    "source_column": "deviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "MaintenanceLog_deviceId_fkey"
+  },
+  {
+    "source_table": "TechnicianActivityLog",
+    "source_column": "deviceId",
+    "target_table": "Device",
+    "target_column": "id",
+    "constraint_name": "TechnicianActivityLog_deviceId_fkey"
+  },
+  {
+    "source_table": "TechnicianActivityLog",
+    "source_column": "morphoRepairId",
+    "target_table": "DeviceMorphoRepair",
+    "target_column": "id",
+    "constraint_name": "TechnicianActivityLog_morphoRepairId_fkey"
+  },
+  {
+    "source_table": "TechnicianActivityLog",
+    "source_column": "replacementId",
+    "target_table": "DeviceReplacement",
+    "target_column": "id",
+    "constraint_name": "TechnicianActivityLog_replacementId_fkey"
+  }
+]
+
+Searching all public text / varchar / inet columns...
+Text hits found: 155
+[
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceCode",
+    "matchedTargets": [
+      "IP",
+      "Secret / Barcode",
+      "Device name",
+      "Serial",
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1852,
+      "notes": "Inserted from full Excel upload. Excel row: 148",
+      "gateNo": null,
+      "barcode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.136",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-148-147-10254198136-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.136",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1792,
+      "notes": "Inserted from full Excel upload. Excel row: 88",
+      "gateNo": null,
+      "barcode": "ACD-V1-D555-26F3-2194-B962",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.230.61",
+      "updatedAt": "2026-07-13T10:09:28.184",
+      "deviceCode": "FULLQR-88-87-1025423061-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘à╪¼┘ä╪│ ┘à╪¼┘à╪╣ ┘ç┘è╪ª╪º╪¬ ╪º┘ä┘ê╪▓╪▒╪º╪í - zon11right - IN - 10.254.230.61",
+      "locationId": 1725,
+      "secretCode": "ACD-V1-D555-26F3-2194-B962",
+      "excelStatus": null,
+      "gateCluster": "19b20b",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘à╪¼┘ä╪│ ┘à╪¼┘à╪╣ ┘ç┘è╪ª╪º╪¬ ╪º┘ä┘ê╪▓╪▒╪º╪í",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-88-87-1025423061-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": "2026-03-31T10:12:44"
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "IP",
+      "Secret / Barcode",
+      "Device name",
+      "Serial",
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1852,
+      "notes": "Inserted from full Excel upload. Excel row: 148",
+      "gateNo": null,
+      "barcode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.136",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-148-147-10254198136-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.136",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1853,
+      "notes": "Inserted from full Excel upload. Excel row: 149",
+      "gateNo": null,
+      "barcode": "ACD-V1-BC97-9B3C-3CB5-54BD",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.107",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-149-148-10254198107-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.107",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-BC97-9B3C-3CB5-54BD",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-149-148-10254198107-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1854,
+      "notes": "Inserted from full Excel upload. Excel row: 150",
+      "gateNo": null,
+      "barcode": "ACD-V1-F9C7-C430-121F-12AD",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.109",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-150-149-10254198109-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.109",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-F9C7-C430-121F-12AD",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-150-149-10254198109-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1855,
+      "notes": "Inserted from full Excel upload. Excel row: 151",
+      "gateNo": null,
+      "barcode": "ACD-V1-85A1-8071-F074-2FD9",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.111",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-151-150-10254198111-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.111",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-85A1-8071-F074-2FD9",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-151-150-10254198111-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1856,
+      "notes": "Inserted from full Excel upload. Excel row: 152",
+      "gateNo": null,
+      "barcode": "ACD-V1-BC98-361A-4494-1D59",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.113",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-152-151-10254198113-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.113",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-BC98-361A-4494-1D59",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-152-151-10254198113-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1857,
+      "notes": "Inserted from full Excel upload. Excel row: 153",
+      "gateNo": null,
+      "barcode": "ACD-V1-452A-8B5D-F297-EDF2",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.115",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-153-152-10254198115-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.115",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-452A-8B5D-F297-EDF2",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-153-152-10254198115-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1858,
+      "notes": "Inserted from full Excel upload. Excel row: 154",
+      "gateNo": null,
+      "barcode": "ACD-V1-C33B-3E3A-CDA5-1D23",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.117",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-154-153-10254198117-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.117",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-C33B-3E3A-CDA5-1D23",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-154-153-10254198117-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1859,
+      "notes": "Inserted from full Excel upload. Excel row: 155",
+      "gateNo": null,
+      "barcode": "ACD-V1-0B2D-A5E2-6114-CB95",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.119",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-155-154-10254198119-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.119",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-0B2D-A5E2-6114-CB95",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-155-154-10254198119-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "deviceName",
+    "matchedTargets": [
+      "Zone normal"
+    ],
+    "row": {
+      "id": 2017,
+      "notes": "Inserted from full Excel upload. Excel row: 313",
+      "gateNo": null,
+      "barcode": "ACD-V1-41C0-3604-0A56-C8F0",
+      "firmware": null,
+      "gateZone": "zone11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.214.117",
+      "updatedAt": "2026-07-13T11:18:47.336",
+      "deviceCode": "FULLQR-313-312-10254214117-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘à╪╡┘ä╪¡┘ç ╪º┘ä╪╢╪▒╪í╪¿ ╪º┘ä┘à╪╡╪▒┘è┘ç - zone11right - IN - 10.254.214.117",
+      "locationId": 1763,
+      "secretCode": "ACD-V1-41C0-3604-0A56-C8F0",
+      "excelStatus": null,
+      "gateCluster": "13a14a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘à╪╡┘ä╪¡┘ç ╪º┘ä╪╢╪▒╪í╪¿ ╪º┘ä┘à╪╡╪▒┘è┘ç",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-313-312-10254214117-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": "2026-06-14T07:48:27"
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "barcode",
+    "matchedTargets": [
+      "IP",
+      "Secret / Barcode",
+      "Device name",
+      "Serial",
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1852,
+      "notes": "Inserted from full Excel upload. Excel row: 148",
+      "gateNo": null,
+      "barcode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.136",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-148-147-10254198136-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.136",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "serialNumber",
+    "matchedTargets": [
+      "IP",
+      "Secret / Barcode",
+      "Device name",
+      "Serial",
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1852,
+      "notes": "Inserted from full Excel upload. Excel row: 148",
+      "gateNo": null,
+      "barcode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.136",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-148-147-10254198136-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.136",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "ipAddress",
+    "matchedTargets": [
+      "IP",
+      "Secret / Barcode",
+      "Device name",
+      "Serial",
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1852,
+      "notes": "Inserted from full Excel upload. Excel row: 148",
+      "gateNo": null,
+      "barcode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.136",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-148-147-10254198136-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.136",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "secretCode",
+    "matchedTargets": [
+      "IP",
+      "Secret / Barcode",
+      "Device name",
+      "Serial",
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1852,
+      "notes": "Inserted from full Excel upload. Excel row: 148",
+      "gateNo": null,
+      "barcode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.136",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-148-147-10254198136-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.136",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1792,
+      "notes": "Inserted from full Excel upload. Excel row: 88",
+      "gateNo": null,
+      "barcode": "ACD-V1-D555-26F3-2194-B962",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.230.61",
+      "updatedAt": "2026-07-13T10:09:28.184",
+      "deviceCode": "FULLQR-88-87-1025423061-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘à╪¼┘ä╪│ ┘à╪¼┘à╪╣ ┘ç┘è╪ª╪º╪¬ ╪º┘ä┘ê╪▓╪▒╪º╪í - zon11right - IN - 10.254.230.61",
+      "locationId": 1725,
+      "secretCode": "ACD-V1-D555-26F3-2194-B962",
+      "excelStatus": null,
+      "gateCluster": "19b20b",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘à╪¼┘ä╪│ ┘à╪¼┘à╪╣ ┘ç┘è╪ª╪º╪¬ ╪º┘ä┘ê╪▓╪▒╪º╪í",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-88-87-1025423061-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": "2026-03-31T10:12:44"
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "IP",
+      "Secret / Barcode",
+      "Device name",
+      "Serial",
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1852,
+      "notes": "Inserted from full Excel upload. Excel row: 148",
+      "gateNo": null,
+      "barcode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.136",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-148-147-10254198136-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.136",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1853,
+      "notes": "Inserted from full Excel upload. Excel row: 149",
+      "gateNo": null,
+      "barcode": "ACD-V1-BC97-9B3C-3CB5-54BD",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.107",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-149-148-10254198107-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.107",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-BC97-9B3C-3CB5-54BD",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-149-148-10254198107-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1854,
+      "notes": "Inserted from full Excel upload. Excel row: 150",
+      "gateNo": null,
+      "barcode": "ACD-V1-F9C7-C430-121F-12AD",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.109",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-150-149-10254198109-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.109",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-F9C7-C430-121F-12AD",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-150-149-10254198109-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1855,
+      "notes": "Inserted from full Excel upload. Excel row: 151",
+      "gateNo": null,
+      "barcode": "ACD-V1-85A1-8071-F074-2FD9",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.111",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-151-150-10254198111-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.111",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-85A1-8071-F074-2FD9",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-151-150-10254198111-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1856,
+      "notes": "Inserted from full Excel upload. Excel row: 152",
+      "gateNo": null,
+      "barcode": "ACD-V1-BC98-361A-4494-1D59",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.113",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-152-151-10254198113-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.113",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-BC98-361A-4494-1D59",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-152-151-10254198113-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1857,
+      "notes": "Inserted from full Excel upload. Excel row: 153",
+      "gateNo": null,
+      "barcode": "ACD-V1-452A-8B5D-F297-EDF2",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.115",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-153-152-10254198115-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.115",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-452A-8B5D-F297-EDF2",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-153-152-10254198115-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1858,
+      "notes": "Inserted from full Excel upload. Excel row: 154",
+      "gateNo": null,
+      "barcode": "ACD-V1-C33B-3E3A-CDA5-1D23",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.117",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-154-153-10254198117-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.117",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-C33B-3E3A-CDA5-1D23",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-154-153-10254198117-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "Zone compact"
+    ],
+    "row": {
+      "id": 1859,
+      "notes": "Inserted from full Excel upload. Excel row: 155",
+      "gateNo": null,
+      "barcode": "ACD-V1-0B2D-A5E2-6114-CB95",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.119",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-155-154-10254198119-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.119",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-0B2D-A5E2-6114-CB95",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-155-154-10254198119-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "gateZone",
+    "matchedTargets": [
+      "Zone normal"
+    ],
+    "row": {
+      "id": 2017,
+      "notes": "Inserted from full Excel upload. Excel row: 313",
+      "gateNo": null,
+      "barcode": "ACD-V1-41C0-3604-0A56-C8F0",
+      "firmware": null,
+      "gateZone": "zone11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.214.117",
+      "updatedAt": "2026-07-13T11:18:47.336",
+      "deviceCode": "FULLQR-313-312-10254214117-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘à╪╡┘ä╪¡┘ç ╪º┘ä╪╢╪▒╪í╪¿ ╪º┘ä┘à╪╡╪▒┘è┘ç - zone11right - IN - 10.254.214.117",
+      "locationId": 1763,
+      "secretCode": "ACD-V1-41C0-3604-0A56-C8F0",
+      "excelStatus": null,
+      "gateCluster": "13a14a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘à╪╡┘ä╪¡┘ç ╪º┘ä╪╢╪▒╪í╪¿ ╪º┘ä┘à╪╡╪▒┘è┘ç",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-313-312-10254214117-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": "2026-06-14T07:48:27"
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 3257,
+      "lane": null,
+      "type": null,
+      "zone": "Zone 11 Plaza left",
+      "notes": null,
+      "gateNo": "1",
+      "status": "ACTIVE",
+      "cluster": "5A/6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-E20F-FCE5-C706-6C6F",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 3258,
+      "lane": null,
+      "type": null,
+      "zone": "Zone 11 Plaza left",
+      "notes": null,
+      "gateNo": "2",
+      "status": "ACTIVE",
+      "cluster": "5A/6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-8303-679A-9E43-0551",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 3259,
+      "lane": null,
+      "type": null,
+      "zone": "Zone 11 Plaza left",
+      "notes": null,
+      "gateNo": "3",
+      "status": "ACTIVE",
+      "cluster": "5A/6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-770B-32CD-A2C9-F117",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 3260,
+      "lane": null,
+      "type": null,
+      "zone": "Zone 11 Plaza left",
+      "notes": null,
+      "gateNo": "4",
+      "status": "ACTIVE",
+      "cluster": "5A/6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-2271-07B9-09D9-A504",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 3261,
+      "lane": null,
+      "type": null,
+      "zone": "Zone 11 Plaza left",
+      "notes": null,
+      "gateNo": "5",
+      "status": "ACTIVE",
+      "cluster": "5A/6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-815F-7945-0FCE-F269",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 3262,
+      "lane": null,
+      "type": null,
+      "zone": "Zone 11 Plaza left",
+      "notes": null,
+      "gateNo": "6",
+      "status": "ACTIVE",
+      "cluster": "5A/6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-FE92-99AA-07E9-4919",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 3263,
+      "lane": null,
+      "type": null,
+      "zone": "Zone 11 Plaza left",
+      "notes": null,
+      "gateNo": "7",
+      "status": "ACTIVE",
+      "cluster": "5A/6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-3D0F-966F-5097-0742",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 3264,
+      "lane": null,
+      "type": null,
+      "zone": "Zone 11 Plaza left",
+      "notes": null,
+      "gateNo": "8",
+      "status": "ACTIVE",
+      "cluster": "5A/6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-F824-C17B-F0F1-6F2E",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 3657,
+      "lane": null,
+      "type": null,
+      "zone": "zone11plazaleft",
+      "notes": null,
+      "gateNo": "1",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-9073-A587-3B79-2A7D",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 3658,
+      "lane": null,
+      "type": null,
+      "zone": "zone11plazaleft",
+      "notes": null,
+      "gateNo": "2",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-200D-81A5-EB7B-34EC",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 3659,
+      "lane": null,
+      "type": null,
+      "zone": "zone11plazaleft",
+      "notes": null,
+      "gateNo": "3",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-E8C9-667E-252A-DF51",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 3660,
+      "lane": null,
+      "type": null,
+      "zone": "zone11plazaleft",
+      "notes": null,
+      "gateNo": "4",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-BF89-D6EE-5836-6954",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 3661,
+      "lane": null,
+      "type": null,
+      "zone": "zone11plazaleft",
+      "notes": null,
+      "gateNo": "5",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-4A3D-16A7-18A5-C940",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 3662,
+      "lane": null,
+      "type": null,
+      "zone": "zone11plazaleft",
+      "notes": null,
+      "gateNo": "6",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-B82A-BC1C-29A7-7725",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 3663,
+      "lane": null,
+      "type": null,
+      "zone": "zone11plazaleft",
+      "notes": null,
+      "gateNo": "7",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-BA76-344C-83F0-C8F0",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Gate",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 3664,
+      "lane": null,
+      "type": null,
+      "zone": "zone11plazaleft",
+      "notes": null,
+      "gateNo": "8",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "excelId": null,
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-06-14T12:02:49.575",
+      "direction": null,
+      "updatedAt": "2026-06-14T12:02:49.575",
+      "locationId": null,
+      "secretCode": "GSC-CCFA-B94F-0D23-187B",
+      "currentStatus": "OK",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Glass",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 49,
+      "lane": "1",
+      "zone": "Zone 11 Plaza left",
+      "notes": "Source Gate ID: 53",
+      "status": "ACTIVE",
+      "cluster": "5A/6A",
+      "building": "┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à",
+      "createdAt": "2026-07-22T12:39:43.999",
+      "direction": "IN",
+      "glassType": "Gate Glass",
+      "thickness": null,
+      "updatedAt": "2026-07-22T12:39:43.999",
+      "locationId": 515,
+      "installDate": null,
+      "currentStatus": "NOT_INSPECTED",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Glass",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 148,
+      "lane": "251",
+      "zone": "zone11plazaleft",
+      "notes": "Source Gate ID: 152",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-07-22T12:39:45.602",
+      "direction": "IN",
+      "glassType": "Gate Glass",
+      "thickness": null,
+      "updatedAt": "2026-07-22T12:39:45.602",
+      "locationId": 1833,
+      "installDate": null,
+      "currentStatus": "NOT_INSPECTED",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Glass",
+    "matchedColumn": "building",
+    "matchedTargets": [
+      "Zone normal",
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 149,
+      "lane": "259",
+      "zone": "zone11right",
+      "notes": "Source Gate ID: 153",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-07-22T12:39:45.618",
+      "direction": "OUT",
+      "glassType": "Gate Glass",
+      "thickness": null,
+      "updatedAt": "2026-07-22T12:39:45.618",
+      "locationId": 1406,
+      "installDate": null,
+      "currentStatus": "NOT_INSPECTED",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Glass",
+    "matchedColumn": "zone",
+    "matchedTargets": [
+      "Zone normal",
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 149,
+      "lane": "259",
+      "zone": "zone11right",
+      "notes": "Source Gate ID: 153",
+      "status": "ACTIVE",
+      "cluster": "5A.6A",
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à",
+      "createdAt": "2026-07-22T12:39:45.618",
+      "direction": "OUT",
+      "glassType": "Gate Glass",
+      "thickness": null,
+      "updatedAt": "2026-07-22T12:39:45.618",
+      "locationId": 1406,
+      "installDate": null,
+      "currentStatus": "NOT_INSPECTED",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Inspection",
+    "matchedColumn": "locationText",
+    "matchedTargets": [
+      "Zone normal",
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 2574,
+      "notes": "[APRIL_IMPORT:APR26-INSP-001276]\nApril 2026 Excel inspection import.\nExcel Inspection ID: APR26-INSP-001276\nMatched by: SERIAL_AND_IP\nSerial Number: 2143smp0000985\nIP Address: 10.254.198.112\nPeriodic inspection completed. Device is operating normally.\nInspection completed successfully. Final Device Condition: OK\nFinal Device Condition: OK",
+      "gateId": null,
+      "taskId": null,
+      "glassId": null,
+      "deviceId": 1402,
+      "latitude": null,
+      "createdAt": "2026-04-22T13:41:31",
+      "longitude": null,
+      "updatedAt": "2026-07-13T10:29:26.158",
+      "inspectedAt": "2026-04-22T13:41:31",
+      "issueReason": "NO_ISSUE",
+      "locationText": "Cluster: 5A.6A | Building: ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à | Zone: zone11right | Lane: 262 | Direction: OUT",
+      "technicianId": 46,
+      "inspectionStatus": "OK"
+    }
+  },
+  {
+    "table": "public.Inspection",
+    "matchedColumn": "locationText",
+    "matchedTargets": [
+      "Zone normal",
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 2575,
+      "notes": "[APRIL_IMPORT:APR26-INSP-001277]\nApril 2026 Excel inspection import.\nExcel Inspection ID: APR26-INSP-001277\nMatched by: SERIAL_AND_IP\nSerial Number: 2142smp0000634\nIP Address: 10.254.198.114\nPeriodic inspection completed. Device is operating normally.\nInspection completed successfully. Final Device Condition: OK\nFinal Device Condition: OK",
+      "gateId": null,
+      "taskId": null,
+      "glassId": null,
+      "deviceId": 1403,
+      "latitude": null,
+      "createdAt": "2026-04-22T13:43:21",
+      "longitude": null,
+      "updatedAt": "2026-07-13T10:29:27.554",
+      "inspectedAt": "2026-04-22T13:43:21",
+      "issueReason": "NO_ISSUE",
+      "locationText": "Cluster: 5A.6A | Building: ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à | Zone: zone11right | Lane: 263 | Direction: OUT",
+      "technicianId": 46,
+      "inspectionStatus": "OK"
+    }
+  },
+  {
+    "table": "public.Inspection",
+    "matchedColumn": "locationText",
+    "matchedTargets": [
+      "Zone normal",
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 2576,
+      "notes": "[APRIL_IMPORT:APR26-INSP-001278]\nApril 2026 Excel inspection import.\nExcel Inspection ID: APR26-INSP-001278\nMatched by: SERIAL_AND_IP\nSerial Number: 2136smp0001630\nIP Address: 10.254.198.116\nPeriodic inspection completed. Device is operating normally.\nInspection completed successfully. Final Device Condition: OK\nFinal Device Condition: OK",
+      "gateId": null,
+      "taskId": null,
+      "glassId": null,
+      "deviceId": 1404,
+      "latitude": null,
+      "createdAt": "2026-04-22T13:45:10",
+      "longitude": null,
+      "updatedAt": "2026-07-13T10:29:28.636",
+      "inspectedAt": "2026-04-22T13:45:10",
+      "issueReason": "NO_ISSUE",
+      "locationText": "Cluster: 5A.6A | Building: ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à | Zone: zone11right | Lane: 264 | Direction: OUT",
+      "technicianId": 46,
+      "inspectionStatus": "OK"
+    }
+  },
+  {
+    "table": "public.Inspection",
+    "matchedColumn": "locationText",
+    "matchedTargets": [
+      "Zone normal",
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 2577,
+      "notes": "[APRIL_IMPORT:APR26-INSP-001279]\nApril 2026 Excel inspection import.\nExcel Inspection ID: APR26-INSP-001279\nMatched by: SERIAL_AND_IP\nSerial Number: 2142smp0000535\nIP Address: 10.254.198.118\nPeriodic inspection completed. Device is operating normally.\nInspection completed successfully. Final Device Condition: OK\nFinal Device Condition: OK",
+      "gateId": null,
+      "taskId": null,
+      "glassId": null,
+      "deviceId": 1405,
+      "latitude": null,
+      "createdAt": "2026-04-22T13:47:00",
+      "longitude": null,
+      "updatedAt": "2026-07-13T10:29:29.718",
+      "inspectedAt": "2026-04-22T13:47:00",
+      "issueReason": "NO_ISSUE",
+      "locationText": "Cluster: 5A.6A | Building: ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à | Zone: zone11right | Lane: 265 | Direction: OUT",
+      "technicianId": 46,
+      "inspectionStatus": "OK"
+    }
+  },
+  {
+    "table": "public.Inspection",
+    "matchedColumn": "locationText",
+    "matchedTargets": [
+      "Zone normal",
+      "Building Arabic 2"
+    ],
+    "row": {
+      "id": 2578,
+      "notes": "[APRIL_IMPORT:APR26-INSP-001280]\nApril 2026 Excel inspection import.\nExcel Inspection ID: APR26-INSP-001280\nMatched by: SERIAL_AND_IP\nSerial Number: 2142smp0000931\nIP Address: 10.254.198.120\nPeriodic inspection completed. Device is operating normally.\nInspection completed successfully. Final Device Condition: OK\nFinal Device Condition: OK",
+      "gateId": null,
+      "taskId": null,
+      "glassId": null,
+      "deviceId": 1406,
+      "latitude": null,
+      "createdAt": "2026-04-22T13:48:49",
+      "longitude": null,
+      "updatedAt": "2026-07-13T10:29:30.783",
+      "inspectedAt": "2026-04-22T13:48:49",
+      "issueReason": "NO_ISSUE",
+      "locationText": "Cluster: 5A.6A | Building: ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä┘à | Zone: zone11right | Lane: 266 | Direction: OUT",
+      "technicianId": 46,
+      "inspectionStatus": "OK"
+    }
+  },
+  {
+    "table": "public.Inspection",
+    "matchedColumn": "locationText",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 1680,
+      "notes": "[APRIL_IMPORT:APR26-INSP-000370]\nApril 2026 Excel inspection import.\nExcel Inspection ID: APR26-INSP-000370\nMatched by: SERIAL_AND_IP\nSerial Number: 2136SMP0001500\nIP Address: 10.205.108.136\nPeriodic inspection completed. Device is operating normally.\nInspection completed successfully. Final Device Condition: OK\nFinal Device Condition: OK",
+      "gateId": null,
+      "taskId": null,
+      "glassId": null,
+      "deviceId": 508,
+      "latitude": null,
+      "createdAt": "2026-04-06T10:10:55",
+      "longitude": null,
+      "updatedAt": "2026-07-13T10:14:07.934",
+      "inspectedAt": "2026-04-06T10:10:55",
+      "issueReason": "NO_ISSUE",
+      "locationText": "Cluster: 5A/6A | Building: ┘ê╪▓╪º╪▒╪⌐ ╪º┘ä╪Ñ╪╣┘ä╪º┘à | Zone: Zone 11 Plaza left | Lane: 1 | Direction: IN",
+      "technicianId": 46,
+      "inspectionStatus": "OK"
+    }
+  },
+  {
+    "table": "public.Inspection",
+    "matchedColumn": "locationText",
+    "matchedTargets": [
+      "Building Arabic 1"
+    ],
+    "row": {
+      "id": 1681,
+      "notes": "[APRIL_IMPORT:APR26-INSP-000371]\nApril 2026 Excel inspection import.\nExcel Inspection ID: APR26-INSP-000371\nMatched by: SERIAL_AND_IP\nSerial Number: 2124SMP0000441\nIP Address: 10.205.108.107\nPeriodic inspection completed. Device is operating normally.\nInspection completed successfully. Final Device Condition: OK\nFinal Device Condition: OK",
+      "gateId": null,
+      "taskId": null,
+      "glassId": null,
+      "deviceId": 509,
+      "latitude": null,
+      "createdAt": "2026-04-06T10:12:44",
+      "longitude": null,
+      "updatedAt": "2026-07-13T10:14:09.065",
+      "inspectedAt": "2026-04-06T10:12:44",
+      "issueReas
+...TRUNCATED...
+
+Searching every numeric ID column for ID 1852...
+ID hits found: 4
+[
+  {
+    "table": "public.AuditLog",
+    "matchedColumn": "id",
+    "row": {
+      "id": 1852,
+      "action": "DEVICE_SCAN_SUCCESS",
+      "userId": null,
+      "details": "{\"source\":\"MOBILE_APP\",\"scanTargetType\":\"DEVICE\",\"matchedBy\":\"secretCode\",\"secretCodePreview\":\"ACD-V1-7****\",\"createdAt\":\"2026-07-01T11:11:54.345Z\"}",
+      "entityId": 1299,
+      "createdAt": "2026-07-01T11:11:54.347",
+      "entityType": "Device"
+    }
+  },
+  {
+    "table": "public.Device",
+    "matchedColumn": "id",
+    "row": {
+      "id": 1852,
+      "notes": "Inserted from full Excel upload. Excel row: 148",
+      "gateNo": null,
+      "barcode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "firmware": null,
+      "gateZone": "zon11right",
+      "assetType": "GATE",
+      "createdAt": "2026-07-09T09:11:09.09",
+      "excelDate": null,
+      "ipAddress": "10.254.198.136",
+      "updatedAt": "2026-07-09T09:11:09.09",
+      "deviceCode": "FULLQR-148-147-10254198136-2026_07_09_13_11_59",
+      "deviceName": "Excel QR Device - ┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à - zon11right - IN - 10.254.198.136",
+      "locationId": 1735,
+      "secretCode": "ACD-V1-E586-60B6-5FA2-13A5",
+      "excelStatus": null,
+      "gateCluster": "5a6a",
+      "installDate": null,
+      "modelNumber": "Unknown",
+      "deviceTypeId": 1,
+      "gateBuilding": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪º╪╣┘ä╪º┘à",
+      "manufacturer": "Unknown",
+      "serialNumber": "FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59",
+      "currentStatus": "OK",
+      "gateDirection": "IN",
+      "lifecycleStatus": "ACTIVE",
+      "lastInspectionAt": null
+    }
+  },
+  {
+    "table": "public.Inspection",
+    "matchedColumn": "id",
+    "row": {
+      "id": 1852,
+      "notes": "[APRIL_IMPORT:APR26-INSP-000542]\nApril 2026 Excel inspection import.\nExcel Inspection ID: APR26-INSP-000542\nMatched by: SERIAL_AND_IP\nSerial Number: _\nIP Address: _\nPeriodic inspection completed. Device is operating normally.\nInspection completed successfully. Final Device Condition: OK\nFinal Device Condition: OK",
+      "gateId": null,
+      "taskId": null,
+      "glassId": null,
+      "deviceId": 653,
+      "latitude": null,
+      "createdAt": "2026-04-12T07:23:38",
+      "longitude": null,
+      "updatedAt": "2026-07-13T10:17:23.466",
+      "inspectedAt": "2026-04-12T07:23:38",
+      "issueReason": "NO_ISSUE",
+      "locationText": "Cluster: 13A/14A | Building: ┘à╪╡┘ä╪¡╪⌐ ╪º┘ä╪¼┘à╪º╪▒┘â | Zone: Zone 8 Plaza right | Lane: 2 | Direction: IN",
+      "technicianId": 46,
+      "inspectionStatus": "OK"
+    }
+  },
+  {
+    "table": "public.Location",
+    "matchedColumn": "id",
+    "row": {
+      "id": 1852,
+      "lane": "1",
+      "type": "GATE_GLASS",
+      "zone": "zone7plazaleft",
+      "cluster": "17A.18A",
+      "excelId": "GLASS-LOC-B90763A8F6DB6D7D90FD774D",
+      "building": "┘ê╪▓╪º╪▒┘ç ╪º┘ä╪┤╪¿╪º╪¿ ┘ê╪º┘ä╪▒┘è╪º╪╢┘ç",
+      "createdAt": "2026-07-22T12:39:46.209",
+      "direction": "IN",
+      "updatedAt": "2026-07-22T12:39:46.209"
+    }
+  }
+]
+
+====================================================
+HOW TO READ THE RESULT
+1) Find the row containing the exact IP / secret / FULLQR name.
+2) Note its locationId, createdAt, updatedAt, createdById, or source fields.
+3) Find the matching Location row in the output.
+4) Compare Location.createdAt with Device.createdAt.
+5) Import/audit/activity hits reveal which process created or changed it.
+====================================================

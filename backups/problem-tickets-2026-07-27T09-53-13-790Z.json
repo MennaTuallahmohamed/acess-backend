@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "createdAt": "2026-07-27T09:53:13.792Z",
+    "table": "ProblemTicket",
+    "count": 4,
+    "description": "Backup created before deleting Software Problems test records."
+  },
+  "data": [
+    {
+      "id": 1,
+      "type": "SOFTWARE",
+      "title": "مشكله",
+      "locationText": "الأمانة العامة لرئاسة مجلس الوزراء + Ministry of Transport + الجهاز المركزي للتنظيم والاداره",
+      "locationBuildings": [
+        "الأمانة العامة لرئاسة مجلس الوزراء",
+        "Ministry of Transport",
+        "الجهاز المركزي للتنظيم والاداره"
+      ],
+      "description": "Test",
+      "priority": "MEDIUM",
+      "status": "RESOLVED",
+      "solutionText": "test",
+      "solutionSteps": [
+        "step one"
+      ],
+      "resultNotes": null,
+      "problemDate": "2026-07-27T00:00:00.000Z",
+      "statusDate": "2026-07-27T07:37:56.496Z",
+      "startedAt": "2026-07-27T07:37:37.165Z",
+      "resolvedAt": "2026-07-27T07:37:56.496Z",
+      "createdById": 56,
+      "assignedToId": 56,
+      "resolvedById": 56,
+      "createdAt": "2026-07-27T07:28:49.180Z",
+      "updatedAt": "2026-07-27T07:37:56.498Z"
+    },
+    {
+      "id": 2,
+      "type": "SOFTWARE",
+      "title": "Issue Name",
+      "locationText": "مصلحة الضرائب العقارية + هيئة التأمين الإجتماعي",
+      "locationBuildings": [
+        "مصلحة الضرائب العقارية",
+        "هيئة التأمين الإجتماعي"
+      ],
+      "description": "Issue Name",
+      "priority": "MEDIUM",
+      "status": "RESOLVED",
+      "solutionText": "Issue Name Issue NameIssue NameIssue NameIssue Name",
+      "solutionSteps": [
+        "Issue Name",
+        "Issue NameIssue Name"
+      ],
+      "resultNotes": null,
+      "problemDate": "2026-07-27T00:00:00.000Z",
+      "statusDate": "2026-07-27T08:44:06.315Z",
+      "startedAt": "2026-07-27T07:40:14.934Z",
+      "resolvedAt": "2026-07-27T08:44:06.315Z",
+      "createdById": 56,
+      "assignedToId": 56,
+      "resolvedById": 56,
+      "createdAt": "2026-07-27T07:39:59.520Z",
+      "updatedAt": "2026-07-27T08:44:06.320Z"
+    },
+    {
+      "id": 3,
+      "type": "SOFTWARE",
+      "title": "Issue Name",
+      "locationText": "وزاره الاسكان + وزاره الاعلام",
+      "locationBuildings": [
+        "وزاره الاسكان",
+        "وزاره الاعلام"
+      ],
+      "description": "Issue NameIssue NameIssue Name",
+      "priority": "MEDIUM",
+      "status": "RESOLVED",
+      "solutionText": "Issue NameIssue NameIssue Name",
+      "solutionSteps": [
+        "Issue NameIssue NameIssue Name",
+        "Issue NameIssue Name"
+      ],
+      "resultNotes": null,
+      "problemDate": "2026-07-27T00:00:00.000Z",
+      "statusDate": "2026-07-27T07:43:51.518Z",
+      "startedAt": "2026-07-27T07:43:34.108Z",
+      "resolvedAt": "2026-07-27T07:43:51.518Z",
+      "createdById": 56,
+      "assignedToId": 56,
+      "resolvedById": 56,
+      "createdAt": "2026-07-27T07:42:58.679Z",
+      "updatedAt": "2026-07-27T07:43:51.522Z"
+    },
+    {
+      "id": 4,
+      "type": "SOFTWARE",
+      "title": "Additional / System Location",
+      "locationText": ".وزارة التعليم العالي [Zone 1 left، Zone 2 right] + الامانه العامه + Additional / System Location",
+      "locationBuildings": [
+        ".وزارة التعليم العالي",
+        "الامانه العامه"
+      ],
+      "description": "Additional / System Location",
+      "priority": "MEDIUM",
+      "status": "IN_PROGRESS",
+      "solutionText": null,
+      "solutionSteps": [],
+      "resultNotes": null,
+      "problemDate": "2026-07-27T00:00:00.000Z",
+      "statusDate": "2026-07-27T08:43:43.613Z",
+      "startedAt": "2026-07-27T08:43:43.613Z",
+      "resolvedAt": null,
+      "createdById": 56,
+      "assignedToId": 56,
+      "resolvedById": null,
+      "createdAt": "2026-07-27T08:43:40.781Z",
+      "updatedAt": "2026-07-27T08:43:43.620Z"
+    }
+  ]
+}

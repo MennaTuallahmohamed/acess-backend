@@ -21,7 +21,7 @@ import { UpdateProblemTicketDto } from './dto/update-problem-ticket.dto';
 
 @Injectable()
 export class IssuesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private issueIncludeOptions = {
     category: true,
@@ -383,19 +383,19 @@ export class IssuesService {
 
       category: issue.category
         ? {
-            id: issue.category.id,
-            name: issue.category.name,
-            code: issue.category.code,
-            description: issue.category.description,
-          }
+          id: issue.category.id,
+          name: issue.category.name,
+          code: issue.category.code,
+          description: issue.category.description,
+        }
         : null,
 
       deviceType: issue.deviceType
         ? {
-            id: issue.deviceType.id,
-            name: issue.deviceType.name,
-            description: issue.deviceType.description,
-          }
+          id: issue.deviceType.id,
+          name: issue.deviceType.name,
+          description: issue.deviceType.description,
+        }
         : null,
 
       solutions: Array.isArray(issue.solutions)
@@ -436,58 +436,58 @@ export class IssuesService {
 
       reportedBy: item.reportedBy
         ? {
-            id: item.reportedBy.id,
-            fullName: item.reportedBy.fullName,
-            username: item.reportedBy.username,
-            email: item.reportedBy.email,
-            phone: item.reportedBy.phone,
-          }
+          id: item.reportedBy.id,
+          fullName: item.reportedBy.fullName,
+          username: item.reportedBy.username,
+          email: item.reportedBy.email,
+          phone: item.reportedBy.phone,
+        }
         : null,
 
       inspection: item.inspection
         ? {
-            id: item.inspection.id,
-            deviceId: item.inspection.deviceId,
-            technicianId: item.inspection.technicianId,
-            inspectionStatus: item.inspection.inspectionStatus,
-            issueReason: item.inspection.issueReason,
-            notes: item.inspection.notes,
-            latitude: item.inspection.latitude,
-            longitude: item.inspection.longitude,
-            locationText: item.inspection.locationText,
-            inspectedAt: item.inspection.inspectedAt,
-            device: item.inspection.device
-              ? {
-                  id: item.inspection.device.id,
-                  deviceCode: item.inspection.device.deviceCode,
-                  deviceName: item.inspection.device.deviceName,
-                  barcode: item.inspection.device.barcode,
-                  serialNumber: item.inspection.device.serialNumber,
-                  ipAddress: item.inspection.device.ipAddress,
-                  currentStatus: item.inspection.device.currentStatus,
-                  deviceType: item.inspection.device.deviceType,
-                  location: item.inspection.device.location,
-                }
-              : null,
-            technician: item.inspection.technician,
-          }
+          id: item.inspection.id,
+          deviceId: item.inspection.deviceId,
+          technicianId: item.inspection.technicianId,
+          inspectionStatus: item.inspection.inspectionStatus,
+          issueReason: item.inspection.issueReason,
+          notes: item.inspection.notes,
+          latitude: item.inspection.latitude,
+          longitude: item.inspection.longitude,
+          locationText: item.inspection.locationText,
+          inspectedAt: item.inspection.inspectedAt,
+          device: item.inspection.device
+            ? {
+              id: item.inspection.device.id,
+              deviceCode: item.inspection.device.deviceCode,
+              deviceName: item.inspection.device.deviceName,
+              barcode: item.inspection.device.barcode,
+              serialNumber: item.inspection.device.serialNumber,
+              ipAddress: item.inspection.device.ipAddress,
+              currentStatus: item.inspection.device.currentStatus,
+              deviceType: item.inspection.device.deviceType,
+              location: item.inspection.device.location,
+            }
+            : null,
+          technician: item.inspection.technician,
+        }
         : null,
 
       actions: Array.isArray(item.actions)
         ? item.actions.map((action: any) => ({
-            id: action.id,
-            inspectionId: action.inspectionId,
-            inspectionIssueId: action.inspectionIssueId,
-            solutionId: action.solutionId,
-            technicianId: action.technicianId,
-            status: action.status,
-            note: action.note,
-            doneAt: action.doneAt,
-            createdAt: action.createdAt,
-            updatedAt: action.updatedAt,
-            solution: action.solution ? this.mapSolution(action.solution) : null,
-            technician: action.technician,
-          }))
+          id: action.id,
+          inspectionId: action.inspectionId,
+          inspectionIssueId: action.inspectionIssueId,
+          solutionId: action.solutionId,
+          technicianId: action.technicianId,
+          status: action.status,
+          note: action.note,
+          doneAt: action.doneAt,
+          createdAt: action.createdAt,
+          updatedAt: action.updatedAt,
+          solution: action.solution ? this.mapSolution(action.solution) : null,
+          technician: action.technician,
+        }))
         : [],
     };
   }
@@ -1089,14 +1089,16 @@ export class IssuesService {
     searchValue?: string,
     limitValue?: number,
   ) {
-    const search = String(searchValue ?? '').trim();
+    const search = String(searchValue ?? '')
+      .trim()
+      .replace(/\s+/g, ' ');
+
     const limit = Math.min(
       5000,
       Math.max(1, Number(limitValue) || 1000),
     );
 
-    const groupedLocations = await this.prisma.location.groupBy({
-      by: ['building'],
+    const locations = await this.prisma.location.findMany({
       where: search
         ? {
             building: {
@@ -1105,28 +1107,83 @@ export class IssuesService {
             },
           }
         : undefined,
-      _count: {
-        _all: true,
+      select: {
+        building: true,
+        zone: true,
       },
-      orderBy: {
-        building: 'asc',
-      },
-      take: limit,
+      orderBy: [
+        {
+          building: 'asc',
+        },
+        {
+          zone: 'asc',
+        },
+      ],
     });
 
-    const items = groupedLocations
-      .map((location) => {
-        const building = String(location.building ?? '')
-          .trim()
-          .replace(/\s+/g, ' ');
+    const buildingsMap = new Map<
+      string,
+      {
+        name: string;
+        building: string;
+        locationCount: number;
+        zones: Set<string>;
+      }
+    >();
 
-        return {
-          name: building,
-          building,
-          locationCount: location._count._all,
-        };
-      })
-      .filter((item) => item.building);
+    for (const location of locations) {
+      const building = String(location.building ?? '')
+        .trim()
+        .replace(/\s+/g, ' ');
+
+      const zone = String(location.zone ?? '')
+        .trim()
+        .replace(/\s+/g, ' ');
+
+      if (!building) {
+        continue;
+      }
+
+      // استخدام مفتاح موحّد يمنع تكرار نفس المبنى بسبب اختلاف المسافات
+      // أو اختلاف شكل الأحرف الإنجليزية.
+      const buildingKey = building.toLocaleLowerCase();
+
+      const current = buildingsMap.get(buildingKey) ?? {
+        name: building,
+        building,
+        locationCount: 0,
+        zones: new Set<string>(),
+      };
+
+      current.locationCount += 1;
+
+      if (zone) {
+        current.zones.add(zone);
+      }
+
+      buildingsMap.set(buildingKey, current);
+    }
+
+    const items = Array.from(buildingsMap.values())
+      .map((item) => ({
+        name: item.name,
+        building: item.building,
+        locationCount: item.locationCount,
+        zoneCount: item.zones.size,
+        zones: Array.from(item.zones).sort((firstZone, secondZone) =>
+          firstZone.localeCompare(secondZone, undefined, {
+            numeric: true,
+            sensitivity: 'base',
+          }),
+        ),
+      }))
+      .sort((firstBuilding, secondBuilding) =>
+        firstBuilding.name.localeCompare(secondBuilding.name, undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        }),
+      )
+      .slice(0, limit);
 
     return {
       items,
@@ -1568,10 +1625,10 @@ export class IssuesService {
     const source = dto as any;
     const assignedToId = Number(
       source.assignedToId ??
-        source.technicianId ??
-        source.createdById ??
-        existing.assignedToId ??
-        existing.createdById,
+      source.technicianId ??
+      source.createdById ??
+      existing.assignedToId ??
+      existing.createdById,
     );
 
     if (!assignedToId || Number.isNaN(assignedToId)) {
@@ -1646,9 +1703,9 @@ export class IssuesService {
 
     const resolvedById = Number(
       source.resolvedById ??
-        source.createdById ??
-        existing.assignedToId ??
-        existing.createdById,
+      source.createdById ??
+      existing.assignedToId ??
+      existing.createdById,
     );
 
     if (!resolvedById || Number.isNaN(resolvedById)) {
