@@ -1,0 +1,2498 @@
+[
+  {
+    "id": 1706,
+    "deviceCode": "FULLQR-2-1-10254202142-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.142",
+    "serialNumber": "FULLQR-SN-2-1-10254202142-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E353-F598-EB47-BE92"
+  },
+  {
+    "id": 1707,
+    "deviceCode": "FULLQR-3-2-10254202143-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.143",
+    "serialNumber": "FULLQR-SN-3-2-10254202143-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-12E1-F305-2D10-ED1A"
+  },
+  {
+    "id": 1708,
+    "deviceCode": "FULLQR-4-3-10254202144-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.144",
+    "serialNumber": "FULLQR-SN-4-3-10254202144-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-AACE-9320-B098-4F25"
+  },
+  {
+    "id": 1709,
+    "deviceCode": "FULLQR-5-4-10254202145-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.145",
+    "serialNumber": "FULLQR-SN-5-4-10254202145-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-EF2A-8D50-E210-1575"
+  },
+  {
+    "id": 1710,
+    "deviceCode": "FULLQR-6-5-10254202146-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.146",
+    "serialNumber": "FULLQR-SN-6-5-10254202146-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-245D-7361-EF75-4EAA"
+  },
+  {
+    "id": 1711,
+    "deviceCode": "FULLQR-7-6-10254202147-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.147",
+    "serialNumber": "FULLQR-SN-7-6-10254202147-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7761-3B6F-DE21-034B"
+  },
+  {
+    "id": 1712,
+    "deviceCode": "FULLQR-8-7-10254202148-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.148",
+    "serialNumber": "FULLQR-SN-8-7-10254202148-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-05A6-FD36-375B-E957"
+  },
+  {
+    "id": 1713,
+    "deviceCode": "FULLQR-9-8-10254202149-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.149",
+    "serialNumber": "FULLQR-SN-9-8-10254202149-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-621D-A8CE-195F-391B"
+  },
+  {
+    "id": 1714,
+    "deviceCode": "FULLQR-10-9-10254202158-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.158",
+    "serialNumber": "FULLQR-SN-10-9-10254202158-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-69D0-8153-1A5C-5C8D"
+  },
+  {
+    "id": 1715,
+    "deviceCode": "FULLQR-11-10-10254202159-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.159",
+    "serialNumber": "FULLQR-SN-11-10-10254202159-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-040A-0EAD-8D9E-B128"
+  },
+  {
+    "id": 1716,
+    "deviceCode": "FULLQR-12-11-10254202160-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.160",
+    "serialNumber": "FULLQR-SN-12-11-10254202160-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9290-B69E-1049-4A91"
+  },
+  {
+    "id": 1717,
+    "deviceCode": "FULLQR-13-12-10254202161-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.161",
+    "serialNumber": "FULLQR-SN-13-12-10254202161-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5D51-E90C-C86F-9A12"
+  },
+  {
+    "id": 1718,
+    "deviceCode": "FULLQR-14-13-10254202162-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.162",
+    "serialNumber": "FULLQR-SN-14-13-10254202162-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C1DA-1D8A-2F80-F70E"
+  },
+  {
+    "id": 1719,
+    "deviceCode": "FULLQR-15-14-10254202163-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.163",
+    "serialNumber": "FULLQR-SN-15-14-10254202163-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BE67-0559-12BB-D9F7"
+  },
+  {
+    "id": 1720,
+    "deviceCode": "FULLQR-16-15-10254202164-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.164",
+    "serialNumber": "FULLQR-SN-16-15-10254202164-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-21C4-625D-95CB-456B"
+  },
+  {
+    "id": 1721,
+    "deviceCode": "FULLQR-17-16-10254202165-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.165",
+    "serialNumber": "FULLQR-SN-17-16-10254202165-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-85FC-92C3-1C37-7B58"
+  },
+  {
+    "id": 1722,
+    "deviceCode": "FULLQR-18-17-10254202150-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.150",
+    "serialNumber": "FULLQR-SN-18-17-10254202150-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3346-0439-9F65-44D2"
+  },
+  {
+    "id": 1723,
+    "deviceCode": "FULLQR-19-18-10254202151-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.151",
+    "serialNumber": "FULLQR-SN-19-18-10254202151-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3154-39F0-EE59-D7C9"
+  },
+  {
+    "id": 1724,
+    "deviceCode": "FULLQR-20-19-10254202152-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.152",
+    "serialNumber": "FULLQR-SN-20-19-10254202152-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E0E1-2507-1A9B-16D4"
+  },
+  {
+    "id": 1725,
+    "deviceCode": "FULLQR-21-20-10254202153-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.153",
+    "serialNumber": "FULLQR-SN-21-20-10254202153-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-EEF3-E121-CBFF-DAEF"
+  },
+  {
+    "id": 1726,
+    "deviceCode": "FULLQR-22-21-10254202154-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.154",
+    "serialNumber": "FULLQR-SN-22-21-10254202154-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E9FD-A557-1591-5CE6"
+  },
+  {
+    "id": 1727,
+    "deviceCode": "FULLQR-23-22-10254202155-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.155",
+    "serialNumber": "FULLQR-SN-23-22-10254202155-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E1DE-8D48-09F2-1160"
+  },
+  {
+    "id": 1728,
+    "deviceCode": "FULLQR-24-23-10254202156-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.156",
+    "serialNumber": "FULLQR-SN-24-23-10254202156-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B472-CEFE-3D6C-53D5"
+  },
+  {
+    "id": 1729,
+    "deviceCode": "FULLQR-25-24-10254202157-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.157",
+    "serialNumber": "FULLQR-SN-25-24-10254202157-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F930-D66C-7A2C-4E42"
+  },
+  {
+    "id": 1730,
+    "deviceCode": "FULLQR-26-25-10254202134-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.134",
+    "serialNumber": "FULLQR-SN-26-25-10254202134-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FCBA-8FDD-91C4-07A0"
+  },
+  {
+    "id": 1731,
+    "deviceCode": "FULLQR-27-26-10254202135-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.135",
+    "serialNumber": "FULLQR-SN-27-26-10254202135-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9964-708A-84D5-2400"
+  },
+  {
+    "id": 1732,
+    "deviceCode": "FULLQR-28-27-10254202136-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.136",
+    "serialNumber": "FULLQR-SN-28-27-10254202136-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-CFF2-1FBC-F9BD-F030"
+  },
+  {
+    "id": 1733,
+    "deviceCode": "FULLQR-29-28-10254202137-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.137",
+    "serialNumber": "FULLQR-SN-29-28-10254202137-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D360-644C-0D95-3EE7"
+  },
+  {
+    "id": 1734,
+    "deviceCode": "FULLQR-30-29-10254202138-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.138",
+    "serialNumber": "FULLQR-SN-30-29-10254202138-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9907-C6E3-E034-6A35"
+  },
+  {
+    "id": 1735,
+    "deviceCode": "FULLQR-31-30-10254202139-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.139",
+    "serialNumber": "FULLQR-SN-31-30-10254202139-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5F3B-C9D1-D591-5C99"
+  },
+  {
+    "id": 1736,
+    "deviceCode": "FULLQR-32-31-10254202140-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.140",
+    "serialNumber": "FULLQR-SN-32-31-10254202140-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D50C-2B8C-29E3-13BA"
+  },
+  {
+    "id": 1737,
+    "deviceCode": "FULLQR-33-32-10254202141-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.141",
+    "serialNumber": "FULLQR-SN-33-32-10254202141-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-128C-B9CE-DC88-9C44"
+  },
+  {
+    "id": 1738,
+    "deviceCode": "FULLQR-34-33-1025420656-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.56",
+    "serialNumber": "FULLQR-SN-34-33-1025420656-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6395-4A93-E219-C30C"
+  },
+  {
+    "id": 1739,
+    "deviceCode": "FULLQR-35-34-1025420653-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.53",
+    "serialNumber": "FULLQR-SN-35-34-1025420653-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-DE06-488E-1599-6105"
+  },
+  {
+    "id": 1740,
+    "deviceCode": "FULLQR-36-35-1025420648-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.48",
+    "serialNumber": "FULLQR-SN-36-35-1025420648-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-1498-83C3-2E9B-468C"
+  },
+  {
+    "id": 1741,
+    "deviceCode": "FULLQR-37-36-1025420652-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.52",
+    "serialNumber": "FULLQR-SN-37-36-1025420652-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FE25-6E9E-93D7-4379"
+  },
+  {
+    "id": 1742,
+    "deviceCode": "FULLQR-38-37-1025420654-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.54",
+    "serialNumber": "FULLQR-SN-38-37-1025420654-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7A86-AA09-4737-4A52"
+  },
+  {
+    "id": 1743,
+    "deviceCode": "FULLQR-39-38-1025420657-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.57",
+    "serialNumber": "FULLQR-SN-39-38-1025420657-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-229A-5830-9588-6518"
+  },
+  {
+    "id": 1744,
+    "deviceCode": "FULLQR-40-39-1025420647-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.47",
+    "serialNumber": "FULLQR-SN-40-39-1025420647-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7AB2-4C4E-B89A-A626"
+  },
+  {
+    "id": 1745,
+    "deviceCode": "FULLQR-41-40-1025420254-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.54",
+    "serialNumber": "FULLQR-SN-41-40-1025420254-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-057A-5104-A41C-C282"
+  },
+  {
+    "id": 1746,
+    "deviceCode": "FULLQR-42-41-1025420255-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.55",
+    "serialNumber": "FULLQR-SN-42-41-1025420255-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9B08-5DF5-CE48-2183"
+  },
+  {
+    "id": 1747,
+    "deviceCode": "FULLQR-43-42-1025420256-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.56",
+    "serialNumber": "FULLQR-SN-43-42-1025420256-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F370-C576-D4A4-16C8"
+  },
+  {
+    "id": 1748,
+    "deviceCode": "FULLQR-44-43-1025420257-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.57",
+    "serialNumber": "FULLQR-SN-44-43-1025420257-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-1816-8CFF-62BC-63EB"
+  },
+  {
+    "id": 1749,
+    "deviceCode": "FULLQR-45-44-1025420258-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.58",
+    "serialNumber": "FULLQR-SN-45-44-1025420258-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0910-5942-2F80-3618"
+  },
+  {
+    "id": 1750,
+    "deviceCode": "FULLQR-46-45-1025420259-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.59",
+    "serialNumber": "FULLQR-SN-46-45-1025420259-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7BB2-A80A-D822-F574"
+  },
+  {
+    "id": 1751,
+    "deviceCode": "FULLQR-47-46-1025420260-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.60",
+    "serialNumber": "FULLQR-SN-47-46-1025420260-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7DDC-532E-E624-C313"
+  },
+  {
+    "id": 1752,
+    "deviceCode": "FULLQR-48-47-1025420261-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.202.61",
+    "serialNumber": "FULLQR-SN-48-47-1025420261-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8B1E-7EA5-7EAA-FE2D"
+  },
+  {
+    "id": 1753,
+    "deviceCode": "FULLQR-49-48-10254210199-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.199",
+    "serialNumber": "FULLQR-SN-49-48-10254210199-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5124-8BA1-3FDF-CD67"
+  },
+  {
+    "id": 1754,
+    "deviceCode": "FULLQR-50-49-10254210197-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.197",
+    "serialNumber": "FULLQR-SN-50-49-10254210197-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-1C4B-1264-83D2-1BDC"
+  },
+  {
+    "id": 1755,
+    "deviceCode": "FULLQR-51-50-1025420660-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.60",
+    "serialNumber": "FULLQR-SN-51-50-1025420660-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9EF0-AF15-33E7-C6F7"
+  },
+  {
+    "id": 1756,
+    "deviceCode": "FULLQR-52-51-1025420661-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.61",
+    "serialNumber": "FULLQR-SN-52-51-1025420661-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BED1-1D30-7CEA-CBD9"
+  },
+  {
+    "id": 1757,
+    "deviceCode": "FULLQR-53-52-1025420662-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.62",
+    "serialNumber": "FULLQR-SN-53-52-1025420662-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6A4A-3EF4-D152-1EC2"
+  },
+  {
+    "id": 1758,
+    "deviceCode": "FULLQR-54-53-1025420663-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.63",
+    "serialNumber": "FULLQR-SN-54-53-1025420663-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8282-66B9-DAC5-347A"
+  },
+  {
+    "id": 1759,
+    "deviceCode": "FULLQR-55-54-1025420664-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.64",
+    "serialNumber": "FULLQR-SN-55-54-1025420664-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-1E7F-678A-5C74-6C00"
+  },
+  {
+    "id": 1760,
+    "deviceCode": "FULLQR-56-55-1025420665-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.65",
+    "serialNumber": "FULLQR-SN-56-55-1025420665-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-76A2-7E46-FAA4-D86E"
+  },
+  {
+    "id": 1761,
+    "deviceCode": "FULLQR-57-56-1025420655-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.55",
+    "serialNumber": "FULLQR-SN-57-56-1025420655-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B7C3-A9BE-DA39-6337"
+  },
+  {
+    "id": 1762,
+    "deviceCode": "FULLQR-58-57-1025420646-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.46",
+    "serialNumber": "FULLQR-SN-58-57-1025420646-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-2A5F-3042-192B-B8B9"
+  },
+  {
+    "id": 1763,
+    "deviceCode": "FULLQR-59-58-1025420649-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.49",
+    "serialNumber": "FULLQR-SN-59-58-1025420649-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0AF2-E1E1-8FA2-36AF"
+  },
+  {
+    "id": 1764,
+    "deviceCode": "FULLQR-60-59-1025420651-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.51",
+    "serialNumber": "FULLQR-SN-60-59-1025420651-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0C4B-9ECD-FC02-AC5D"
+  },
+  {
+    "id": 1765,
+    "deviceCode": "FULLQR-61-60-1025420659-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.59",
+    "serialNumber": "FULLQR-SN-61-60-1025420659-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-40C1-10AF-A2F7-467E"
+  },
+  {
+    "id": 1766,
+    "deviceCode": "FULLQR-62-61-1025420658-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.58",
+    "serialNumber": "FULLQR-SN-62-61-1025420658-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B77D-CAD9-223B-2E61"
+  },
+  {
+    "id": 1767,
+    "deviceCode": "FULLQR-63-62-1025420650-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.206.50",
+    "serialNumber": "FULLQR-SN-63-62-1025420650-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B648-D533-A14F-21B1"
+  },
+  {
+    "id": 1768,
+    "deviceCode": "FULLQR-64-63-10254210168-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.168",
+    "serialNumber": "FULLQR-SN-64-63-10254210168-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-95F4-C6DB-B689-07FD"
+  },
+  {
+    "id": 1769,
+    "deviceCode": "FULLQR-65-64-10254210143-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.143",
+    "serialNumber": "FULLQR-SN-65-64-10254210143-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3A4F-5B3C-DCDD-0411"
+  },
+  {
+    "id": 1770,
+    "deviceCode": "FULLQR-66-65-10254210122-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.122",
+    "serialNumber": "FULLQR-SN-66-65-10254210122-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F379-49F3-1525-2BD5"
+  },
+  {
+    "id": 1771,
+    "deviceCode": "FULLQR-67-66-10254210123-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.123",
+    "serialNumber": "FULLQR-SN-67-66-10254210123-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-2EF9-A9CD-27EC-D93D"
+  },
+  {
+    "id": 1772,
+    "deviceCode": "FULLQR-68-67-10254210144-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.144",
+    "serialNumber": "FULLQR-SN-68-67-10254210144-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5F0F-DCF7-12F4-D7CF"
+  },
+  {
+    "id": 1773,
+    "deviceCode": "FULLQR-69-68-10254210147-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.147",
+    "serialNumber": "FULLQR-SN-69-68-10254210147-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BD12-472A-23A1-7FE5"
+  },
+  {
+    "id": 1774,
+    "deviceCode": "FULLQR-70-69-10254210148-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.148",
+    "serialNumber": "FULLQR-SN-70-69-10254210148-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-40AD-B018-3CF0-E41A"
+  },
+  {
+    "id": 1775,
+    "deviceCode": "FULLQR-71-70-10254210149-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.149",
+    "serialNumber": "FULLQR-SN-71-70-10254210149-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F7F9-0723-9BD0-1C55"
+  },
+  {
+    "id": 1776,
+    "deviceCode": "FULLQR-72-71-1025421020-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.20",
+    "serialNumber": "FULLQR-SN-72-71-1025421020-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-59C4-66AA-3B2B-31AC"
+  },
+  {
+    "id": 1777,
+    "deviceCode": "FULLQR-73-72-1025421042-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.42",
+    "serialNumber": "FULLQR-SN-73-72-1025421042-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-05B8-F418-FF55-F80C"
+  },
+  {
+    "id": 1778,
+    "deviceCode": "FULLQR-74-73-1025421050-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.50",
+    "serialNumber": "FULLQR-SN-74-73-1025421050-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-ED27-C427-7BD1-E533"
+  },
+  {
+    "id": 1779,
+    "deviceCode": "FULLQR-75-74-1025421047-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.47",
+    "serialNumber": "FULLQR-SN-75-74-1025421047-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3429-5FA6-F8D3-E139"
+  },
+  {
+    "id": 1780,
+    "deviceCode": "FULLQR-76-75-1025421041-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.41",
+    "serialNumber": "FULLQR-SN-76-75-1025421041-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-44D8-C166-7E83-5F2F"
+  },
+  {
+    "id": 1781,
+    "deviceCode": "FULLQR-77-76-1025421022-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.22",
+    "serialNumber": "FULLQR-SN-77-76-1025421022-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7E07-8F7E-86A7-10FD"
+  },
+  {
+    "id": 1782,
+    "deviceCode": "FULLQR-78-77-1025421049-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.49",
+    "serialNumber": "FULLQR-SN-78-77-1025421049-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FC99-08CE-B952-E79C"
+  },
+  {
+    "id": 1783,
+    "deviceCode": "FULLQR-79-78-1025421016-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.16",
+    "serialNumber": "FULLQR-SN-79-78-1025421016-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-AF1D-8D25-CD63-9994"
+  },
+  {
+    "id": 1784,
+    "deviceCode": "FULLQR-80-79-1025423077-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.77",
+    "serialNumber": "FULLQR-SN-80-79-1025423077-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3780-2047-B23B-DC8C"
+  },
+  {
+    "id": 1785,
+    "deviceCode": "FULLQR-81-80-1025423078-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.78",
+    "serialNumber": "FULLQR-SN-81-80-1025423078-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-2AE4-DCFC-3D61-16C3"
+  },
+  {
+    "id": 1786,
+    "deviceCode": "FULLQR-82-81-1025423079-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.79",
+    "serialNumber": "FULLQR-SN-82-81-1025423079-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BF36-995A-A6D4-5CCD"
+  },
+  {
+    "id": 1787,
+    "deviceCode": "FULLQR-83-82-1025423080-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.80",
+    "serialNumber": "FULLQR-SN-83-82-1025423080-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6980-41ED-B19F-D8BE"
+  },
+  {
+    "id": 1788,
+    "deviceCode": "FULLQR-84-83-1025423081-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.81",
+    "serialNumber": "FULLQR-SN-84-83-1025423081-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-753F-8574-A350-F8AB"
+  },
+  {
+    "id": 1789,
+    "deviceCode": "FULLQR-85-84-1025423082-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.82",
+    "serialNumber": "FULLQR-SN-85-84-1025423082-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A97C-10FB-11A0-7AE4"
+  },
+  {
+    "id": 1790,
+    "deviceCode": "FULLQR-86-85-1025423083-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.83",
+    "serialNumber": "FULLQR-SN-86-85-1025423083-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3C47-059D-892B-3838"
+  },
+  {
+    "id": 1791,
+    "deviceCode": "FULLQR-87-86-1025423084-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.84",
+    "serialNumber": "FULLQR-SN-87-86-1025423084-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5EB0-3620-DE10-E9DF"
+  },
+  {
+    "id": 1792,
+    "deviceCode": "FULLQR-88-87-1025423061-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.61",
+    "serialNumber": "FULLQR-SN-88-87-1025423061-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D555-26F3-2194-B962"
+  },
+  {
+    "id": 1793,
+    "deviceCode": "FULLQR-89-88-1025419331-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.193.31",
+    "serialNumber": "FULLQR-SN-89-88-1025419331-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6C67-FE8E-32A6-95E1"
+  },
+  {
+    "id": 1794,
+    "deviceCode": "FULLQR-90-89-10254210254-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.254",
+    "serialNumber": "FULLQR-SN-90-89-10254210254-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3261-F120-9D1A-5594"
+  },
+  {
+    "id": 1795,
+    "deviceCode": "FULLQR-91-90-10254210253-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.253",
+    "serialNumber": "FULLQR-SN-91-90-10254210253-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B6D5-45D6-7C5E-1BEF"
+  },
+  {
+    "id": 1796,
+    "deviceCode": "FULLQR-92-91-10254210252-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.252",
+    "serialNumber": "FULLQR-SN-92-91-10254210252-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6C19-B2B5-945E-311E"
+  },
+  {
+    "id": 1797,
+    "deviceCode": "FULLQR-93-92-10254210251-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.251",
+    "serialNumber": "FULLQR-SN-93-92-10254210251-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-CB92-3A93-91EA-6F88"
+  },
+  {
+    "id": 1798,
+    "deviceCode": "FULLQR-94-93-10254210250-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.250",
+    "serialNumber": "FULLQR-SN-94-93-10254210250-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8397-AF35-1328-C063"
+  },
+  {
+    "id": 1799,
+    "deviceCode": "FULLQR-95-94-10254210249-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.249",
+    "serialNumber": "FULLQR-SN-95-94-10254210249-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9927-2810-A909-DC27"
+  },
+  {
+    "id": 1800,
+    "deviceCode": "FULLQR-96-95-10254210248-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.248",
+    "serialNumber": "FULLQR-SN-96-95-10254210248-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-18B6-5AC8-4E73-8FE0"
+  },
+  {
+    "id": 1801,
+    "deviceCode": "FULLQR-97-96-10254210247-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.247",
+    "serialNumber": "FULLQR-SN-97-96-10254210247-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-78C6-0508-BB58-6CBB"
+  },
+  {
+    "id": 1802,
+    "deviceCode": "FULLQR-98-97-10254210128-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.128",
+    "serialNumber": "FULLQR-SN-98-97-10254210128-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A1BA-5EDC-2FC3-8F13"
+  },
+  {
+    "id": 1803,
+    "deviceCode": "FULLQR-99-98-10254210129-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.129",
+    "serialNumber": "FULLQR-SN-99-98-10254210129-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-68B2-F841-F966-9CA1"
+  },
+  {
+    "id": 1804,
+    "deviceCode": "FULLQR-100-99-10254210150-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.150",
+    "serialNumber": "FULLQR-SN-100-99-10254210150-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-EE45-5A33-55DD-D719"
+  },
+  {
+    "id": 1805,
+    "deviceCode": "FULLQR-101-100-10254210151-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.151",
+    "serialNumber": "FULLQR-SN-101-100-10254210151-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C1ED-B018-EE83-E98A"
+  },
+  {
+    "id": 1806,
+    "deviceCode": "FULLQR-102-101-10254210132-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.132",
+    "serialNumber": "FULLQR-SN-102-101-10254210132-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FA61-5D4D-6DD1-0794"
+  },
+  {
+    "id": 1807,
+    "deviceCode": "FULLQR-103-102-10254210152-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.152",
+    "serialNumber": "FULLQR-SN-103-102-10254210152-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-DC83-4171-31D2-E583"
+  },
+  {
+    "id": 1808,
+    "deviceCode": "FULLQR-104-103-10254210-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.",
+    "serialNumber": "FULLQR-SN-104-103-10254210-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8426-4FF4-E5F7-AD50"
+  },
+  {
+    "id": 1809,
+    "deviceCode": "FULLQR-105-104-10254210135-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.135",
+    "serialNumber": "FULLQR-SN-105-104-10254210135-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-EB1D-EEA7-EDDD-EF5C"
+  },
+  {
+    "id": 1810,
+    "deviceCode": "FULLQR-106-105-10254230170-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.170",
+    "serialNumber": "FULLQR-SN-106-105-10254230170-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-37CE-648D-A201-8B8D"
+  },
+  {
+    "id": 1811,
+    "deviceCode": "FULLQR-107-106-10254230171-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.171",
+    "serialNumber": "FULLQR-SN-107-106-10254230171-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C7E3-DE47-2F63-0562"
+  },
+  {
+    "id": 1812,
+    "deviceCode": "FULLQR-108-107-10254230172-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.172",
+    "serialNumber": "FULLQR-SN-108-107-10254230172-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C798-8EF7-B2F3-BEC1"
+  },
+  {
+    "id": 1813,
+    "deviceCode": "FULLQR-109-108-10254230173-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.173",
+    "serialNumber": "FULLQR-SN-109-108-10254230173-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0E5F-AA34-98C6-6D24"
+  },
+  {
+    "id": 1814,
+    "deviceCode": "FULLQR-110-109-10254230174-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.174",
+    "serialNumber": "FULLQR-SN-110-109-10254230174-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-295A-9B6A-F159-B4DD"
+  },
+  {
+    "id": 1815,
+    "deviceCode": "FULLQR-111-110-10254230175-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.175",
+    "serialNumber": "FULLQR-SN-111-110-10254230175-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C667-5017-8983-53B5"
+  },
+  {
+    "id": 1816,
+    "deviceCode": "FULLQR-112-111-10254230176-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.176",
+    "serialNumber": "FULLQR-SN-112-111-10254230176-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8D50-F91D-4DF5-4AB4"
+  },
+  {
+    "id": 1817,
+    "deviceCode": "FULLQR-113-112-10254230177-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.177",
+    "serialNumber": "FULLQR-SN-113-112-10254230177-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0B88-C611-CBE4-D4A8"
+  },
+  {
+    "id": 1818,
+    "deviceCode": "FULLQR-114-113-10254230178-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.178",
+    "serialNumber": "FULLQR-SN-114-113-10254230178-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-194B-5082-AF45-35CB"
+  },
+  {
+    "id": 1819,
+    "deviceCode": "FULLQR-115-114-10254230179-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.179",
+    "serialNumber": "FULLQR-SN-115-114-10254230179-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-1D7F-7F0E-3C14-F1C9"
+  },
+  {
+    "id": 1820,
+    "deviceCode": "FULLQR-116-115-10254230180-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.180",
+    "serialNumber": "FULLQR-SN-116-115-10254230180-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D1F3-3FBB-2A04-CF2B"
+  },
+  {
+    "id": 1821,
+    "deviceCode": "FULLQR-117-116-10254230181-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.181",
+    "serialNumber": "FULLQR-SN-117-116-10254230181-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C1BC-2338-F1E9-5535"
+  },
+  {
+    "id": 1822,
+    "deviceCode": "FULLQR-118-117-10254230182-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.182",
+    "serialNumber": "FULLQR-SN-118-117-10254230182-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-076D-DD8A-3B1B-9A05"
+  },
+  {
+    "id": 1823,
+    "deviceCode": "FULLQR-119-118-10254230183-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.183",
+    "serialNumber": "FULLQR-SN-119-118-10254230183-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F0A9-9A7D-2627-EB0D"
+  },
+  {
+    "id": 1824,
+    "deviceCode": "FULLQR-120-119-10254230184-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.184",
+    "serialNumber": "FULLQR-SN-120-119-10254230184-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-701A-AEEA-CDBC-E3AB"
+  },
+  {
+    "id": 1825,
+    "deviceCode": "FULLQR-121-120-10254230185-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.185",
+    "serialNumber": "FULLQR-SN-121-120-10254230185-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-AA7D-7715-CE19-D090"
+  },
+  {
+    "id": 1826,
+    "deviceCode": "FULLQR-122-121-10254230115-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.115",
+    "serialNumber": "FULLQR-SN-122-121-10254230115-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-2DF4-F0B6-A127-BB93"
+  },
+  {
+    "id": 1827,
+    "deviceCode": "FULLQR-123-122-10254230116-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.116",
+    "serialNumber": "FULLQR-SN-123-122-10254230116-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6F2B-5545-24E0-5E9D"
+  },
+  {
+    "id": 1828,
+    "deviceCode": "FULLQR-124-123-10254230117-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.117",
+    "serialNumber": "FULLQR-SN-124-123-10254230117-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5F98-412C-EE73-6EDF"
+  },
+  {
+    "id": 1829,
+    "deviceCode": "FULLQR-125-124-10254230118-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.118",
+    "serialNumber": "FULLQR-SN-125-124-10254230118-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5AF4-F2C8-C809-5747"
+  },
+  {
+    "id": 1830,
+    "deviceCode": "FULLQR-126-125-10254230119-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.119",
+    "serialNumber": "FULLQR-SN-126-125-10254230119-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-1A17-7FD9-9206-716F"
+  },
+  {
+    "id": 1831,
+    "deviceCode": "FULLQR-127-126-10254230120-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.120",
+    "serialNumber": "FULLQR-SN-127-126-10254230120-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FDE2-3109-4D88-7327"
+  },
+  {
+    "id": 1832,
+    "deviceCode": "FULLQR-128-127-10254230121-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.121",
+    "serialNumber": "FULLQR-SN-128-127-10254230121-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-52E9-EB21-654D-7335"
+  },
+  {
+    "id": 1833,
+    "deviceCode": "FULLQR-129-128-10254230122-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.122",
+    "serialNumber": "FULLQR-SN-129-128-10254230122-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C944-209D-7FB1-55BB"
+  },
+  {
+    "id": 1834,
+    "deviceCode": "FULLQR-130-129-10254230154-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.154",
+    "serialNumber": "FULLQR-SN-130-129-10254230154-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C5F9-A82B-4FAA-1912"
+  },
+  {
+    "id": 1835,
+    "deviceCode": "FULLQR-131-130-10254230155-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.155",
+    "serialNumber": "FULLQR-SN-131-130-10254230155-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8DD1-F7FB-2DA7-A341"
+  },
+  {
+    "id": 1836,
+    "deviceCode": "FULLQR-132-131-10254230156-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.156",
+    "serialNumber": "FULLQR-SN-132-131-10254230156-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FD4B-A08B-031D-3703"
+  },
+  {
+    "id": 1837,
+    "deviceCode": "FULLQR-133-132-10254230157-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.157",
+    "serialNumber": "FULLQR-SN-133-132-10254230157-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-954B-38AB-0CF7-CF46"
+  },
+  {
+    "id": 1838,
+    "deviceCode": "FULLQR-134-133-10254230158-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.158",
+    "serialNumber": "FULLQR-SN-134-133-10254230158-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C151-8704-D55C-B3F1"
+  },
+  {
+    "id": 1839,
+    "deviceCode": "FULLQR-135-134-10254230159-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.159",
+    "serialNumber": "FULLQR-SN-135-134-10254230159-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0E6F-E920-A6AA-B4F2"
+  },
+  {
+    "id": 1840,
+    "deviceCode": "FULLQR-136-135-10254230160-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.160",
+    "serialNumber": "FULLQR-SN-136-135-10254230160-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A5C8-D274-7756-B7D9"
+  },
+  {
+    "id": 1841,
+    "deviceCode": "FULLQR-137-136-10254230161-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.161",
+    "serialNumber": "FULLQR-SN-137-136-10254230161-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8814-ABB2-1BD7-635A"
+  },
+  {
+    "id": 1842,
+    "deviceCode": "FULLQR-138-137-10254230162-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.162",
+    "serialNumber": "FULLQR-SN-138-137-10254230162-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-05C6-8B55-ABE8-46E4"
+  },
+  {
+    "id": 1843,
+    "deviceCode": "FULLQR-139-138-10254230165-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.165",
+    "serialNumber": "FULLQR-SN-139-138-10254230165-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0F99-F789-B9BD-493E"
+  },
+  {
+    "id": 1844,
+    "deviceCode": "FULLQR-140-139-1025423029-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.29",
+    "serialNumber": "FULLQR-SN-140-139-1025423029-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-44D0-279E-979E-B837"
+  },
+  {
+    "id": 1845,
+    "deviceCode": "FULLQR-141-140-1025423030-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.30",
+    "serialNumber": "FULLQR-SN-141-140-1025423030-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0C80-D748-2AF0-C609"
+  },
+  {
+    "id": 1846,
+    "deviceCode": "FULLQR-142-141-1025423031-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.31",
+    "serialNumber": "FULLQR-SN-142-141-1025423031-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FF28-CB2E-ED4C-7C63"
+  },
+  {
+    "id": 1847,
+    "deviceCode": "FULLQR-143-142-1025423032-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.32",
+    "serialNumber": "FULLQR-SN-143-142-1025423032-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A819-99E8-A751-5051"
+  },
+  {
+    "id": 1848,
+    "deviceCode": "FULLQR-144-143-1025423033-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.33",
+    "serialNumber": "FULLQR-SN-144-143-1025423033-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A110-39C5-ACAA-F5E5"
+  },
+  {
+    "id": 1849,
+    "deviceCode": "FULLQR-145-144-1025423034-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.34",
+    "serialNumber": "FULLQR-SN-145-144-1025423034-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-CC7F-C044-1720-2BF0"
+  },
+  {
+    "id": 1850,
+    "deviceCode": "FULLQR-146-145-1025423035-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.35",
+    "serialNumber": "FULLQR-SN-146-145-1025423035-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9F7F-5148-F6E1-B336"
+  },
+  {
+    "id": 1851,
+    "deviceCode": "FULLQR-147-146-1025423036-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.230.36",
+    "serialNumber": "FULLQR-SN-147-146-1025423036-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A7C8-49CC-8E10-5F23"
+  },
+  {
+    "id": 1852,
+    "deviceCode": "FULLQR-148-147-10254198136-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.198.136",
+    "serialNumber": "FULLQR-SN-148-147-10254198136-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E586-60B6-5FA2-13A5"
+  },
+  {
+    "id": 1853,
+    "deviceCode": "FULLQR-149-148-10254198107-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.198.107",
+    "serialNumber": "FULLQR-SN-149-148-10254198107-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BC97-9B3C-3CB5-54BD"
+  },
+  {
+    "id": 1854,
+    "deviceCode": "FULLQR-150-149-10254198109-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.198.109",
+    "serialNumber": "FULLQR-SN-150-149-10254198109-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F9C7-C430-121F-12AD"
+  },
+  {
+    "id": 1855,
+    "deviceCode": "FULLQR-151-150-10254198111-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.198.111",
+    "serialNumber": "FULLQR-SN-151-150-10254198111-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-85A1-8071-F074-2FD9"
+  },
+  {
+    "id": 1856,
+    "deviceCode": "FULLQR-152-151-10254198113-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.198.113",
+    "serialNumber": "FULLQR-SN-152-151-10254198113-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BC98-361A-4494-1D59"
+  },
+  {
+    "id": 1857,
+    "deviceCode": "FULLQR-153-152-10254198115-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.198.115",
+    "serialNumber": "FULLQR-SN-153-152-10254198115-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-452A-8B5D-F297-EDF2"
+  },
+  {
+    "id": 1858,
+    "deviceCode": "FULLQR-154-153-10254198117-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.198.117",
+    "serialNumber": "FULLQR-SN-154-153-10254198117-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C33B-3E3A-CDA5-1D23"
+  },
+  {
+    "id": 1859,
+    "deviceCode": "FULLQR-155-154-10254198119-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.198.119",
+    "serialNumber": "FULLQR-SN-155-154-10254198119-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0B2D-A5E2-6114-CB95"
+  },
+  {
+    "id": 1860,
+    "deviceCode": "FULLQR-156-155-10254234104-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.234.104",
+    "serialNumber": "FULLQR-SN-156-155-10254234104-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BB1D-F736-F74D-1E72"
+  },
+  {
+    "id": 1861,
+    "deviceCode": "FULLQR-157-156-10254234105-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.234.105",
+    "serialNumber": "FULLQR-SN-157-156-10254234105-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0B46-3515-E715-E456"
+  },
+  {
+    "id": 1862,
+    "deviceCode": "FULLQR-158-157-10254234106-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.234.106",
+    "serialNumber": "FULLQR-SN-158-157-10254234106-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E4A4-D14B-43A6-9284"
+  },
+  {
+    "id": 1863,
+    "deviceCode": "FULLQR-159-158-10254234103-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.234.103",
+    "serialNumber": "FULLQR-SN-159-158-10254234103-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8074-B376-B53A-8D90"
+  },
+  {
+    "id": 1864,
+    "deviceCode": "FULLQR-160-159-10254210207-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.207",
+    "serialNumber": "FULLQR-SN-160-159-10254210207-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D73C-8093-7FA5-89DA"
+  },
+  {
+    "id": 1865,
+    "deviceCode": "FULLQR-161-160-10254210206-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.206",
+    "serialNumber": "FULLQR-SN-161-160-10254210206-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B74C-8361-4947-FFCA"
+  },
+  {
+    "id": 1866,
+    "deviceCode": "FULLQR-162-161-10254210205-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.205",
+    "serialNumber": "FULLQR-SN-162-161-10254210205-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5A64-5124-0845-2685"
+  },
+  {
+    "id": 1867,
+    "deviceCode": "FULLQR-163-162-10254210204-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.204",
+    "serialNumber": "FULLQR-SN-163-162-10254210204-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6654-716F-3CAA-449D"
+  },
+  {
+    "id": 1868,
+    "deviceCode": "FULLQR-164-163-10254210203-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.203",
+    "serialNumber": "FULLQR-SN-164-163-10254210203-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-043C-AEB0-ED63-35A5"
+  },
+  {
+    "id": 1869,
+    "deviceCode": "FULLQR-165-164-10254210202-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.202",
+    "serialNumber": "FULLQR-SN-165-164-10254210202-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-80FE-3769-ED94-5614"
+  },
+  {
+    "id": 1870,
+    "deviceCode": "FULLQR-166-165-1025421085-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.85",
+    "serialNumber": "FULLQR-SN-166-165-1025421085-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9E20-27C8-25D2-89E1"
+  },
+  {
+    "id": 1871,
+    "deviceCode": "FULLQR-167-166-1025421084-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.84",
+    "serialNumber": "FULLQR-SN-167-166-1025421084-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7A0F-7F8E-4996-035C"
+  },
+  {
+    "id": 1872,
+    "deviceCode": "FULLQR-168-167-1025421076-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.210.76",
+    "serialNumber": "FULLQR-SN-168-167-1025421076-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D80D-D88E-3AC3-167E"
+  },
+  {
+    "id": 1873,
+    "deviceCode": "FULLQR-169-168-10254222100-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.100",
+    "serialNumber": "FULLQR-SN-169-168-10254222100-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D53E-D461-2B2C-62D6"
+  },
+  {
+    "id": 1874,
+    "deviceCode": "FULLQR-170-169-1025422219-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.19",
+    "serialNumber": "FULLQR-SN-170-169-1025422219-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-AE74-AFE8-F677-6252"
+  },
+  {
+    "id": 1875,
+    "deviceCode": "FULLQR-171-170-1025422220-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.20",
+    "serialNumber": "FULLQR-SN-171-170-1025422220-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-DCD2-A467-368A-4D48"
+  },
+  {
+    "id": 1876,
+    "deviceCode": "FULLQR-172-171-1025422221-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.21",
+    "serialNumber": "FULLQR-SN-172-171-1025422221-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A392-DB3D-E6E3-F8DC"
+  },
+  {
+    "id": 1877,
+    "deviceCode": "FULLQR-173-172-1025422222-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.22",
+    "serialNumber": "FULLQR-SN-173-172-1025422222-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8BBA-2A3D-932B-57BE"
+  },
+  {
+    "id": 1878,
+    "deviceCode": "FULLQR-174-173-1025422223-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.23",
+    "serialNumber": "FULLQR-SN-174-173-1025422223-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5A1C-4FC4-CA5F-0CF6"
+  },
+  {
+    "id": 1879,
+    "deviceCode": "FULLQR-175-174-1025422224-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.24",
+    "serialNumber": "FULLQR-SN-175-174-1025422224-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A769-31F7-079F-CA8D"
+  },
+  {
+    "id": 1880,
+    "deviceCode": "FULLQR-176-175-1025422225-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.25",
+    "serialNumber": "FULLQR-SN-176-175-1025422225-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-EAD9-061A-EB1D-BD08"
+  },
+  {
+    "id": 1881,
+    "deviceCode": "FULLQR-177-176-1025422226-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.26",
+    "serialNumber": "FULLQR-SN-177-176-1025422226-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-620B-6C20-93DD-A02A"
+  },
+  {
+    "id": 1882,
+    "deviceCode": "FULLQR-178-177-1025422253-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.53",
+    "serialNumber": "FULLQR-SN-178-177-1025422253-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-20D3-8635-857E-F1D1"
+  },
+  {
+    "id": 1883,
+    "deviceCode": "FULLQR-179-178-1025422259-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.59",
+    "serialNumber": "FULLQR-SN-179-178-1025422259-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-32F8-7D6E-6856-2827"
+  },
+  {
+    "id": 1884,
+    "deviceCode": "FULLQR-180-179-1025422261-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.61",
+    "serialNumber": "FULLQR-SN-180-179-1025422261-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-55F6-BA08-A12E-55A0"
+  },
+  {
+    "id": 1885,
+    "deviceCode": "FULLQR-181-180-1025422263-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.63",
+    "serialNumber": "FULLQR-SN-181-180-1025422263-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-127A-3C22-A441-C234"
+  },
+  {
+    "id": 1886,
+    "deviceCode": "FULLQR-182-181-1025422265-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.65",
+    "serialNumber": "FULLQR-SN-182-181-1025422265-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B4DF-208C-680A-EBB0"
+  },
+  {
+    "id": 1887,
+    "deviceCode": "FULLQR-183-182-1025422267-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.67",
+    "serialNumber": "FULLQR-SN-183-182-1025422267-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-2B9A-7BBB-059F-BFF5"
+  },
+  {
+    "id": 1888,
+    "deviceCode": "FULLQR-184-183-1025422269-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.69",
+    "serialNumber": "FULLQR-SN-184-183-1025422269-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3A9D-CF5C-7030-CEBB"
+  },
+  {
+    "id": 1889,
+    "deviceCode": "FULLQR-185-184-1025422271-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.71",
+    "serialNumber": "FULLQR-SN-185-184-1025422271-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-824A-5F02-F462-D341"
+  },
+  {
+    "id": 1890,
+    "deviceCode": "FULLQR-186-185-1025422273-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.73",
+    "serialNumber": "FULLQR-SN-186-185-1025422273-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B1F3-DEDE-03C8-50D7"
+  },
+  {
+    "id": 1891,
+    "deviceCode": "FULLQR-187-186-1025422275-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.75",
+    "serialNumber": "FULLQR-SN-187-186-1025422275-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-4404-93C8-FD9B-382F"
+  },
+  {
+    "id": 1892,
+    "deviceCode": "FULLQR-188-187-1025422277-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.77",
+    "serialNumber": "FULLQR-SN-188-187-1025422277-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-64B8-0085-506F-6076"
+  },
+  {
+    "id": 1893,
+    "deviceCode": "FULLQR-189-188-10254222-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.",
+    "serialNumber": "FULLQR-SN-189-188-10254222-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F703-A179-4BCA-088C"
+  },
+  {
+    "id": 1894,
+    "deviceCode": "FULLQR-190-189-1025422281-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.81",
+    "serialNumber": "FULLQR-SN-190-189-1025422281-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-22AC-B451-EDFF-1AF1"
+  },
+  {
+    "id": 1895,
+    "deviceCode": "FULLQR-191-190-1025422283-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.83",
+    "serialNumber": "FULLQR-SN-191-190-1025422283-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B4C1-A014-17DD-8C46"
+  },
+  {
+    "id": 1896,
+    "deviceCode": "FULLQR-192-191-10254222124-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.124",
+    "serialNumber": "FULLQR-SN-192-191-10254222124-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B61D-D756-9AAF-9786"
+  },
+  {
+    "id": 1897,
+    "deviceCode": "FULLQR-193-192-10254222125-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.125",
+    "serialNumber": "FULLQR-SN-193-192-10254222125-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B0A7-E44A-AB37-6B6B"
+  },
+  {
+    "id": 1898,
+    "deviceCode": "FULLQR-194-193-10254222126-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.126",
+    "serialNumber": "FULLQR-SN-194-193-10254222126-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-460B-98B8-DAB7-D037"
+  },
+  {
+    "id": 1899,
+    "deviceCode": "FULLQR-195-194-10254222127-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.127",
+    "serialNumber": "FULLQR-SN-195-194-10254222127-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0DDD-CFA0-7E1B-267C"
+  },
+  {
+    "id": 1900,
+    "deviceCode": "FULLQR-196-195-10254222128-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.128",
+    "serialNumber": "FULLQR-SN-196-195-10254222128-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-4665-674D-9372-D8B6"
+  },
+  {
+    "id": 1901,
+    "deviceCode": "FULLQR-197-196-10254222129-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.129",
+    "serialNumber": "FULLQR-SN-197-196-10254222129-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-91AD-FCEA-5451-41B6"
+  },
+  {
+    "id": 1902,
+    "deviceCode": "FULLQR-198-197-10254222130-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.130",
+    "serialNumber": "FULLQR-SN-198-197-10254222130-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8236-96A6-D443-6D4D"
+  },
+  {
+    "id": 1903,
+    "deviceCode": "FULLQR-199-198-10254222131-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.131",
+    "serialNumber": "FULLQR-SN-199-198-10254222131-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-40D2-3096-66E7-5C3F"
+  },
+  {
+    "id": 1904,
+    "deviceCode": "FULLQR-200-199-1025422293-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.93",
+    "serialNumber": "FULLQR-SN-200-199-1025422293-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D05A-5B24-F124-47A3"
+  },
+  {
+    "id": 1905,
+    "deviceCode": "FULLQR-201-200-1025422294-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.94",
+    "serialNumber": "FULLQR-SN-201-200-1025422294-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-2916-BC37-811C-28C0"
+  },
+  {
+    "id": 1906,
+    "deviceCode": "FULLQR-202-201-1025422295-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.95",
+    "serialNumber": "FULLQR-SN-202-201-1025422295-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B2B5-A314-26BB-1AB7"
+  },
+  {
+    "id": 1907,
+    "deviceCode": "FULLQR-203-202-1025422296-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.96",
+    "serialNumber": "FULLQR-SN-203-202-1025422296-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-744D-9D77-7DAE-7BAA"
+  },
+  {
+    "id": 1908,
+    "deviceCode": "FULLQR-204-203-10254222132-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.132",
+    "serialNumber": "FULLQR-SN-204-203-10254222132-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3ECD-4A01-77E8-E373"
+  },
+  {
+    "id": 1909,
+    "deviceCode": "FULLQR-205-204-1025422297-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.97",
+    "serialNumber": "FULLQR-SN-205-204-1025422297-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0CE4-4782-D9E6-13CC"
+  },
+  {
+    "id": 1910,
+    "deviceCode": "FULLQR-206-205-1025422298-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.98",
+    "serialNumber": "FULLQR-SN-206-205-1025422298-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-CAAE-43D5-F01F-A00C"
+  },
+  {
+    "id": 1911,
+    "deviceCode": "FULLQR-207-206-1025422299-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.222.99",
+    "serialNumber": "FULLQR-SN-207-206-1025422299-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D7C2-76C6-4374-E54F"
+  },
+  {
+    "id": 1912,
+    "deviceCode": "FULLQR-208-207-1025421839-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.39",
+    "serialNumber": "FULLQR-SN-208-207-1025421839-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E8E2-DFA0-CBBE-72C2"
+  },
+  {
+    "id": 1913,
+    "deviceCode": "FULLQR-209-208-1025421840-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.40",
+    "serialNumber": "FULLQR-SN-209-208-1025421840-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5844-57A1-3C97-011B"
+  },
+  {
+    "id": 1914,
+    "deviceCode": "FULLQR-210-209-1025421841-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.41",
+    "serialNumber": "FULLQR-SN-210-209-1025421841-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8338-5D26-06BE-AD57"
+  },
+  {
+    "id": 1915,
+    "deviceCode": "FULLQR-211-210-1025421842-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.42",
+    "serialNumber": "FULLQR-SN-211-210-1025421842-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BD61-B60C-7F7D-33B4"
+  },
+  {
+    "id": 1916,
+    "deviceCode": "FULLQR-212-211-1025421843-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.43",
+    "serialNumber": "FULLQR-SN-212-211-1025421843-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9800-1C23-0162-A220"
+  },
+  {
+    "id": 1917,
+    "deviceCode": "FULLQR-213-212-1025421844-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.44",
+    "serialNumber": "FULLQR-SN-213-212-1025421844-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-50CC-2837-49F3-3EE4"
+  },
+  {
+    "id": 1918,
+    "deviceCode": "FULLQR-214-213-1025421845-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.45",
+    "serialNumber": "FULLQR-SN-214-213-1025421845-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A9AA-8DDF-24C0-B062"
+  },
+  {
+    "id": 1919,
+    "deviceCode": "FULLQR-215-214-1025421846-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.46",
+    "serialNumber": "FULLQR-SN-215-214-1025421846-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BD5C-EBEC-5BA0-AADC"
+  },
+  {
+    "id": 1920,
+    "deviceCode": "FULLQR-216-215-1025421847-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.47",
+    "serialNumber": "FULLQR-SN-216-215-1025421847-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B543-A52E-8211-23F1"
+  },
+  {
+    "id": 1921,
+    "deviceCode": "FULLQR-217-216-1025421848-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.48",
+    "serialNumber": "FULLQR-SN-217-216-1025421848-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0EAA-41F7-7991-4821"
+  },
+  {
+    "id": 1922,
+    "deviceCode": "FULLQR-218-217-1025421849-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.49",
+    "serialNumber": "FULLQR-SN-218-217-1025421849-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0350-5F21-02C4-7848"
+  },
+  {
+    "id": 1923,
+    "deviceCode": "FULLQR-219-218-1025421850-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.50",
+    "serialNumber": "FULLQR-SN-219-218-1025421850-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BAE6-0113-4A4D-E1D7"
+  },
+  {
+    "id": 1924,
+    "deviceCode": "FULLQR-220-219-1025421851-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.51",
+    "serialNumber": "FULLQR-SN-220-219-1025421851-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-1476-22E0-26D6-3185"
+  },
+  {
+    "id": 1925,
+    "deviceCode": "FULLQR-221-220-1025421852-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.52",
+    "serialNumber": "FULLQR-SN-221-220-1025421852-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F00C-6578-F5D2-446D"
+  },
+  {
+    "id": 1926,
+    "deviceCode": "FULLQR-222-221-1025421853-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.53",
+    "serialNumber": "FULLQR-SN-222-221-1025421853-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6699-517C-D7D9-179D"
+  },
+  {
+    "id": 1927,
+    "deviceCode": "FULLQR-223-222-10254218142-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.142",
+    "serialNumber": "FULLQR-SN-223-222-10254218142-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-2384-E023-F0CA-177F"
+  },
+  {
+    "id": 1928,
+    "deviceCode": "FULLQR-224-223-10254218143-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.143",
+    "serialNumber": "FULLQR-SN-224-223-10254218143-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-EAB4-9584-F3C4-4EC9"
+  },
+  {
+    "id": 1929,
+    "deviceCode": "FULLQR-225-224-10254218144-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.144",
+    "serialNumber": "FULLQR-SN-225-224-10254218144-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-4A66-C954-A794-3A5C"
+  },
+  {
+    "id": 1930,
+    "deviceCode": "FULLQR-226-225-10254218145-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.145",
+    "serialNumber": "FULLQR-SN-226-225-10254218145-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-4787-EBF0-7DD1-403E"
+  },
+  {
+    "id": 1931,
+    "deviceCode": "FULLQR-227-226-10254218146-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.146",
+    "serialNumber": "FULLQR-SN-227-226-10254218146-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8B31-9AC1-E415-341A"
+  },
+  {
+    "id": 1932,
+    "deviceCode": "FULLQR-228-227-10254218147-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.147",
+    "serialNumber": "FULLQR-SN-228-227-10254218147-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-2079-CD1B-8691-8D90"
+  },
+  {
+    "id": 1933,
+    "deviceCode": "FULLQR-229-228-10254218148-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.148",
+    "serialNumber": "FULLQR-SN-229-228-10254218148-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D90D-5834-74FE-1B40"
+  },
+  {
+    "id": 1934,
+    "deviceCode": "FULLQR-230-229-10254218149-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.149",
+    "serialNumber": "FULLQR-SN-230-229-10254218149-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A910-0AE2-7347-6019"
+  },
+  {
+    "id": 1935,
+    "deviceCode": "FULLQR-231-230-10254218134-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.134",
+    "serialNumber": "FULLQR-SN-231-230-10254218134-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5E56-CBDD-AB75-27C0"
+  },
+  {
+    "id": 1936,
+    "deviceCode": "FULLQR-232-231-10254218135-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.135",
+    "serialNumber": "FULLQR-SN-232-231-10254218135-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-DF9F-17DF-4B8E-EF4C"
+  },
+  {
+    "id": 1937,
+    "deviceCode": "FULLQR-233-232-10254218136-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.136",
+    "serialNumber": "FULLQR-SN-233-232-10254218136-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-410E-255D-2207-A1E7"
+  },
+  {
+    "id": 1938,
+    "deviceCode": "FULLQR-234-233-10254218137-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.137",
+    "serialNumber": "FULLQR-SN-234-233-10254218137-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5FE1-6BAC-872C-9CF0"
+  },
+  {
+    "id": 1939,
+    "deviceCode": "FULLQR-235-234-10254218138-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.138",
+    "serialNumber": "FULLQR-SN-235-234-10254218138-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-941A-25A7-D455-015C"
+  },
+  {
+    "id": 1940,
+    "deviceCode": "FULLQR-236-235-10254218139-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.139",
+    "serialNumber": "FULLQR-SN-236-235-10254218139-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FB3A-699A-A3CD-68B3"
+  },
+  {
+    "id": 1941,
+    "deviceCode": "FULLQR-237-236-10254218140-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.140",
+    "serialNumber": "FULLQR-SN-237-236-10254218140-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8718-45AC-6A63-8E9C"
+  },
+  {
+    "id": 1942,
+    "deviceCode": "FULLQR-238-237-10254218141-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.141",
+    "serialNumber": "FULLQR-SN-238-237-10254218141-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-43C9-A580-5CAC-A6F7"
+  },
+  {
+    "id": 1943,
+    "deviceCode": "FULLQR-239-238-1025421894-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.94",
+    "serialNumber": "FULLQR-SN-239-238-1025421894-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0B47-F2B0-24AF-4E6A"
+  },
+  {
+    "id": 1944,
+    "deviceCode": "FULLQR-240-239-1025421895-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.95",
+    "serialNumber": "FULLQR-SN-240-239-1025421895-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-84A6-AF05-51FC-8767"
+  },
+  {
+    "id": 1945,
+    "deviceCode": "FULLQR-241-240-1025421896-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.96",
+    "serialNumber": "FULLQR-SN-241-240-1025421896-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F632-4DAF-248F-76EC"
+  },
+  {
+    "id": 1946,
+    "deviceCode": "FULLQR-242-241-1025421897-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.97",
+    "serialNumber": "FULLQR-SN-242-241-1025421897-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-ADC2-7D7C-FCB2-D396"
+  },
+  {
+    "id": 1947,
+    "deviceCode": "FULLQR-243-242-1025421898-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.98",
+    "serialNumber": "FULLQR-SN-243-242-1025421898-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-CECD-59F9-DE9E-F71D"
+  },
+  {
+    "id": 1948,
+    "deviceCode": "FULLQR-244-243-1025421899-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.99",
+    "serialNumber": "FULLQR-SN-244-243-1025421899-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3196-3978-75D9-3FDD"
+  },
+  {
+    "id": 1949,
+    "deviceCode": "FULLQR-245-244-10254218100-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.100",
+    "serialNumber": "FULLQR-SN-245-244-10254218100-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D311-E7F1-CEFA-C294"
+  },
+  {
+    "id": 1950,
+    "deviceCode": "FULLQR-246-245-10254218101-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.101",
+    "serialNumber": "FULLQR-SN-246-245-10254218101-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3B31-E516-DE30-0C86"
+  },
+  {
+    "id": 1951,
+    "deviceCode": "FULLQR-247-246-1025421886-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.86",
+    "serialNumber": "FULLQR-SN-247-246-1025421886-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8152-E879-5875-F0AC"
+  },
+  {
+    "id": 1952,
+    "deviceCode": "FULLQR-248-247-1025421887-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.87",
+    "serialNumber": "FULLQR-SN-248-247-1025421887-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5CA2-512F-7079-0C41"
+  },
+  {
+    "id": 1953,
+    "deviceCode": "FULLQR-249-248-1025421888-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.88",
+    "serialNumber": "FULLQR-SN-249-248-1025421888-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0DAD-07A2-BE05-2F71"
+  },
+  {
+    "id": 1954,
+    "deviceCode": "FULLQR-250-249-1025421889-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.89",
+    "serialNumber": "FULLQR-SN-250-249-1025421889-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8913-6676-CE1B-8964"
+  },
+  {
+    "id": 1955,
+    "deviceCode": "FULLQR-251-250-1025421890-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.90",
+    "serialNumber": "FULLQR-SN-251-250-1025421890-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-91FE-6B6E-89EB-983F"
+  },
+  {
+    "id": 1956,
+    "deviceCode": "FULLQR-252-251-1025421891-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.91",
+    "serialNumber": "FULLQR-SN-252-251-1025421891-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7FE3-868F-522D-F60C"
+  },
+  {
+    "id": 1957,
+    "deviceCode": "FULLQR-253-252-1025421892-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.92",
+    "serialNumber": "FULLQR-SN-253-252-1025421892-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9E44-7D8F-D545-C37C"
+  },
+  {
+    "id": 1958,
+    "deviceCode": "FULLQR-254-253-1025421893-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.93",
+    "serialNumber": "FULLQR-SN-254-253-1025421893-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-5B19-7B73-4166-1F73"
+  },
+  {
+    "id": 1959,
+    "deviceCode": "FULLQR-255-254-10254218118-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.118",
+    "serialNumber": "FULLQR-SN-255-254-10254218118-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8140-7F45-23F5-98F0"
+  },
+  {
+    "id": 1960,
+    "deviceCode": "FULLQR-256-255-10254218119-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.119",
+    "serialNumber": "FULLQR-SN-256-255-10254218119-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F029-E4D1-D442-4793"
+  },
+  {
+    "id": 1961,
+    "deviceCode": "FULLQR-257-256-10254218120-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.120",
+    "serialNumber": "FULLQR-SN-257-256-10254218120-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BE58-54A1-F046-EBC6"
+  },
+  {
+    "id": 1962,
+    "deviceCode": "FULLQR-258-257-10254218121-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.121",
+    "serialNumber": "FULLQR-SN-258-257-10254218121-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B928-C612-6D35-FA99"
+  },
+  {
+    "id": 1963,
+    "deviceCode": "FULLQR-259-258-10254218122-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.122",
+    "serialNumber": "FULLQR-SN-259-258-10254218122-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F42B-4ED4-2259-8B4A"
+  },
+  {
+    "id": 1964,
+    "deviceCode": "FULLQR-260-259-10254218123-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.123",
+    "serialNumber": "FULLQR-SN-260-259-10254218123-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-0B8D-CAEC-CE8C-1FD5"
+  },
+  {
+    "id": 1965,
+    "deviceCode": "FULLQR-261-260-10254218124-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.124",
+    "serialNumber": "FULLQR-SN-261-260-10254218124-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FF86-D46F-A358-1665"
+  },
+  {
+    "id": 1966,
+    "deviceCode": "FULLQR-262-261-10254218125-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.125",
+    "serialNumber": "FULLQR-SN-262-261-10254218125-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-95F8-5C69-7BB3-2FC2"
+  },
+  {
+    "id": 1967,
+    "deviceCode": "FULLQR-263-262-10254218126-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.126",
+    "serialNumber": "FULLQR-SN-263-262-10254218126-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-FA0A-F678-D073-B748"
+  },
+  {
+    "id": 1968,
+    "deviceCode": "FULLQR-264-263-10254218127-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.127",
+    "serialNumber": "FULLQR-SN-264-263-10254218127-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-ACFF-960A-B84E-E7FA"
+  },
+  {
+    "id": 1969,
+    "deviceCode": "FULLQR-265-264-10254218128-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.128",
+    "serialNumber": "FULLQR-SN-265-264-10254218128-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9C61-6CF8-243C-6923"
+  },
+  {
+    "id": 1970,
+    "deviceCode": "FULLQR-266-265-10254218129-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.129",
+    "serialNumber": "FULLQR-SN-266-265-10254218129-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-9698-E512-7389-AD23"
+  },
+  {
+    "id": 1971,
+    "deviceCode": "FULLQR-267-266-10254218130-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.130",
+    "serialNumber": "FULLQR-SN-267-266-10254218130-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-815A-5E19-FD0B-D731"
+  },
+  {
+    "id": 1972,
+    "deviceCode": "FULLQR-268-267-10254218131-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.131",
+    "serialNumber": "FULLQR-SN-268-267-10254218131-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6D22-2D06-33A1-3AB6"
+  },
+  {
+    "id": 1973,
+    "deviceCode": "FULLQR-269-268-10254218132-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.132",
+    "serialNumber": "FULLQR-SN-269-268-10254218132-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D11D-02F9-7B77-B382"
+  },
+  {
+    "id": 1974,
+    "deviceCode": "FULLQR-270-269-10254218133-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.133",
+    "serialNumber": "FULLQR-SN-270-269-10254218133-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E993-A1E9-AC64-1329"
+  },
+  {
+    "id": 1975,
+    "deviceCode": "FULLQR-271-270-10254218110-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.110",
+    "serialNumber": "FULLQR-SN-271-270-10254218110-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-83AA-5A79-0119-5C24"
+  },
+  {
+    "id": 1976,
+    "deviceCode": "FULLQR-272-271-10254218112-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.112",
+    "serialNumber": "FULLQR-SN-272-271-10254218112-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-DFF7-CDBE-65E2-B245"
+  },
+  {
+    "id": 1977,
+    "deviceCode": "FULLQR-273-272-10254218114-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.114",
+    "serialNumber": "FULLQR-SN-273-272-10254218114-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-02C1-7AC0-2E9A-D0AE"
+  },
+  {
+    "id": 1978,
+    "deviceCode": "FULLQR-274-273-10254218116-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.116",
+    "serialNumber": "FULLQR-SN-274-273-10254218116-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-414A-67C6-1653-B3D7"
+  },
+  {
+    "id": 1979,
+    "deviceCode": "FULLQR-275-274-10254218118-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.118",
+    "serialNumber": "FULLQR-SN-275-274-10254218118-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A499-722A-AA53-EFDF"
+  },
+  {
+    "id": 1980,
+    "deviceCode": "FULLQR-276-275-10254218120-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.120",
+    "serialNumber": "FULLQR-SN-276-275-10254218120-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-1223-EBD8-8425-131D"
+  },
+  {
+    "id": 1981,
+    "deviceCode": "FULLQR-277-276-10254218122-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.122",
+    "serialNumber": "FULLQR-SN-277-276-10254218122-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-AC3F-5296-2A47-D184"
+  },
+  {
+    "id": 1982,
+    "deviceCode": "FULLQR-278-277-10254218124-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.124",
+    "serialNumber": "FULLQR-SN-278-277-10254218124-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BF81-F501-E974-C565"
+  },
+  {
+    "id": 1983,
+    "deviceCode": "FULLQR-279-278-10254218109-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.109",
+    "serialNumber": "FULLQR-SN-279-278-10254218109-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-BC13-CFBE-F698-986D"
+  },
+  {
+    "id": 1984,
+    "deviceCode": "FULLQR-280-279-10254218111-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.111",
+    "serialNumber": "FULLQR-SN-280-279-10254218111-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-78C8-36EC-8DEB-36D2"
+  },
+  {
+    "id": 1985,
+    "deviceCode": "FULLQR-281-280-10254218113-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.113",
+    "serialNumber": "FULLQR-SN-281-280-10254218113-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F1AA-1D18-35F2-CD1F"
+  },
+  {
+    "id": 1986,
+    "deviceCode": "FULLQR-282-281-10254218115-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.115",
+    "serialNumber": "FULLQR-SN-282-281-10254218115-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-71EC-C15C-2A18-43FB"
+  },
+  {
+    "id": 1987,
+    "deviceCode": "FULLQR-283-282-10254218117-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.117",
+    "serialNumber": "FULLQR-SN-283-282-10254218117-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-EC3B-E2C2-B21F-A8EC"
+  },
+  {
+    "id": 1988,
+    "deviceCode": "FULLQR-284-283-10254218119-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.119",
+    "serialNumber": "FULLQR-SN-284-283-10254218119-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-EAE1-0D95-F647-1CCF"
+  },
+  {
+    "id": 1989,
+    "deviceCode": "FULLQR-285-284-10254218121-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.121",
+    "serialNumber": "FULLQR-SN-285-284-10254218121-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E6D4-AC8B-E500-49BD"
+  },
+  {
+    "id": 1990,
+    "deviceCode": "FULLQR-286-285-10254218123-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.123",
+    "serialNumber": "FULLQR-SN-286-285-10254218123-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F893-72EF-582B-F085"
+  },
+  {
+    "id": 1991,
+    "deviceCode": "FULLQR-287-286-10254218110-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.110",
+    "serialNumber": "FULLQR-SN-287-286-10254218110-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-D9E0-3487-DD6E-4808"
+  },
+  {
+    "id": 1992,
+    "deviceCode": "FULLQR-288-287-10254218112-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.112",
+    "serialNumber": "FULLQR-SN-288-287-10254218112-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B71C-5635-E854-1C4E"
+  },
+  {
+    "id": 1993,
+    "deviceCode": "FULLQR-289-288-10254218114-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.114",
+    "serialNumber": "FULLQR-SN-289-288-10254218114-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F78D-F80D-7722-9DD1"
+  },
+  {
+    "id": 1994,
+    "deviceCode": "FULLQR-290-289-10254218116-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.116",
+    "serialNumber": "FULLQR-SN-290-289-10254218116-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-13A1-5505-430C-D62F"
+  },
+  {
+    "id": 1995,
+    "deviceCode": "FULLQR-291-290-10254218118-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.118",
+    "serialNumber": "FULLQR-SN-291-290-10254218118-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-EEB6-175F-DC34-344B"
+  },
+  {
+    "id": 1996,
+    "deviceCode": "FULLQR-292-291-10254218120-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.120",
+    "serialNumber": "FULLQR-SN-292-291-10254218120-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A199-C51D-1C17-7233"
+  },
+  {
+    "id": 1997,
+    "deviceCode": "FULLQR-293-292-10254218122-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.122",
+    "serialNumber": "FULLQR-SN-293-292-10254218122-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B1DC-4D4F-1A89-36C3"
+  },
+  {
+    "id": 1998,
+    "deviceCode": "FULLQR-294-293-10254218124-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.124",
+    "serialNumber": "FULLQR-SN-294-293-10254218124-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-CAF9-8A23-980F-3CB1"
+  },
+  {
+    "id": 1999,
+    "deviceCode": "FULLQR-295-294-1025421423-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.214.23",
+    "serialNumber": "FULLQR-SN-295-294-1025421423-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-8694-1C41-DA43-99DD"
+  },
+  {
+    "id": 2000,
+    "deviceCode": "FULLQR-296-295-1025421836-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.36",
+    "serialNumber": "FULLQR-SN-296-295-1025421836-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-A44A-4379-DB4C-04E2"
+  },
+  {
+    "id": 2001,
+    "deviceCode": "FULLQR-297-296-102542187-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.7",
+    "serialNumber": "FULLQR-SN-297-296-102542187-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-360E-C1B8-006B-2630"
+  },
+  {
+    "id": 2002,
+    "deviceCode": "FULLQR-298-297-102542189-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.9",
+    "serialNumber": "FULLQR-SN-298-297-102542189-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7C43-D1F5-31AD-9533"
+  },
+  {
+    "id": 2003,
+    "deviceCode": "FULLQR-299-298-1025421813-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.13",
+    "serialNumber": "FULLQR-SN-299-298-1025421813-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-07CD-8EC8-A285-605F"
+  },
+  {
+    "id": 2004,
+    "deviceCode": "FULLQR-300-299-1025421811-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.11",
+    "serialNumber": "FULLQR-SN-300-299-1025421811-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-C73D-30AC-5912-CA2B"
+  },
+  {
+    "id": 2005,
+    "deviceCode": "FULLQR-301-300-1025421815-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.15",
+    "serialNumber": "FULLQR-SN-301-300-1025421815-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-3171-576F-DEE6-E3E1"
+  },
+  {
+    "id": 2006,
+    "deviceCode": "FULLQR-302-301-1025421817-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.17",
+    "serialNumber": "FULLQR-SN-302-301-1025421817-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-1A4C-F860-2BB8-F788"
+  },
+  {
+    "id": 2007,
+    "deviceCode": "FULLQR-303-302-1025421819-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.19",
+    "serialNumber": "FULLQR-SN-303-302-1025421819-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-6EE4-4584-6DA0-1DD3"
+  },
+  {
+    "id": 2008,
+    "deviceCode": "FULLQR-304-303-1025421821-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.21",
+    "serialNumber": "FULLQR-SN-304-303-1025421821-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-F290-6193-9A0C-B7F5"
+  },
+  {
+    "id": 2009,
+    "deviceCode": "FULLQR-305-304-1025421878-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.78",
+    "serialNumber": "FULLQR-SN-305-304-1025421878-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-85B5-AEB1-8890-B7B1"
+  },
+  {
+    "id": 2010,
+    "deviceCode": "FULLQR-306-305-1025421879-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.79",
+    "serialNumber": "FULLQR-SN-306-305-1025421879-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-96F5-0485-6B1C-338F"
+  },
+  {
+    "id": 2011,
+    "deviceCode": "FULLQR-307-306-1025421880-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.80",
+    "serialNumber": "FULLQR-SN-307-306-1025421880-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-E249-776E-F8F4-87DC"
+  },
+  {
+    "id": 2012,
+    "deviceCode": "FULLQR-308-307-1025421881-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.81",
+    "serialNumber": "FULLQR-SN-308-307-1025421881-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-92E1-0E71-1B9A-7066"
+  },
+  {
+    "id": 2013,
+    "deviceCode": "FULLQR-309-308-1025421882-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.82",
+    "serialNumber": "FULLQR-SN-309-308-1025421882-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-7281-94CF-2A14-13E3"
+  },
+  {
+    "id": 2014,
+    "deviceCode": "FULLQR-310-309-1025421883-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.83",
+    "serialNumber": "FULLQR-SN-310-309-1025421883-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-94A7-CC5C-3859-4284"
+  },
+  {
+    "id": 2015,
+    "deviceCode": "FULLQR-311-310-1025421884-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.84",
+    "serialNumber": "FULLQR-SN-311-310-1025421884-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-B32E-1477-81B3-5677"
+  },
+  {
+    "id": 2016,
+    "deviceCode": "FULLQR-312-311-1025421885-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.218.85",
+    "serialNumber": "FULLQR-SN-312-311-1025421885-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-65BC-FA3B-368C-35DF"
+  },
+  {
+    "id": 2017,
+    "deviceCode": "FULLQR-313-312-10254214117-2026_07_09_13_11_59",
+    "assetType": "GATE",
+    "ipAddress": "10.254.214.117",
+    "serialNumber": "FULLQR-SN-313-312-10254214117-2026_07_09_13_11_59",
+    "secretCode": "ACD-V1-41C0-3604-0A56-C8F0"
+  }
+]

@@ -25,6 +25,7 @@ import { UpdateGlassDto } from './dto/update-glass.dto';
 import { GetGlassesQueryDto } from './dto/get-glasses-query.dto';
 import { CreateGlassInspectionDto } from './dto/create-glass-inspection.dto';
 import { GetGlassInspectionsQueryDto } from './dto/get-glass-inspections-query.dto';
+import { GetGlassInspectionHistoryQueryDto } from './dto/get-glass-inspection-history-query.dto';
 import { SyncGlassesFromLocationsDto } from './dto/sync-glasses-from-locations.dto';
 
 @Injectable()
@@ -1303,6 +1304,202 @@ export class GlassesService {
         return inspection;
       },
     );
+  }
+
+  /*
+  =========================================================
+  تاريخ كل تفتيشات الزجاج - سريع
+  =========================================================
+  */
+
+  async getInspectionHistory(
+    query: GetGlassInspectionHistoryQueryDto,
+  ) {
+    /*
+     * Flutter لا يحتاج لإرسال limit.
+     * لو لم يرسل limit نرجع أحدث 50 تفتيش.
+     * Request واحد فقط من جدول Inspection.
+     */
+    const limit =
+      query.limit ?? 50;
+
+    const where:
+      Prisma.InspectionWhereInput = {
+        glassId: {
+          not: null,
+        },
+
+        ...(query.inspectionStatus
+          ? {
+              inspectionStatus:
+                query.inspectionStatus,
+            }
+          : {}),
+
+        ...(query.technicianId
+          ? {
+              technicianId:
+                query.technicianId,
+            }
+          : {}),
+
+        ...(query.from || query.to
+          ? {
+              inspectedAt: {
+                ...(query.from
+                  ? {
+                      gte:
+                        new Date(query.from),
+                    }
+                  : {}),
+
+                ...(query.to
+                  ? {
+                      lte:
+                        new Date(query.to),
+                    }
+                  : {}),
+              },
+            }
+          : {}),
+      };
+
+    const data =
+      await this.prisma.inspection.findMany({
+        where,
+
+        take: limit,
+
+        orderBy: [
+          {
+            inspectedAt: 'desc',
+          },
+          {
+            id: 'desc',
+          },
+        ],
+
+        include: {
+          glass: {
+            include: {
+              location: true,
+            },
+          },
+
+          technician: {
+            select: {
+              id: true,
+              fullName: true,
+              firstName: true,
+              lastName: true,
+              username: true,
+              phone: true,
+              jobTitle: true,
+            },
+          },
+
+          images: {
+            orderBy: {
+              createdAt: 'asc',
+            },
+          },
+
+          inspectionIssues: {
+            include: {
+              issue: true,
+            },
+          },
+        },
+      });
+
+    return {
+      data,
+    };
+  }
+
+  /*
+  =========================================================
+  تعديل Comment لتفتيش زجاج
+  =========================================================
+  */
+
+  async updateInspectionComment(
+    inspectionId: number,
+    notes: string,
+  ) {
+    const cleanNotes =
+      notes.trim();
+
+    if (!cleanNotes) {
+      throw new BadRequestException(
+        'الكومنت لا يمكن أن يكون فارغًا',
+      );
+    }
+
+    const inspection =
+      await this.prisma.inspection.findFirst({
+        where: {
+          id: inspectionId,
+
+          glassId: {
+            not: null,
+          },
+        },
+
+        select: {
+          id: true,
+          glassId: true,
+        },
+      });
+
+    if (!inspection) {
+      throw new NotFoundException(
+        'تفتيش الزجاج غير موجود',
+      );
+    }
+
+    return this.prisma.inspection.update({
+      where: {
+        id: inspectionId,
+      },
+
+      data: {
+        notes:
+          cleanNotes,
+      },
+
+      include: {
+        glass: {
+          include: {
+            location: true,
+          },
+        },
+
+        technician: {
+          select: {
+            id: true,
+            fullName: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            phone: true,
+            jobTitle: true,
+          },
+        },
+
+        images: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+
+        inspectionIssues: {
+          include: {
+            issue: true,
+          },
+        },
+      },
+    });
   }
 
   /*

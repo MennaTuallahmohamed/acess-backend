@@ -1,0 +1,4844 @@
+[
+  {
+    "id": 1,
+    "deviceCode": "WW",
+    "ipAddress": null,
+    "serialNumber": "SN123"
+  },
+  {
+    "id": 2,
+    "deviceCode": "M-001",
+    "ipAddress": null,
+    "serialNumber": "SN123456"
+  },
+  {
+    "id": 21,
+    "deviceCode": "19",
+    "ipAddress": "10.254.218.28",
+    "serialNumber": "2125SMP0000297"
+  },
+  {
+    "id": 22,
+    "deviceCode": "20",
+    "ipAddress": "10.254.218.30",
+    "serialNumber": "2111SMP0002586"
+  },
+  {
+    "id": 23,
+    "deviceCode": "21",
+    "ipAddress": "10.254.218.32",
+    "serialNumber": "2111SMP0002661"
+  },
+  {
+    "id": 24,
+    "deviceCode": "22",
+    "ipAddress": "10.254.218.34",
+    "serialNumber": "2125SMP0002150"
+  },
+  {
+    "id": 25,
+    "deviceCode": "23",
+    "ipAddress": "10.254.218.36",
+    "serialNumber": "2234SMP0002098"
+  },
+  {
+    "id": 50,
+    "deviceCode": "48",
+    "ipAddress": "10.254.230.107",
+    "serialNumber": "2238SMP0000735"
+  },
+  {
+    "id": 51,
+    "deviceCode": "49",
+    "ipAddress": "10.254.230.108",
+    "serialNumber": "2234SMP0001185"
+  },
+  {
+    "id": 52,
+    "deviceCode": "50",
+    "ipAddress": "10.254.230.109",
+    "serialNumber": "2238SMP0000551"
+  },
+  {
+    "id": 53,
+    "deviceCode": "51",
+    "ipAddress": "10.254.230.110",
+    "serialNumber": "2234SMP0001109"
+  },
+  {
+    "id": 54,
+    "deviceCode": "52",
+    "ipAddress": "10.254.230.111",
+    "serialNumber": "2234SMP0002401"
+  },
+  {
+    "id": 55,
+    "deviceCode": "53",
+    "ipAddress": "10.254.230.112",
+    "serialNumber": "2237SMP0000248"
+  },
+  {
+    "id": 56,
+    "deviceCode": "54",
+    "ipAddress": "10.254.230.113",
+    "serialNumber": "2142SMP0002276"
+  },
+  {
+    "id": 57,
+    "deviceCode": "55",
+    "ipAddress": "10.254.230.114",
+    "serialNumber": "2237SMP0000033"
+  },
+  {
+    "id": 78,
+    "deviceCode": "76",
+    "ipAddress": "10.254.230.29",
+    "serialNumber": "2238SMP0000698"
+  },
+  {
+    "id": 79,
+    "deviceCode": "77",
+    "ipAddress": "10.254.230.30",
+    "serialNumber": "2237SMP0000484"
+  },
+  {
+    "id": 80,
+    "deviceCode": "78",
+    "ipAddress": "10.254.230.31",
+    "serialNumber": "2234SMP0002128"
+  },
+  {
+    "id": 81,
+    "deviceCode": "79",
+    "ipAddress": "10.254.230.32",
+    "serialNumber": "2234SMP0001390"
+  },
+  {
+    "id": 82,
+    "deviceCode": "80",
+    "ipAddress": "10.254.230.33",
+    "serialNumber": "2237SMP0001038"
+  },
+  {
+    "id": 83,
+    "deviceCode": "81",
+    "ipAddress": "10.254.230.34",
+    "serialNumber": "2237SMP0000330"
+  },
+  {
+    "id": 84,
+    "deviceCode": "82",
+    "ipAddress": "10.254.230.35",
+    "serialNumber": "2238SMP0000216"
+  },
+  {
+    "id": 85,
+    "deviceCode": "83",
+    "ipAddress": "10.254.230.36",
+    "serialNumber": "2238SMP0000162"
+  },
+  {
+    "id": 102,
+    "deviceCode": "100",
+    "ipAddress": "10.254.230.62",
+    "serialNumber": null
+  },
+  {
+    "id": 103,
+    "deviceCode": "101",
+    "ipAddress": "10.254.230.63",
+    "serialNumber": null
+  },
+  {
+    "id": 104,
+    "deviceCode": "102",
+    "ipAddress": "10.254.230.64",
+    "serialNumber": null
+  },
+  {
+    "id": 105,
+    "deviceCode": "103",
+    "ipAddress": "10.254.230.65",
+    "serialNumber": null
+  },
+  {
+    "id": 106,
+    "deviceCode": "104",
+    "ipAddress": "10.254.230.66",
+    "serialNumber": null
+  },
+  {
+    "id": 107,
+    "deviceCode": "105",
+    "ipAddress": "10.254.230.67",
+    "serialNumber": null
+  },
+  {
+    "id": 108,
+    "deviceCode": "106",
+    "ipAddress": "10.254.230.68",
+    "serialNumber": null
+  },
+  {
+    "id": 109,
+    "deviceCode": "107",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 110,
+    "deviceCode": "108",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 111,
+    "deviceCode": "109",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 112,
+    "deviceCode": "110",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 113,
+    "deviceCode": "111",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 114,
+    "deviceCode": "112",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 115,
+    "deviceCode": "113",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 116,
+    "deviceCode": "114",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 117,
+    "deviceCode": "115",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 118,
+    "deviceCode": "116",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 119,
+    "deviceCode": "117",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 120,
+    "deviceCode": "118",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 121,
+    "deviceCode": "119",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 122,
+    "deviceCode": "120",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 123,
+    "deviceCode": "121",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 124,
+    "deviceCode": "122",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 125,
+    "deviceCode": "123",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 126,
+    "deviceCode": "124",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 127,
+    "deviceCode": "125",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 128,
+    "deviceCode": "126",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 129,
+    "deviceCode": "127",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 130,
+    "deviceCode": "128",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 131,
+    "deviceCode": "129",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 132,
+    "deviceCode": "130",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 133,
+    "deviceCode": "131",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 134,
+    "deviceCode": "132",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 135,
+    "deviceCode": "133",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 136,
+    "deviceCode": "134",
+    "ipAddress": null,
+    "serialNumber": null
+  },
+  {
+    "id": 139,
+    "deviceCode": "C-001",
+    "ipAddress": null,
+    "serialNumber": "SNCTRL001"
+  },
+  {
+    "id": 277,
+    "deviceCode": "136",
+    "ipAddress": "10.254.206.66",
+    "serialNumber": "2223SMP0000483"
+  },
+  {
+    "id": 292,
+    "deviceCode": "151",
+    "ipAddress": "10.254.238.9",
+    "serialNumber": "2237SMP0000019"
+  },
+  {
+    "id": 309,
+    "deviceCode": "168",
+    "ipAddress": "10.254.234.19",
+    "serialNumber": "2142SMP0000917"
+  },
+  {
+    "id": 317,
+    "deviceCode": "176",
+    "ipAddress": "10.254.234.113",
+    "serialNumber": "2125SMP0002587"
+  },
+  {
+    "id": 389,
+    "deviceCode": "248",
+    "ipAddress": "10.254.230.190",
+    "serialNumber": "2125SMP0001193"
+  },
+  {
+    "id": 390,
+    "deviceCode": "249",
+    "ipAddress": "10.254.230.191",
+    "serialNumber": "2237SMP0001373"
+  },
+  {
+    "id": 391,
+    "deviceCode": "250",
+    "ipAddress": "10.254.230.192",
+    "serialNumber": "2234SMP0002258"
+  },
+  {
+    "id": 392,
+    "deviceCode": "251",
+    "ipAddress": "10.254.230.193",
+    "serialNumber": "2237SMP0001106"
+  },
+  {
+    "id": 401,
+    "deviceCode": "260",
+    "ipAddress": "10.254.230.37",
+    "serialNumber": "2234SMP0002166"
+  },
+  {
+    "id": 402,
+    "deviceCode": "261",
+    "ipAddress": "10.254.230.38",
+    "serialNumber": "2238SMP0000506"
+  },
+  {
+    "id": 403,
+    "deviceCode": "262",
+    "ipAddress": "10.254.230.39",
+    "serialNumber": "2237SMP0001090"
+  },
+  {
+    "id": 404,
+    "deviceCode": "263",
+    "ipAddress": "10.254.230.40",
+    "serialNumber": "2142SMP0000788"
+  },
+  {
+    "id": 405,
+    "deviceCode": "264",
+    "ipAddress": "10.254.230.41",
+    "serialNumber": "2234SMP0001796"
+  },
+  {
+    "id": 406,
+    "deviceCode": "265",
+    "ipAddress": "10.254.230.42",
+    "serialNumber": "2238SMP0000773"
+  },
+  {
+    "id": 407,
+    "deviceCode": "266",
+    "ipAddress": "10.254.230.43",
+    "serialNumber": "2234SMP0002432"
+  },
+  {
+    "id": 408,
+    "deviceCode": "267",
+    "ipAddress": "10.254.230.44",
+    "serialNumber": "2234SMP0002319"
+  },
+  {
+    "id": 409,
+    "deviceCode": "269",
+    "ipAddress": "10.254.230.163",
+    "serialNumber": "2143SMP0000473"
+  },
+  {
+    "id": 410,
+    "deviceCode": "270",
+    "ipAddress": "10.254.230.164",
+    "serialNumber": "2142SMP0002900"
+  },
+  {
+    "id": 411,
+    "deviceCode": "272",
+    "ipAddress": "10.254.230.166",
+    "serialNumber": "2125SMP0001728"
+  },
+  {
+    "id": 412,
+    "deviceCode": "273",
+    "ipAddress": "10.254.230.167",
+    "serialNumber": "2143SMP0001751"
+  },
+  {
+    "id": 413,
+    "deviceCode": "274",
+    "ipAddress": "10.254.230.168",
+    "serialNumber": "2142SMP0002504"
+  },
+  {
+    "id": 414,
+    "deviceCode": "275",
+    "ipAddress": "10.254.230.169",
+    "serialNumber": "2143SMP0000251"
+  },
+  {
+    "id": 489,
+    "deviceCode": "845",
+    "ipAddress": "مهنجة",
+    "serialNumber": "مهنجة"
+  },
+  {
+    "id": 493,
+    "deviceCode": "355",
+    "ipAddress": "10.254.234.108",
+    "serialNumber": "2234SMP0000944"
+  },
+  {
+    "id": 494,
+    "deviceCode": "356",
+    "ipAddress": "10.254.234.106",
+    "serialNumber": "2238SMP0000223"
+  },
+  {
+    "id": 495,
+    "deviceCode": "357",
+    "ipAddress": "10.254.234.105",
+    "serialNumber": "2234SMP0002340"
+  },
+  {
+    "id": 496,
+    "deviceCode": "358",
+    "ipAddress": "10.254.234.104",
+    "serialNumber": "2234SMP0001437"
+  },
+  {
+    "id": 501,
+    "deviceCode": "363",
+    "ipAddress": "10.254.234.97",
+    "serialNumber": "2147SMP0000684"
+  },
+  {
+    "id": 502,
+    "deviceCode": "364",
+    "ipAddress": "10.254.234.34",
+    "serialNumber": "2237SMP0001717"
+  },
+  {
+    "id": 503,
+    "deviceCode": "365",
+    "ipAddress": "10.254.234.35",
+    "serialNumber": "2136SMP0001371"
+  },
+  {
+    "id": 504,
+    "deviceCode": "366",
+    "ipAddress": "10.254.234.36",
+    "serialNumber": "2234SMP0002104"
+  },
+  {
+    "id": 505,
+    "deviceCode": "367",
+    "ipAddress": "10.254.234.37",
+    "serialNumber": "2142SMP0000443"
+  },
+  {
+    "id": 506,
+    "deviceCode": "368",
+    "ipAddress": "10.254.234.38",
+    "serialNumber": "2142SMP0001967"
+  },
+  {
+    "id": 507,
+    "deviceCode": "369",
+    "ipAddress": "10.254.234.39",
+    "serialNumber": "2136SMP0000178"
+  },
+  {
+    "id": 508,
+    "deviceCode": "370",
+    "ipAddress": "10.205.108.136",
+    "serialNumber": "2136SMP0001500"
+  },
+  {
+    "id": 509,
+    "deviceCode": "371",
+    "ipAddress": "10.205.108.107",
+    "serialNumber": "2124SMP0000441"
+  },
+  {
+    "id": 510,
+    "deviceCode": "372",
+    "ipAddress": "10.205.108.109",
+    "serialNumber": "2147SMP0000493"
+  },
+  {
+    "id": 511,
+    "deviceCode": "373",
+    "ipAddress": "10.205.108.111",
+    "serialNumber": "2142SMP0000207"
+  },
+  {
+    "id": 512,
+    "deviceCode": "374",
+    "ipAddress": "10.205.108.113",
+    "serialNumber": "2136SMP0001661"
+  },
+  {
+    "id": 513,
+    "deviceCode": "375",
+    "ipAddress": "10.205.108.115",
+    "serialNumber": "2142SMP0001509"
+  },
+  {
+    "id": 514,
+    "deviceCode": "376",
+    "ipAddress": "10.254.198.117",
+    "serialNumber": "2136SMP0000536"
+  },
+  {
+    "id": 515,
+    "deviceCode": "377",
+    "ipAddress": "10.254.198.119",
+    "serialNumber": "2142SMP0000924"
+  },
+  {
+    "id": 524,
+    "deviceCode": "386",
+    "ipAddress": "10.254.198.6",
+    "serialNumber": "2111SMP0002463"
+  },
+  {
+    "id": 525,
+    "deviceCode": "387",
+    "ipAddress": "10.254.198.8",
+    "serialNumber": "2234SMP0001628"
+  },
+  {
+    "id": 526,
+    "deviceCode": "388",
+    "ipAddress": "10.254.198.10",
+    "serialNumber": "2125SMP0002327"
+  },
+  {
+    "id": 527,
+    "deviceCode": "389",
+    "ipAddress": "10.254.198.12",
+    "serialNumber": "2234SMP0002760"
+  },
+  {
+    "id": 528,
+    "deviceCode": "390",
+    "ipAddress": "10.254.198.14",
+    "serialNumber": "2125SMP0001216"
+  },
+  {
+    "id": 529,
+    "deviceCode": "391",
+    "ipAddress": "10.254.198.16",
+    "serialNumber": "2125SMP0002570"
+  },
+  {
+    "id": 530,
+    "deviceCode": "392",
+    "ipAddress": "10.254.198.18",
+    "serialNumber": "2142SMP0002122"
+  },
+  {
+    "id": 531,
+    "deviceCode": "393",
+    "ipAddress": "10.254.198.20",
+    "serialNumber": "2136SMP0000819"
+  },
+  {
+    "id": 532,
+    "deviceCode": "394",
+    "ipAddress": "10.254.198.54",
+    "serialNumber": "2234SMP0001093"
+  },
+  {
+    "id": 533,
+    "deviceCode": "395",
+    "ipAddress": "10.254.198.56",
+    "serialNumber": "2124SMP0000502"
+  },
+  {
+    "id": 534,
+    "deviceCode": "396",
+    "ipAddress": "10.254.198.58",
+    "serialNumber": "2143SMP0000701"
+  },
+  {
+    "id": 535,
+    "deviceCode": "397",
+    "ipAddress": "10.254.198.60",
+    "serialNumber": "2142SMP0001523"
+  },
+  {
+    "id": 536,
+    "deviceCode": "398",
+    "ipAddress": "10.254.198.62",
+    "serialNumber": "2125SMP0002099"
+  },
+  {
+    "id": 537,
+    "deviceCode": "399",
+    "ipAddress": "10.254.198.64",
+    "serialNumber": "2142SMP0001714"
+  },
+  {
+    "id": 538,
+    "deviceCode": "400",
+    "ipAddress": "10.254.198.66",
+    "serialNumber": "2147SMP0000530"
+  },
+  {
+    "id": 539,
+    "deviceCode": "401",
+    "ipAddress": "10.254.198.68",
+    "serialNumber": "2147SMP0000745"
+  },
+  {
+    "id": 540,
+    "deviceCode": "402",
+    "ipAddress": "10.254.198.138",
+    "serialNumber": "2142SMP0000801"
+  },
+  {
+    "id": 541,
+    "deviceCode": "403",
+    "ipAddress": "10.254.198.139",
+    "serialNumber": "2223SMP0000704"
+  },
+  {
+    "id": 542,
+    "deviceCode": "404",
+    "ipAddress": "10.254.198.140",
+    "serialNumber": "2124SMP0000618"
+  },
+  {
+    "id": 543,
+    "deviceCode": "405",
+    "ipAddress": "10.254.198.141",
+    "serialNumber": "2142SMP0002030"
+  },
+  {
+    "id": 544,
+    "deviceCode": "406",
+    "ipAddress": "10.254.198.142",
+    "serialNumber": "2142SMP0001882"
+  },
+  {
+    "id": 545,
+    "deviceCode": "407",
+    "ipAddress": "10.254.198.143",
+    "serialNumber": "2125SMP0000594"
+  },
+  {
+    "id": 546,
+    "deviceCode": "408",
+    "ipAddress": "10.254.198.144",
+    "serialNumber": "2136SMP0001692"
+  },
+  {
+    "id": 547,
+    "deviceCode": "409",
+    "ipAddress": "10.254.198.145",
+    "serialNumber": "2125SMP0000518"
+  },
+  {
+    "id": 548,
+    "deviceCode": "422",
+    "ipAddress": "10.254.198.98",
+    "serialNumber": "-"
+  },
+  {
+    "id": 556,
+    "deviceCode": "418",
+    "ipAddress": "10.254.198.90",
+    "serialNumber": "2143SMP0001065"
+  },
+  {
+    "id": 557,
+    "deviceCode": "419",
+    "ipAddress": "10.254.198.92",
+    "serialNumber": "2125SMP0001186"
+  },
+  {
+    "id": 558,
+    "deviceCode": "420",
+    "ipAddress": "10.254.198.94",
+    "serialNumber": "2136SMP0001173"
+  },
+  {
+    "id": 559,
+    "deviceCode": "421",
+    "ipAddress": "10.254.198.96",
+    "serialNumber": "2237SMP0000255"
+  },
+  {
+    "id": 561,
+    "deviceCode": "423",
+    "ipAddress": "10.254.198.100",
+    "serialNumber": "2147SMP0000509"
+  },
+  {
+    "id": 562,
+    "deviceCode": "424",
+    "ipAddress": "10.254.198.102",
+    "serialNumber": "2120SMP0000414"
+  },
+  {
+    "id": 563,
+    "deviceCode": "425",
+    "ipAddress": "10.254.198.104",
+    "serialNumber": "2124SMP0000892"
+  },
+  {
+    "id": 564,
+    "deviceCode": "426",
+    "ipAddress": "10.254.198.154",
+    "serialNumber": "2147SMP0001016"
+  },
+  {
+    "id": 565,
+    "deviceCode": "427",
+    "ipAddress": "10.254.198.155",
+    "serialNumber": "2142SMP0000757"
+  },
+  {
+    "id": 566,
+    "deviceCode": "428",
+    "ipAddress": "10.254.198.156",
+    "serialNumber": "2142SMP0000986"
+  },
+  {
+    "id": 567,
+    "deviceCode": "429",
+    "ipAddress": "10.254.198.157",
+    "serialNumber": "2143SMP0001133"
+  },
+  {
+    "id": 568,
+    "deviceCode": "430",
+    "ipAddress": "10.254.198.158",
+    "serialNumber": "2147SMP0000578"
+  },
+  {
+    "id": 569,
+    "deviceCode": "431",
+    "ipAddress": "10.254.198.159",
+    "serialNumber": "2143SMP0001355"
+  },
+  {
+    "id": 570,
+    "deviceCode": "432",
+    "ipAddress": "10.254.198.160",
+    "serialNumber": "2147SMP0000677"
+  },
+  {
+    "id": 571,
+    "deviceCode": "433",
+    "ipAddress": "10.254.198.161",
+    "serialNumber": "2143SMP0000725"
+  },
+  {
+    "id": 572,
+    "deviceCode": "434",
+    "ipAddress": "10.254.198.170",
+    "serialNumber": "2142SMP0000641"
+  },
+  {
+    "id": 573,
+    "deviceCode": "435",
+    "ipAddress": "10.254.198.171",
+    "serialNumber": "2142SMP0000085"
+  },
+  {
+    "id": 574,
+    "deviceCode": "436",
+    "ipAddress": "10.254.198.172",
+    "serialNumber": "2136SMP0000918"
+  },
+  {
+    "id": 575,
+    "deviceCode": "437",
+    "ipAddress": "10.254.198.173",
+    "serialNumber": "2136SMP0000772"
+  },
+  {
+    "id": 576,
+    "deviceCode": "438",
+    "ipAddress": "10.254.198.174",
+    "serialNumber": "2147SMP0000967"
+  },
+  {
+    "id": 577,
+    "deviceCode": "439",
+    "ipAddress": "10.254.198.175",
+    "serialNumber": "2141SMP0001975"
+  },
+  {
+    "id": 578,
+    "deviceCode": "440",
+    "ipAddress": "10.254.198.176",
+    "serialNumber": "2143SMP0001072"
+  },
+  {
+    "id": 579,
+    "deviceCode": "441",
+    "ipAddress": "10.254.198.177",
+    "serialNumber": "2142SMP0001639"
+  },
+  {
+    "id": 588,
+    "deviceCode": "M NEW",
+    "ipAddress": "10.254.198.57",
+    "serialNumber": "2142SMP0001561"
+  },
+  {
+    "id": 589,
+    "deviceCode": "451",
+    "ipAddress": "10.254.198.56",
+    "serialNumber": "2125SMP0001797"
+  },
+  {
+    "id": 590,
+    "deviceCode": "452",
+    "ipAddress": "10.254.198.55",
+    "serialNumber": "2147SMP0000462"
+  },
+  {
+    "id": 591,
+    "deviceCode": "453",
+    "ipAddress": "10.254.198.54",
+    "serialNumber": "2142SMP0001514"
+  },
+  {
+    "id": 592,
+    "deviceCode": "454",
+    "ipAddress": "10.254.198.109",
+    "serialNumber": "2147SMP0000196"
+  },
+  {
+    "id": 593,
+    "deviceCode": "455",
+    "ipAddress": "10.254.198.53",
+    "serialNumber": "2124SMP0000380"
+  },
+  {
+    "id": 594,
+    "deviceCode": "456",
+    "ipAddress": "10.254.198.52",
+    "serialNumber": "2147SMP0000936"
+  },
+  {
+    "id": 595,
+    "deviceCode": "457",
+    "ipAddress": "10.254.198.93",
+    "serialNumber": "2142SMP0002757"
+  },
+  {
+    "id": 596,
+    "deviceCode": "458",
+    "ipAddress": "10.254.198.94",
+    "serialNumber": "2125SMP0001698"
+  },
+  {
+    "id": 597,
+    "deviceCode": "459",
+    "ipAddress": "10.254.198.95",
+    "serialNumber": "2125SMP0001520"
+  },
+  {
+    "id": 598,
+    "deviceCode": "460",
+    "ipAddress": "10.254.198.96",
+    "serialNumber": "2125SMP0001131"
+  },
+  {
+    "id": 599,
+    "deviceCode": "461",
+    "ipAddress": "10.254.198.97",
+    "serialNumber": "2142SMP0000870"
+  },
+  {
+    "id": 600,
+    "deviceCode": "462",
+    "ipAddress": "10.254.198.98",
+    "serialNumber": "2142SMP0001141"
+  },
+  {
+    "id": 601,
+    "deviceCode": "463",
+    "ipAddress": "10.254.198.99",
+    "serialNumber": "2125SMP0002303"
+  },
+  {
+    "id": 602,
+    "deviceCode": "464",
+    "ipAddress": "10.254.198.100",
+    "serialNumber": "2142SMP0000672"
+  },
+  {
+    "id": 603,
+    "deviceCode": "465",
+    "ipAddress": "10.254.198.111",
+    "serialNumber": "2237SMP0001595"
+  },
+  {
+    "id": 604,
+    "deviceCode": "466",
+    "ipAddress": "10.254.198.112",
+    "serialNumber": "2237SMP0001601"
+  },
+  {
+    "id": 605,
+    "deviceCode": "467",
+    "ipAddress": "10.254.198.113",
+    "serialNumber": "2223SMP0000573"
+  },
+  {
+    "id": 606,
+    "deviceCode": "468",
+    "ipAddress": "10.254.198.114",
+    "serialNumber": "2223SMP0000490"
+  },
+  {
+    "id": 607,
+    "deviceCode": "469",
+    "ipAddress": "10.254.198.115",
+    "serialNumber": "2234SMP0001291"
+  },
+  {
+    "id": 608,
+    "deviceCode": "470",
+    "ipAddress": "10.254.198.116",
+    "serialNumber": "2234SMP0002609"
+  },
+  {
+    "id": 609,
+    "deviceCode": "471",
+    "ipAddress": "10.254.198.117",
+    "serialNumber": "2238SMP0000926"
+  },
+  {
+    "id": 610,
+    "deviceCode": "472",
+    "ipAddress": "10.254.198.64",
+    "serialNumber": "2234SMP0002944"
+  },
+  {
+    "id": 611,
+    "deviceCode": "473",
+    "ipAddress": "10.254.198.65",
+    "serialNumber": "2234SMP0002418"
+  },
+  {
+    "id": 612,
+    "deviceCode": "474",
+    "ipAddress": "10.254.198.66",
+    "serialNumber": "2142SMP0000146"
+  },
+  {
+    "id": 613,
+    "deviceCode": "475",
+    "ipAddress": "10.254.198.67",
+    "serialNumber": "2223SMP0000339"
+  },
+  {
+    "id": 614,
+    "deviceCode": "476",
+    "ipAddress": "10.254.198.68",
+    "serialNumber": "2223SMP0000629"
+  },
+  {
+    "id": 615,
+    "deviceCode": "477",
+    "ipAddress": "10.254.198.69",
+    "serialNumber": "2223SMP0000636"
+  },
+  {
+    "id": 616,
+    "deviceCode": "478",
+    "ipAddress": "10.254.198.70",
+    "serialNumber": "2223SMP0000834"
+  },
+  {
+    "id": 617,
+    "deviceCode": "479",
+    "ipAddress": "10.254.198.22",
+    "serialNumber": "2142SMP0002429"
+  },
+  {
+    "id": 618,
+    "deviceCode": "480",
+    "ipAddress": "10.254.198.23",
+    "serialNumber": "2143SMP0001584"
+  },
+  {
+    "id": 619,
+    "deviceCode": "481",
+    "ipAddress": "10.254.198.24",
+    "serialNumber": "2142SMP0002344"
+  },
+  {
+    "id": 620,
+    "deviceCode": "482",
+    "ipAddress": "10.254.198.25",
+    "serialNumber": "2223SMP0001006"
+  },
+  {
+    "id": 621,
+    "deviceCode": "483",
+    "ipAddress": "10.254.198.26",
+    "serialNumber": "2143SMP0000015"
+  },
+  {
+    "id": 622,
+    "deviceCode": "484",
+    "ipAddress": "10.254.198.27",
+    "serialNumber": "2143SMP0000213"
+  },
+  {
+    "id": 623,
+    "deviceCode": "485",
+    "ipAddress": "10.254.198.28",
+    "serialNumber": "2143SMP0001737"
+  },
+  {
+    "id": 624,
+    "deviceCode": "486",
+    "ipAddress": "10.254.198.29",
+    "serialNumber": "2234SMP0000999"
+  },
+  {
+    "id": 625,
+    "deviceCode": "487",
+    "ipAddress": "10.254.198.6",
+    "serialNumber": "2143SMP0001263"
+  },
+  {
+    "id": 626,
+    "deviceCode": "488",
+    "ipAddress": "10.254.198.7",
+    "serialNumber": "2142SMP0002498"
+  },
+  {
+    "id": 627,
+    "deviceCode": "489",
+    "ipAddress": "10.254.198.8",
+    "serialNumber": "2143SMP0001768"
+  },
+  {
+    "id": 628,
+    "deviceCode": "490",
+    "ipAddress": "10.254.198.9",
+    "serialNumber": "2143SMP0001836"
+  },
+  {
+    "id": 629,
+    "deviceCode": "491",
+    "ipAddress": "10.254.198.10",
+    "serialNumber": "2142SMP0000542"
+  },
+  {
+    "id": 630,
+    "deviceCode": "492",
+    "ipAddress": "10.254.198.11",
+    "serialNumber": "2142SMP0001159"
+  },
+  {
+    "id": 631,
+    "deviceCode": "493",
+    "ipAddress": "10.254.198.12",
+    "serialNumber": "2143SMP0001614"
+  },
+  {
+    "id": 632,
+    "deviceCode": "494",
+    "ipAddress": "10.254.198.13",
+    "serialNumber": "2142SMP0001431"
+  },
+  {
+    "id": 633,
+    "deviceCode": "495",
+    "ipAddress": "10.254.198.84",
+    "serialNumber": "2238SMP0000971"
+  },
+  {
+    "id": 634,
+    "deviceCode": "496",
+    "ipAddress": "10.254.198.83",
+    "serialNumber": "2237SMP0001694"
+  },
+  {
+    "id": 635,
+    "deviceCode": "497",
+    "ipAddress": "10.254.198.82",
+    "serialNumber": "2234SMP0001581"
+  },
+  {
+    "id": 636,
+    "deviceCode": "498",
+    "ipAddress": "10.254.198.81",
+    "serialNumber": "2238SMP0000742"
+  },
+  {
+    "id": 637,
+    "deviceCode": "499",
+    "ipAddress": "10.254.198.80",
+    "serialNumber": "2238SMP0000650"
+  },
+  {
+    "id": 638,
+    "deviceCode": "500",
+    "ipAddress": "10.254.198.79",
+    "serialNumber": "2234SMP0001246"
+  },
+  {
+    "id": 639,
+    "deviceCode": "501",
+    "ipAddress": "10.254.198.78",
+    "serialNumber": "2234SMP0001178"
+  },
+  {
+    "id": 640,
+    "deviceCode": "502",
+    "ipAddress": "10.254.198.38",
+    "serialNumber": "2142SMP0000887"
+  },
+  {
+    "id": 641,
+    "deviceCode": "503",
+    "ipAddress": "10.254.198.40",
+    "serialNumber": "2142SMP0002436"
+  },
+  {
+    "id": 642,
+    "deviceCode": "504",
+    "ipAddress": "10.254.198.42",
+    "serialNumber": "2142SMP0002924"
+  },
+  {
+    "id": 643,
+    "deviceCode": "505",
+    "ipAddress": "10.254.198.44",
+    "serialNumber": "2234SMP0002296"
+  },
+  {
+    "id": 644,
+    "deviceCode": "506",
+    "ipAddress": "10.254.198.46",
+    "serialNumber": "2136SMP0001678"
+  },
+  {
+    "id": 645,
+    "deviceCode": "507",
+    "ipAddress": "10.254.198.48",
+    "serialNumber": "2142SMP0001127"
+  },
+  {
+    "id": 646,
+    "deviceCode": "508",
+    "ipAddress": "10.254.198.50",
+    "serialNumber": "2143SMP0001553"
+  },
+  {
+    "id": 653,
+    "deviceCode": "754",
+    "ipAddress": "_",
+    "serialNumber": "_"
+  },
+  {
+    "id": 703,
+    "deviceCode": "565",
+    "ipAddress": "10.254.202.6",
+    "serialNumber": "2142SMP0001608"
+  },
+  {
+    "id": 704,
+    "deviceCode": "566",
+    "ipAddress": "10.254.202.8",
+    "serialNumber": "2125SMP0001377"
+  },
+  {
+    "id": 705,
+    "deviceCode": "567",
+    "ipAddress": "10.254.202.10",
+    "serialNumber": "2147SMP0000257"
+  },
+  {
+    "id": 706,
+    "deviceCode": "568",
+    "ipAddress": "10.254.202.12",
+    "serialNumber": "2125SMP0002013"
+  },
+  {
+    "id": 707,
+    "deviceCode": "569",
+    "ipAddress": "10.254.202.14",
+    "serialNumber": "2142SMP0001035"
+  },
+  {
+    "id": 708,
+    "deviceCode": "570",
+    "ipAddress": "10.254.202.16",
+    "serialNumber": "2142SMP0001363"
+  },
+  {
+    "id": 709,
+    "deviceCode": "571",
+    "ipAddress": "10.254.202.18",
+    "serialNumber": "2147SMP0000929"
+  },
+  {
+    "id": 710,
+    "deviceCode": "572",
+    "ipAddress": "10.254.202.20",
+    "serialNumber": "2147SMP0000622"
+  },
+  {
+    "id": 711,
+    "deviceCode": "573",
+    "ipAddress": "10.254.202.134",
+    "serialNumber": "2142SMP0001912"
+  },
+  {
+    "id": 712,
+    "deviceCode": "574",
+    "ipAddress": "10.254.202.135",
+    "serialNumber": "2147SMP0000554"
+  },
+  {
+    "id": 713,
+    "deviceCode": "575",
+    "ipAddress": "10.254.202.136",
+    "serialNumber": "2142SMP0000184"
+  },
+  {
+    "id": 714,
+    "deviceCode": "576",
+    "ipAddress": "10.254.202.137",
+    "serialNumber": "2143SMP0001409"
+  },
+  {
+    "id": 715,
+    "deviceCode": "577",
+    "ipAddress": "10.254.202.138",
+    "serialNumber": "2143SMP0000947"
+  },
+  {
+    "id": 716,
+    "deviceCode": "578",
+    "ipAddress": "10.254.202.139",
+    "serialNumber": "2143SMP0000695"
+  },
+  {
+    "id": 718,
+    "deviceCode": "580",
+    "ipAddress": "10.254.202.141",
+    "serialNumber": "2124SMP0001378"
+  },
+  {
+    "id": 719,
+    "deviceCode": "581",
+    "ipAddress": "10.254.202.150",
+    "serialNumber": "2125SMP0002365"
+  },
+  {
+    "id": 720,
+    "deviceCode": "582",
+    "ipAddress": "10.254.202.151",
+    "serialNumber": "2142SMP0000177"
+  },
+  {
+    "id": 721,
+    "deviceCode": "583",
+    "ipAddress": "10.254.202.152",
+    "serialNumber": "2147SMP0001269"
+  },
+  {
+    "id": 723,
+    "deviceCode": "585",
+    "ipAddress": "10.254.202.154",
+    "serialNumber": "2223SMP0000421"
+  },
+  {
+    "id": 724,
+    "deviceCode": "586",
+    "ipAddress": "10.254.202.155",
+    "serialNumber": "2143SMP0000596"
+  },
+  {
+    "id": 726,
+    "deviceCode": "588",
+    "ipAddress": "10.254.202.157",
+    "serialNumber": "2125SMP0001261"
+  },
+  {
+    "id": 783,
+    "deviceCode": "645",
+    "ipAddress": "10.254.218.70",
+    "serialNumber": "2234SMP0001673"
+  },
+  {
+    "id": 784,
+    "deviceCode": "646",
+    "ipAddress": "10.254.218.71",
+    "serialNumber": "2237SMP0001205"
+  },
+  {
+    "id": 785,
+    "deviceCode": "647",
+    "ipAddress": "10.254.218.72",
+    "serialNumber": "2223SMP0000995"
+  },
+  {
+    "id": 786,
+    "deviceCode": "648",
+    "ipAddress": "10.254.218.73",
+    "serialNumber": "2234SMP0002920"
+  },
+  {
+    "id": 787,
+    "deviceCode": "649",
+    "ipAddress": "10.254.218.74",
+    "serialNumber": "2234SMP0002159"
+  },
+  {
+    "id": 788,
+    "deviceCode": "650",
+    "ipAddress": "10.254.218.75",
+    "serialNumber": "2237SMP0001298"
+  },
+  {
+    "id": 789,
+    "deviceCode": "651",
+    "ipAddress": "10.254.218.76",
+    "serialNumber": "2234SMP0001918"
+  },
+  {
+    "id": 790,
+    "deviceCode": "652",
+    "ipAddress": "10.254.218.77",
+    "serialNumber": "2237SMP0000378"
+  },
+  {
+    "id": 799,
+    "deviceCode": "661",
+    "ipAddress": "10.254.218.38",
+    "serialNumber": "2124SMP0001071"
+  },
+  {
+    "id": 800,
+    "deviceCode": "662",
+    "ipAddress": "10.254.218.39",
+    "serialNumber": "2136SMP0000925"
+  },
+  {
+    "id": 801,
+    "deviceCode": "663",
+    "ipAddress": "10.254.218.40",
+    "serialNumber": "2142SMP0001660"
+  },
+  {
+    "id": 802,
+    "deviceCode": "664",
+    "ipAddress": "10.254.218.41",
+    "serialNumber": "2142SMP0000900"
+  },
+  {
+    "id": 803,
+    "deviceCode": "665",
+    "ipAddress": "10.254.218.42",
+    "serialNumber": "2142SMP0000733"
+  },
+  {
+    "id": 804,
+    "deviceCode": "666",
+    "ipAddress": "10.254.218.43",
+    "serialNumber": "2142SMP0001844"
+  },
+  {
+    "id": 805,
+    "deviceCode": "667",
+    "ipAddress": "10.254.218.44",
+    "serialNumber": "2147SMP0000844"
+  },
+  {
+    "id": 806,
+    "deviceCode": "668",
+    "ipAddress": "10.254.218.45",
+    "serialNumber": "2142SMP0000139"
+  },
+  {
+    "id": 807,
+    "deviceCode": "669",
+    "ipAddress": "10.254.218.134",
+    "serialNumber": "2223SMP0001013"
+  },
+  {
+    "id": 808,
+    "deviceCode": "670",
+    "ipAddress": "10.254.218.135",
+    "serialNumber": "2234SMP0001970"
+  },
+  {
+    "id": 809,
+    "deviceCode": "671",
+    "ipAddress": "10.254.218.136",
+    "serialNumber": "2223SMP0000841"
+  },
+  {
+    "id": 810,
+    "deviceCode": "672",
+    "ipAddress": "10.254.218.137",
+    "serialNumber": "2111SMP0002388"
+  },
+  {
+    "id": 811,
+    "deviceCode": "673",
+    "ipAddress": "10.254.218.138",
+    "serialNumber": "2237SMP0000507"
+  },
+  {
+    "id": 812,
+    "deviceCode": "674",
+    "ipAddress": "10.254.218.139",
+    "serialNumber": "2234SMP0001574"
+  },
+  {
+    "id": 813,
+    "deviceCode": "675",
+    "ipAddress": "10.254.218.140",
+    "serialNumber": "2237SMP0000163"
+  },
+  {
+    "id": 814,
+    "deviceCode": "676",
+    "ipAddress": "10.254.218.141",
+    "serialNumber": "2234SMP0000913"
+  },
+  {
+    "id": 815,
+    "deviceCode": "677",
+    "ipAddress": "10.254.218.86",
+    "serialNumber": "2237SMP0001632"
+  },
+  {
+    "id": 816,
+    "deviceCode": "678",
+    "ipAddress": "10.254.218.87",
+    "serialNumber": "2223SMP0000650"
+  },
+  {
+    "id": 817,
+    "deviceCode": "679",
+    "ipAddress": "10.254.218.88",
+    "serialNumber": "2238SMP0000087"
+  },
+  {
+    "id": 818,
+    "deviceCode": "680",
+    "ipAddress": "10.254.218.89",
+    "serialNumber": "2237SMP0000293"
+  },
+  {
+    "id": 819,
+    "deviceCode": "681",
+    "ipAddress": "10.254.218.90",
+    "serialNumber": "2237SMP0001175"
+  },
+  {
+    "id": 820,
+    "deviceCode": "682",
+    "ipAddress": "10.254.218.91",
+    "serialNumber": "2238SMP0000704"
+  },
+  {
+    "id": 821,
+    "deviceCode": "683",
+    "ipAddress": "10.254.218.92",
+    "serialNumber": "2234SMP0002241"
+  },
+  {
+    "id": 822,
+    "deviceCode": "684",
+    "ipAddress": "10.254.218.93",
+    "serialNumber": "2234SMP0002838"
+  },
+  {
+    "id": 823,
+    "deviceCode": "685",
+    "ipAddress": "10.254.222.100",
+    "serialNumber": "2120SMP0000582"
+  },
+  {
+    "id": 828,
+    "deviceCode": "690",
+    "ipAddress": "10.254.222.106",
+    "serialNumber": "2143SMP0000992"
+  },
+  {
+    "id": 829,
+    "deviceCode": "691",
+    "ipAddress": "10.254.222.107",
+    "serialNumber": "2124SMP0000359"
+  },
+  {
+    "id": 830,
+    "deviceCode": "692",
+    "ipAddress": "10.254.222.105",
+    "serialNumber": "2147SMP0000387"
+  },
+  {
+    "id": 839,
+    "deviceCode": "701",
+    "ipAddress": "10.254.222.11",
+    "serialNumber": "2234SMP0002081"
+  },
+  {
+    "id": 871,
+    "deviceCode": "733",
+    "ipAddress": "10.254.221.109",
+    "serialNumber": "2234SMP0002074"
+  },
+  {
+    "id": 872,
+    "deviceCode": "734",
+    "ipAddress": "10.254.221.110",
+    "serialNumber": "2125SMP0000426"
+  },
+  {
+    "id": 873,
+    "deviceCode": "735",
+    "ipAddress": "10.254.221.111",
+    "serialNumber": "2125SMP0001896"
+  },
+  {
+    "id": 874,
+    "deviceCode": "736",
+    "ipAddress": "10.254.221.127",
+    "serialNumber": "2125SMP0002143"
+  },
+  {
+    "id": 876,
+    "deviceCode": "738",
+    "ipAddress": "10.254.221.120",
+    "serialNumber": "2125SMP0000389"
+  },
+  {
+    "id": 877,
+    "deviceCode": "739",
+    "ipAddress": "10.254.221.122",
+    "serialNumber": "2111SMP0002654"
+  },
+  {
+    "id": 878,
+    "deviceCode": "740",
+    "ipAddress": "10.254.221.124",
+    "serialNumber": "2143SMP0000176"
+  },
+  {
+    "id": 879,
+    "deviceCode": "741",
+    "ipAddress": "10.254.222.53",
+    "serialNumber": "2124SMP0000687"
+  },
+  {
+    "id": 880,
+    "deviceCode": "742",
+    "ipAddress": "10.254.222.55",
+    "serialNumber": "2125SMP0001162"
+  },
+  {
+    "id": 881,
+    "deviceCode": "743",
+    "ipAddress": "10.254.222.57",
+    "serialNumber": "2234SMP0002852"
+  },
+  {
+    "id": 882,
+    "deviceCode": "744",
+    "ipAddress": "10.254.222.59",
+    "serialNumber": "2125SMP0001292"
+  },
+  {
+    "id": 883,
+    "deviceCode": "745",
+    "ipAddress": "10.254.222.61",
+    "serialNumber": "2143SMP0001782"
+  },
+  {
+    "id": 884,
+    "deviceCode": "746",
+    "ipAddress": "10.254.222.63",
+    "serialNumber": "2147SMP0001054"
+  },
+  {
+    "id": 885,
+    "deviceCode": "747",
+    "ipAddress": "10.254.222.65",
+    "serialNumber": "2124SMP0001521"
+  },
+  {
+    "id": 886,
+    "deviceCode": "748",
+    "ipAddress": "10.254.222.67",
+    "serialNumber": "2125SMP0001049"
+  },
+  {
+    "id": 887,
+    "deviceCode": "749",
+    "ipAddress": "10.254.222.69",
+    "serialNumber": "2223SMP0000827"
+  },
+  {
+    "id": 890,
+    "deviceCode": "752",
+    "ipAddress": "10.254.222.75",
+    "serialNumber": "2125SMP0002518"
+  },
+  {
+    "id": 891,
+    "deviceCode": "753",
+    "ipAddress": "10.254.222.77",
+    "serialNumber": "2120SMP0000407"
+  },
+  {
+    "id": 893,
+    "deviceCode": "755",
+    "ipAddress": "10.254.222.81",
+    "serialNumber": "2125SMP0000716"
+  },
+  {
+    "id": 894,
+    "deviceCode": "756",
+    "ipAddress": "10.254.222.83",
+    "serialNumber": "2125SMP0000723"
+  },
+  {
+    "id": 911,
+    "deviceCode": "773",
+    "ipAddress": "10.254.210.173",
+    "serialNumber": "2147SMP0000592"
+  },
+  {
+    "id": 912,
+    "deviceCode": "774",
+    "ipAddress": "10.254.210.169",
+    "serialNumber": "2141SMP0002000"
+  },
+  {
+    "id": 913,
+    "deviceCode": "775",
+    "ipAddress": "10.254.210.175",
+    "serialNumber": "2136SMP0000673"
+  },
+  {
+    "id": 914,
+    "deviceCode": "776",
+    "ipAddress": "10.254.210.180",
+    "serialNumber": "2147SMP0000486"
+  },
+  {
+    "id": 915,
+    "deviceCode": "777",
+    "ipAddress": "10.254.210.179",
+    "serialNumber": "2136SMP0000901"
+  },
+  {
+    "id": 916,
+    "deviceCode": "778",
+    "ipAddress": "10.254.210.183",
+    "serialNumber": "2142SMP0000108"
+  },
+  {
+    "id": 917,
+    "deviceCode": "779",
+    "ipAddress": "10.254.210.181",
+    "serialNumber": "2140SMP0000018"
+  },
+  {
+    "id": 918,
+    "deviceCode": "780",
+    "ipAddress": "10.254.210.172",
+    "serialNumber": "2136SMP0000840"
+  },
+  {
+    "id": 919,
+    "deviceCode": "781",
+    "ipAddress": "10.254.210.208",
+    "serialNumber": "2143SMP0000633"
+  },
+  {
+    "id": 920,
+    "deviceCode": "782",
+    "ipAddress": "10.254.210.209",
+    "serialNumber": "2111SMP0002241"
+  },
+  {
+    "id": 921,
+    "deviceCode": "783",
+    "ipAddress": "10.254.210.210",
+    "serialNumber": "2120SMP0000179"
+  },
+  {
+    "id": 922,
+    "deviceCode": "784",
+    "ipAddress": "10.254.210.211",
+    "serialNumber": "2142SMP0000894"
+  },
+  {
+    "id": 923,
+    "deviceCode": "785",
+    "ipAddress": "10.254.210.212",
+    "serialNumber": "2125SMP0002556"
+  },
+  {
+    "id": 924,
+    "deviceCode": "786",
+    "ipAddress": "10.254.210.213",
+    "serialNumber": "2223SMP0000223"
+  },
+  {
+    "id": 925,
+    "deviceCode": "787",
+    "ipAddress": "10.254.210.214",
+    "serialNumber": "2120SMP0000360"
+  },
+  {
+    "id": 926,
+    "deviceCode": "788",
+    "ipAddress": "10.254.210.215",
+    "serialNumber": "2136SMP0000550"
+  },
+  {
+    "id": 927,
+    "deviceCode": "789",
+    "ipAddress": "10.254.210.137",
+    "serialNumber": "2234SMP0002555"
+  },
+  {
+    "id": 928,
+    "deviceCode": "790",
+    "ipAddress": "10.254.210.159",
+    "serialNumber": "2234SMP0001611"
+  },
+  {
+    "id": 929,
+    "deviceCode": "791",
+    "ipAddress": "10.254.210.102",
+    "serialNumber": "2223SMP0000544"
+  },
+  {
+    "id": 930,
+    "deviceCode": "792",
+    "ipAddress": "10.254.210.14",
+    "serialNumber": "2234SMP0001123"
+  },
+  {
+    "id": 931,
+    "deviceCode": "793",
+    "ipAddress": "10.254.210.156",
+    "serialNumber": "2237SMP0001526"
+  },
+  {
+    "id": 932,
+    "deviceCode": "794",
+    "ipAddress": "10.254.210.106",
+    "serialNumber": "2234SMP0002500"
+  },
+  {
+    "id": 933,
+    "deviceCode": "795",
+    "ipAddress": "10.254.210.141",
+    "serialNumber": "2237SMP0000439"
+  },
+  {
+    "id": 934,
+    "deviceCode": "796",
+    "ipAddress": "10.254.210.120",
+    "serialNumber": "2237SMP0001076"
+  },
+  {
+    "id": 935,
+    "deviceCode": "797",
+    "ipAddress": "10.254.210.143",
+    "serialNumber": "2234SMP0001086"
+  },
+  {
+    "id": 936,
+    "deviceCode": "798",
+    "ipAddress": "10.254.210.122",
+    "serialNumber": "2234SMP0002777"
+  },
+  {
+    "id": 937,
+    "deviceCode": "799",
+    "ipAddress": "10.254.210.123",
+    "serialNumber": "2223SMP0000728"
+  },
+  {
+    "id": 938,
+    "deviceCode": "800",
+    "ipAddress": "10.254.210.144",
+    "serialNumber": "2223SMP0000810"
+  },
+  {
+    "id": 939,
+    "deviceCode": "801",
+    "ipAddress": "10.254.210.147",
+    "serialNumber": "2223SMP0001020"
+  },
+  {
+    "id": 940,
+    "deviceCode": "802",
+    "ipAddress": "10.254.210.148",
+    "serialNumber": "2223SMP0000353"
+  },
+  {
+    "id": 941,
+    "deviceCode": "803",
+    "ipAddress": "10.254.210.149",
+    "serialNumber": "2234SMP0002364"
+  },
+  {
+    "id": 942,
+    "deviceCode": "804",
+    "ipAddress": "10.254.202.22",
+    "serialNumber": "2125SMP0002020"
+  },
+  {
+    "id": 943,
+    "deviceCode": "805",
+    "ipAddress": "10.254.202.23",
+    "serialNumber": "2142SMP0001806"
+  },
+  {
+    "id": 944,
+    "deviceCode": "806",
+    "ipAddress": "10.254.202.24",
+    "serialNumber": "2124SMP0001385"
+  },
+  {
+    "id": 945,
+    "deviceCode": "807",
+    "ipAddress": "10.254.202.25",
+    "serialNumber": "2142SMP0001707"
+  },
+  {
+    "id": 946,
+    "deviceCode": "808",
+    "ipAddress": "10.254.202.26",
+    "serialNumber": "2142SMP0000795"
+  },
+  {
+    "id": 947,
+    "deviceCode": "809",
+    "ipAddress": "10.254.202.27",
+    "serialNumber": "2125SMP0001513"
+  },
+  {
+    "id": 948,
+    "deviceCode": "810",
+    "ipAddress": "10.254.202.28",
+    "serialNumber": "2143SMP0000862"
+  },
+  {
+    "id": 949,
+    "deviceCode": "811",
+    "ipAddress": "10.254.202.29",
+    "serialNumber": "2147SMP0000615"
+  },
+  {
+    "id": 950,
+    "deviceCode": "812",
+    "ipAddress": "10.254.202.54",
+    "serialNumber": "21245MP0001415"
+  },
+  {
+    "id": 951,
+    "deviceCode": "813",
+    "ipAddress": "بتهنج",
+    "serialNumber": "بتهنج"
+  },
+  {
+    "id": 952,
+    "deviceCode": "814",
+    "ipAddress": "10.254.202.56",
+    "serialNumber": "2143SMP0000183"
+  },
+  {
+    "id": 953,
+    "deviceCode": "815",
+    "ipAddress": "10.254.202.57",
+    "serialNumber": "2147SMP0000295"
+  },
+  {
+    "id": 954,
+    "deviceCode": "816",
+    "ipAddress": "10.254.202.58",
+    "serialNumber": "2142SMP0002702"
+  },
+  {
+    "id": 955,
+    "deviceCode": "817",
+    "ipAddress": "10.254.202.59",
+    "serialNumber": "2125SMP0002105"
+  },
+  {
+    "id": 956,
+    "deviceCode": "833",
+    "ipAddress": "ريدر فاصل",
+    "serialNumber": "ريدر فاصل"
+  },
+  {
+    "id": 957,
+    "deviceCode": "819",
+    "ipAddress": "10.254.202.61",
+    "serialNumber": "2120SMP0000278"
+  },
+  {
+    "id": 958,
+    "deviceCode": "820",
+    "ipAddress": "10.254.202.70",
+    "serialNumber": "2124SMP0000823"
+  },
+  {
+    "id": 959,
+    "deviceCode": "821",
+    "ipAddress": "10.254.202.71",
+    "serialNumber": "2136SMP0001524"
+  },
+  {
+    "id": 960,
+    "deviceCode": "822",
+    "ipAddress": "10.254.202.72",
+    "serialNumber": "2147SMP0001337"
+  },
+  {
+    "id": 961,
+    "deviceCode": "823",
+    "ipAddress": "10.254.202.73",
+    "serialNumber": "2142SMP0001103"
+  },
+  {
+    "id": 962,
+    "deviceCode": "824",
+    "ipAddress": "10.254.202.74",
+    "serialNumber": "2124SMP0000779"
+  },
+  {
+    "id": 963,
+    "deviceCode": "825",
+    "ipAddress": "10.254.202.75",
+    "serialNumber": "2124SMP0000793"
+  },
+  {
+    "id": 964,
+    "deviceCode": "826",
+    "ipAddress": "10.254.202.76",
+    "serialNumber": "2142SMP0001394"
+  },
+  {
+    "id": 965,
+    "deviceCode": "827",
+    "ipAddress": "10.254.202.77",
+    "serialNumber": "2125SMP0000884"
+  },
+  {
+    "id": 996,
+    "deviceCode": "867",
+    "ipAddress": "10.254.198.69",
+    "serialNumber": "2142SMP0001790"
+  },
+  {
+    "id": 997,
+    "deviceCode": "868",
+    "ipAddress": "10.254.198.67",
+    "serialNumber": "2125SMP0002273"
+  },
+  {
+    "id": 998,
+    "deviceCode": "869",
+    "ipAddress": "10.254.198.65",
+    "serialNumber": "2147SMP0000660"
+  },
+  {
+    "id": 999,
+    "deviceCode": "870",
+    "ipAddress": "10.254.198.63",
+    "serialNumber": "2125SMP0002181"
+  },
+  {
+    "id": 1000,
+    "deviceCode": "871",
+    "ipAddress": "10.254.198.61",
+    "serialNumber": "2142SMP0001219"
+  },
+  {
+    "id": 1001,
+    "deviceCode": "872",
+    "ipAddress": "10.254.198.59",
+    "serialNumber": "2136SMP0000758"
+  },
+  {
+    "id": 1002,
+    "deviceCode": "873",
+    "ipAddress": "10.254.198.57",
+    "serialNumber": "2125SMP0001506"
+  },
+  {
+    "id": 1003,
+    "deviceCode": "874",
+    "ipAddress": "10.254.198.55",
+    "serialNumber": "2125SMP0001933"
+  },
+  {
+    "id": 1004,
+    "deviceCode": "875",
+    "ipAddress": "10.254.193.39",
+    "serialNumber": "2142SMP0001134"
+  },
+  {
+    "id": 1005,
+    "deviceCode": "876",
+    "ipAddress": "10.254.193.41",
+    "serialNumber": "2124SMP0001248"
+  },
+  {
+    "id": 1006,
+    "deviceCode": "877",
+    "ipAddress": "10.254.193.43",
+    "serialNumber": "2142SMP0002788"
+  },
+  {
+    "id": 1007,
+    "deviceCode": "878",
+    "ipAddress": "10.254.193.45",
+    "serialNumber": "2142SMP0002252"
+  },
+  {
+    "id": 1008,
+    "deviceCode": "879",
+    "ipAddress": "10.254.193.47",
+    "serialNumber": "2143SMP0001713"
+  },
+  {
+    "id": 1009,
+    "deviceCode": "880",
+    "ipAddress": "10.254.193.49",
+    "serialNumber": "2143SMP0001294"
+  },
+  {
+    "id": 1010,
+    "deviceCode": "881",
+    "ipAddress": "10.254.193.51",
+    "serialNumber": "2136SMP0000505"
+  },
+  {
+    "id": 1019,
+    "deviceCode": "890",
+    "ipAddress": "10.254.210.36",
+    "serialNumber": "2120SMP0000551"
+  },
+  {
+    "id": 1020,
+    "deviceCode": "891",
+    "ipAddress": "10.254.210.35",
+    "serialNumber": "2238SMP0000544"
+  },
+  {
+    "id": 1021,
+    "deviceCode": "892",
+    "ipAddress": "10.254.210.45",
+    "serialNumber": "2120SMP0000254"
+  },
+  {
+    "id": 1022,
+    "deviceCode": "893",
+    "ipAddress": "10.254.210.26",
+    "serialNumber": "2120SMP0000018"
+  },
+  {
+    "id": 1023,
+    "deviceCode": "894",
+    "ipAddress": "10.254.210.13",
+    "serialNumber": "2238SMP0000063"
+  },
+  {
+    "id": 1024,
+    "deviceCode": "895",
+    "ipAddress": "10.254.210.39",
+    "serialNumber": "2125SMP0001124"
+  },
+  {
+    "id": 1025,
+    "deviceCode": "896",
+    "ipAddress": "10.254.210.19",
+    "serialNumber": "2125SMP0001063"
+  },
+  {
+    "id": 1026,
+    "deviceCode": "897",
+    "ipAddress": "10.254.210.32",
+    "serialNumber": "2125SMP0000273"
+  },
+  {
+    "id": 1035,
+    "deviceCode": "906",
+    "ipAddress": "10.254.210.221",
+    "serialNumber": "2142SMP0000481"
+  },
+  {
+    "id": 1036,
+    "deviceCode": "907",
+    "ipAddress": "10.254.210.217",
+    "serialNumber": "2124SMP0001118"
+  },
+  {
+    "id": 1037,
+    "deviceCode": "908",
+    "ipAddress": "10.254.210.222",
+    "serialNumber": "2125SMP0000914"
+  },
+  {
+    "id": 1038,
+    "deviceCode": "909",
+    "ipAddress": "10.254.210.216",
+    "serialNumber": "2124SMP0000601"
+  },
+  {
+    "id": 1039,
+    "deviceCode": "910",
+    "ipAddress": "10.254.210.218",
+    "serialNumber": "2124SMP0000694"
+  },
+  {
+    "id": 1040,
+    "deviceCode": "911",
+    "ipAddress": "10.254.210.219",
+    "serialNumber": "2111SMP0002500"
+  },
+  {
+    "id": 1041,
+    "deviceCode": "912",
+    "ipAddress": "10.254.210.220",
+    "serialNumber": "2143SMP0001270"
+  },
+  {
+    "id": 1042,
+    "deviceCode": "914",
+    "ipAddress": "10.254.210.161",
+    "serialNumber": "2237SMP0001144"
+  },
+  {
+    "id": 1043,
+    "deviceCode": "915",
+    "ipAddress": "10.254.210.142",
+    "serialNumber": "2237SMP0000125"
+  },
+  {
+    "id": 1044,
+    "deviceCode": "916",
+    "ipAddress": "10.254.210.158",
+    "serialNumber": "2234SMP0001307"
+  },
+  {
+    "id": 1045,
+    "deviceCode": "917",
+    "ipAddress": "10.254.210.111",
+    "serialNumber": "2234SMP0001000"
+  },
+  {
+    "id": 1046,
+    "deviceCode": "918",
+    "ipAddress": "الريدر قاطع",
+    "serialNumber": "الريدر قاطع"
+  },
+  {
+    "id": 1047,
+    "deviceCode": "919",
+    "ipAddress": "10.254.210.113",
+    "serialNumber": "2234SMP0001260"
+  },
+  {
+    "id": 1048,
+    "deviceCode": "920",
+    "ipAddress": "10.254.210.114",
+    "serialNumber": "2234SMP0002494"
+  },
+  {
+    "id": 1049,
+    "deviceCode": "921",
+    "ipAddress": "10.254.210.115",
+    "serialNumber": "2234SMP0002678"
+  },
+  {
+    "id": 1050,
+    "deviceCode": "922",
+    "ipAddress": "10.254.210.128",
+    "serialNumber": "2238SMP0000513"
+  },
+  {
+    "id": 1051,
+    "deviceCode": "923",
+    "ipAddress": "10.254.210.129",
+    "serialNumber": "2142SMP0001257"
+  },
+  {
+    "id": 1052,
+    "deviceCode": "924",
+    "ipAddress": "10.254.210.150",
+    "serialNumber": "2234SMP0002517"
+  },
+  {
+    "id": 1053,
+    "deviceCode": "925",
+    "ipAddress": "10.254.210.151",
+    "serialNumber": "2238SMP0000681"
+  },
+  {
+    "id": 1054,
+    "deviceCode": "926",
+    "ipAddress": "10.254.210.132",
+    "serialNumber": "2237SMP0001137"
+  },
+  {
+    "id": 1055,
+    "deviceCode": "927",
+    "ipAddress": "10.254.210.152",
+    "serialNumber": "2136SMP0000970"
+  },
+  {
+    "id": 1056,
+    "deviceCode": "928",
+    "ipAddress": "الريدر مهنج",
+    "serialNumber": "الريدر مهنج"
+  },
+  {
+    "id": 1057,
+    "deviceCode": "930",
+    "ipAddress": "10.254.202.30",
+    "serialNumber": "2143SMP0000961"
+  },
+  {
+    "id": 1058,
+    "deviceCode": "931",
+    "ipAddress": "10.254.202.31",
+    "serialNumber": "2143SMP0000879"
+  },
+  {
+    "id": 1059,
+    "deviceCode": "932",
+    "ipAddress": "10.254.202.32",
+    "serialNumber": "2238SMP0000193"
+  },
+  {
+    "id": 1060,
+    "deviceCode": "933",
+    "ipAddress": "10.254.202.33",
+    "serialNumber": "2125SMP0001919"
+  },
+  {
+    "id": 1061,
+    "deviceCode": "934",
+    "ipAddress": "10.254.202.34",
+    "serialNumber": "2136SMP0000543"
+  },
+  {
+    "id": 1062,
+    "deviceCode": "935",
+    "ipAddress": "10.254.202.35",
+    "serialNumber": "2120SMP0000667"
+  },
+  {
+    "id": 1063,
+    "deviceCode": "936",
+    "ipAddress": "10.254.202.36",
+    "serialNumber": "2111SMP0002548"
+  },
+  {
+    "id": 1064,
+    "deviceCode": "937",
+    "ipAddress": "10.254.202.37",
+    "serialNumber": "2125SMP0001100"
+  },
+  {
+    "id": 1065,
+    "deviceCode": "938",
+    "ipAddress": "10.254.202.62",
+    "serialNumber": "2142SMP0001066"
+  },
+  {
+    "id": 1066,
+    "deviceCode": "939",
+    "ipAddress": "10.254.202.63",
+    "serialNumber": "2147SMP0000608"
+  },
+  {
+    "id": 1067,
+    "deviceCode": "940",
+    "ipAddress": "10.254.202.64",
+    "serialNumber": "2142SMP0001172"
+  },
+  {
+    "id": 1068,
+    "deviceCode": "941",
+    "ipAddress": "10.254.202.65",
+    "serialNumber": "2237SMP0000088"
+  },
+  {
+    "id": 1069,
+    "deviceCode": "942",
+    "ipAddress": "10.254.202.66",
+    "serialNumber": "2125SMP0001346"
+  },
+  {
+    "id": 1070,
+    "deviceCode": "943",
+    "ipAddress": "10.254.202.67",
+    "serialNumber": "2142SMP0002573"
+  },
+  {
+    "id": 1071,
+    "deviceCode": "944",
+    "ipAddress": "10.254.202.68",
+    "serialNumber": "2142SMP0001165"
+  },
+  {
+    "id": 1072,
+    "deviceCode": "945",
+    "ipAddress": "10.254.202.69",
+    "serialNumber": "2125SMP0001254"
+  },
+  {
+    "id": 1073,
+    "deviceCode": "1033",
+    "ipAddress": "10.254.214.14",
+    "serialNumber": "2142SMP0002009"
+  },
+  {
+    "id": 1074,
+    "deviceCode": "1034",
+    "ipAddress": "10.254.214.15",
+    "serialNumber": "2142SMP0002078"
+  },
+  {
+    "id": 1075,
+    "deviceCode": "1035",
+    "ipAddress": "10.254.214.16",
+    "serialNumber": "2130SMP0000969"
+  },
+  {
+    "id": 1076,
+    "deviceCode": "1036",
+    "ipAddress": "10.254.214.17",
+    "serialNumber": "2143SMP0000954"
+  },
+  {
+    "id": 1077,
+    "deviceCode": "1037",
+    "ipAddress": "10.254.214.18",
+    "serialNumber": "2142SMP0002016"
+  },
+  {
+    "id": 1078,
+    "deviceCode": "1038",
+    "ipAddress": "10.254.214.19",
+    "serialNumber": "2143SMP0000763"
+  },
+  {
+    "id": 1079,
+    "deviceCode": "1039",
+    "ipAddress": "10.254.214.20",
+    "serialNumber": "2124SMP0001323"
+  },
+  {
+    "id": 1080,
+    "deviceCode": "1040",
+    "ipAddress": "10.254.214.21",
+    "serialNumber": "2142SMP0001332"
+  },
+  {
+    "id": 1129,
+    "deviceCode": "1089",
+    "ipAddress": "10.254.214.155",
+    "serialNumber": "2124SMP0001149"
+  },
+  {
+    "id": 1130,
+    "deviceCode": "1090",
+    "ipAddress": "10.254.214.156",
+    "serialNumber": "2143SMP0001454"
+  },
+  {
+    "id": 1131,
+    "deviceCode": "1091",
+    "ipAddress": "10.254.214.157",
+    "serialNumber": "2147SMP0000059"
+  },
+  {
+    "id": 1132,
+    "deviceCode": "1092",
+    "ipAddress": "10.254.214.158",
+    "serialNumber": "2142SMP0002825"
+  },
+  {
+    "id": 1133,
+    "deviceCode": "1093",
+    "ipAddress": "10.254.214.159",
+    "serialNumber": "2125SMP0001643"
+  },
+  {
+    "id": 1134,
+    "deviceCode": "1094",
+    "ipAddress": "10.254.214.160",
+    "serialNumber": "2143SMP0000312"
+  },
+  {
+    "id": 1135,
+    "deviceCode": "1095",
+    "ipAddress": "10.254.214.161",
+    "serialNumber": "2143SMP0001621"
+  },
+  {
+    "id": 1136,
+    "deviceCode": "1096",
+    "ipAddress": "10.254.214.162",
+    "serialNumber": "2143SMP0000541"
+  },
+  {
+    "id": 1263,
+    "deviceCode": "1137",
+    "ipAddress": "10.254.202.174",
+    "serialNumber": "2142SMP0000702"
+  },
+  {
+    "id": 1264,
+    "deviceCode": "1138",
+    "ipAddress": "10.254.202.175",
+    "serialNumber": "2142SMP0001271"
+  },
+  {
+    "id": 1265,
+    "deviceCode": "1139",
+    "ipAddress": "10.254.202.176",
+    "serialNumber": "2125SMP0002051"
+  },
+  {
+    "id": 1266,
+    "deviceCode": "1140",
+    "ipAddress": "10.254.202.177",
+    "serialNumber": "2142SMP0002481"
+  },
+  {
+    "id": 1267,
+    "deviceCode": "1141",
+    "ipAddress": "10.254.202.178",
+    "serialNumber": "2142SMP0000221"
+  },
+  {
+    "id": 1268,
+    "deviceCode": "1142",
+    "ipAddress": "10.254.202.179",
+    "serialNumber": "2142SMP0002306"
+  },
+  {
+    "id": 1269,
+    "deviceCode": "1143",
+    "ipAddress": "10.254.202.180",
+    "serialNumber": "2120SMP0000087"
+  },
+  {
+    "id": 1270,
+    "deviceCode": "1144",
+    "ipAddress": "10.254.202.181",
+    "serialNumber": "2142SMP0002566"
+  },
+  {
+    "id": 1295,
+    "deviceCode": "1169",
+    "ipAddress": "10.254.218.126",
+    "serialNumber": "2143SMP0001102"
+  },
+  {
+    "id": 1296,
+    "deviceCode": "1170",
+    "ipAddress": "10.254.218.127",
+    "serialNumber": "2111SMP0002326"
+  },
+  {
+    "id": 1297,
+    "deviceCode": "1171",
+    "ipAddress": "10.254.218.128",
+    "serialNumber": "2147SMP0000783"
+  },
+  {
+    "id": 1298,
+    "deviceCode": "1172",
+    "ipAddress": "10.254.218.129",
+    "serialNumber": "2143SMP0000091"
+  },
+  {
+    "id": 1299,
+    "deviceCode": "1173",
+    "ipAddress": "10.254.218.130",
+    "serialNumber": "2147SMP0000073"
+  },
+  {
+    "id": 1300,
+    "deviceCode": "1174",
+    "ipAddress": "10.254.218.131",
+    "serialNumber": "2143SMP0000329"
+  },
+  {
+    "id": 1301,
+    "deviceCode": "1175",
+    "ipAddress": "10.254.218.132",
+    "serialNumber": "2143SMP0000152"
+  },
+  {
+    "id": 1302,
+    "deviceCode": "1176",
+    "ipAddress": "10.254.218.133",
+    "serialNumber": "2142SMP0000276"
+  },
+  {
+    "id": 1303,
+    "deviceCode": "1177",
+    "ipAddress": "10.254.222.11",
+    "serialNumber": "spm0002081"
+  },
+  {
+    "id": 1304,
+    "deviceCode": "1178",
+    "ipAddress": "10.254.222.12",
+    "serialNumber": "spm0000981"
+  },
+  {
+    "id": 1305,
+    "deviceCode": "1179",
+    "ipAddress": "10.254.222.13",
+    "serialNumber": "spm0001929"
+  },
+  {
+    "id": 1306,
+    "deviceCode": "1562",
+    "ipAddress": "عطل",
+    "serialNumber": "عطل"
+  },
+  {
+    "id": 1307,
+    "deviceCode": "1181",
+    "ipAddress": "10.254.222.15",
+    "serialNumber": "spm0001027"
+  },
+  {
+    "id": 1308,
+    "deviceCode": "1182",
+    "ipAddress": "10.254.222.16",
+    "serialNumber": "spm0000653"
+  },
+  {
+    "id": 1309,
+    "deviceCode": "1183",
+    "ipAddress": "10.254.222.17",
+    "serialNumber": "spm0002092"
+  },
+  {
+    "id": 1310,
+    "deviceCode": "1184",
+    "ipAddress": "10.254.222.18",
+    "serialNumber": "spm0000056"
+  },
+  {
+    "id": 1311,
+    "deviceCode": "1185",
+    "ipAddress": "10.254.222.149",
+    "serialNumber": "spm0000932"
+  },
+  {
+    "id": 1312,
+    "deviceCode": "1186",
+    "ipAddress": "10.254.222.150",
+    "serialNumber": "spm0000301"
+  },
+  {
+    "id": 1313,
+    "deviceCode": "1187",
+    "ipAddress": "10.254.222.151",
+    "serialNumber": "spm0002524"
+  },
+  {
+    "id": 1314,
+    "deviceCode": "1188",
+    "ipAddress": "10.254.222.152",
+    "serialNumber": "smp0000776"
+  },
+  {
+    "id": 1315,
+    "deviceCode": "1189",
+    "ipAddress": "10.254.222.153",
+    "serialNumber": "spm0000094"
+  },
+  {
+    "id": 1316,
+    "deviceCode": "1190",
+    "ipAddress": "10.254.222.154",
+    "serialNumber": "smp0001872"
+  },
+  {
+    "id": 1317,
+    "deviceCode": "1191",
+    "ipAddress": "10.254.222.155",
+    "serialNumber": "smp0002470"
+  },
+  {
+    "id": 1318,
+    "deviceCode": "1192",
+    "ipAddress": "10.254.222.156",
+    "serialNumber": "smp0001093"
+  },
+  {
+    "id": 1319,
+    "deviceCode": "1558",
+    "ipAddress": "10.254.222.166",
+    "serialNumber": "2124smp0001163"
+  },
+  {
+    "id": 1320,
+    "deviceCode": "1559",
+    "ipAddress": "10.254.222.114",
+    "serialNumber": "2111smp0002616"
+  },
+  {
+    "id": 1321,
+    "deviceCode": "1560",
+    "ipAddress": "10.254.222.113",
+    "serialNumber": "2111smp0002340"
+  },
+  {
+    "id": 1322,
+    "deviceCode": "1561",
+    "ipAddress": "10.254.222.117",
+    "serialNumber": "2143smp0000367"
+  },
+  {
+    "id": 1324,
+    "deviceCode": "1563",
+    "ipAddress": "10.254.222.121",
+    "serialNumber": "2111smp0002364"
+  },
+  {
+    "id": 1325,
+    "deviceCode": "1564",
+    "ipAddress": "10.254.222.123",
+    "serialNumber": "2111smp0002319"
+  },
+  {
+    "id": 1326,
+    "deviceCode": "1565",
+    "ipAddress": "10.254.222.125",
+    "serialNumber": "2143smp0000053"
+  },
+  {
+    "id": 1327,
+    "deviceCode": "1566",
+    "ipAddress": "10.254.222.165",
+    "serialNumber": "2120smp0000124"
+  },
+  {
+    "id": 1328,
+    "deviceCode": "1567",
+    "ipAddress": "10.254.222.56",
+    "serialNumber": "2125smp0000853"
+  },
+  {
+    "id": 1329,
+    "deviceCode": "1568",
+    "ipAddress": "10.254.222.58",
+    "serialNumber": "2125smp0002044"
+  },
+  {
+    "id": 1330,
+    "deviceCode": "1569",
+    "ipAddress": "10.254.222.60",
+    "serialNumber": "2124smp0000700"
+  },
+  {
+    "id": 1331,
+    "deviceCode": "1205",
+    "ipAddress": "10.254.222.62",
+    "serialNumber": "2238smp0000018"
+  },
+  {
+    "id": 1332,
+    "deviceCode": "1571",
+    "ipAddress": "10.254.222.64",
+    "serialNumber": "2124smp0001507"
+  },
+  {
+    "id": 1333,
+    "deviceCode": "1572",
+    "ipAddress": "10.254.222.66",
+    "serialNumber": "2124smp0001132"
+  },
+  {
+    "id": 1334,
+    "deviceCode": "1573",
+    "ipAddress": "10.254.222.68",
+    "serialNumber": "2143smp0000206"
+  },
+  {
+    "id": 1335,
+    "deviceCode": "1574",
+    "ipAddress": "10.254.222.70",
+    "serialNumber": "2125smp0000181"
+  },
+  {
+    "id": 1336,
+    "deviceCode": "1575",
+    "ipAddress": "10.254.222.72",
+    "serialNumber": "2120smp0000292"
+  },
+  {
+    "id": 1337,
+    "deviceCode": "1576",
+    "ipAddress": "10.254.222.74",
+    "serialNumber": "2125smp0000044"
+  },
+  {
+    "id": 1338,
+    "deviceCode": "1577",
+    "ipAddress": "10.254.222.76",
+    "serialNumber": "2125smp0002464"
+  },
+  {
+    "id": 1339,
+    "deviceCode": "1578",
+    "ipAddress": "10.254.222.78",
+    "serialNumber": "2125smp0001780"
+  },
+  {
+    "id": 1340,
+    "deviceCode": "1579",
+    "ipAddress": "10.254.222.80",
+    "serialNumber": "2120smp0000322"
+  },
+  {
+    "id": 1341,
+    "deviceCode": "1580",
+    "ipAddress": "10.254.222.82",
+    "serialNumber": "2125smp0001766"
+  },
+  {
+    "id": 1342,
+    "deviceCode": "1216",
+    "ipAddress": "10.254.222.84",
+    "serialNumber": "2124smp000526"
+  },
+  {
+    "id": 1343,
+    "deviceCode": "1217",
+    "ipAddress": "10.254.210.224",
+    "serialNumber": "2142smp0002733"
+  },
+  {
+    "id": 1344,
+    "deviceCode": "1218",
+    "ipAddress": "10.254.210.225",
+    "serialNumber": "2147smp0000035"
+  },
+  {
+    "id": 1345,
+    "deviceCode": "1219",
+    "ipAddress": "10.254.210.226",
+    "serialNumber": "2142smp0001950"
+  },
+  {
+    "id": 1346,
+    "deviceCode": "1220",
+    "ipAddress": "10.254.210.227",
+    "serialNumber": "2125smp0001278"
+  },
+  {
+    "id": 1347,
+    "deviceCode": "1221",
+    "ipAddress": "10.254.210.228",
+    "serialNumber": "2143smp0000084"
+  },
+  {
+    "id": 1348,
+    "deviceCode": "1222",
+    "ipAddress": "10.254.210.229",
+    "serialNumber": "2237smp0001212"
+  },
+  {
+    "id": 1349,
+    "deviceCode": "1223",
+    "ipAddress": "10.254.210.230",
+    "serialNumber": "2147smp0000455"
+  },
+  {
+    "id": 1350,
+    "deviceCode": "1224",
+    "ipAddress": "10.254.210.231",
+    "serialNumber": "2147smp0000110"
+  },
+  {
+    "id": 1351,
+    "deviceCode": "1225",
+    "ipAddress": "10.254.210.42",
+    "serialNumber": "2120smp0000216"
+  },
+  {
+    "id": 1352,
+    "deviceCode": "1226",
+    "ipAddress": "10.254.210.20",
+    "serialNumber": "2125smp0001056"
+  },
+  {
+    "id": 1353,
+    "deviceCode": "1227",
+    "ipAddress": "10.254.210.47",
+    "serialNumber": "2237smp0000408"
+  },
+  {
+    "id": 1354,
+    "deviceCode": "1228",
+    "ipAddress": "10.254.210.41",
+    "serialNumber": "2120smp0000056"
+  },
+  {
+    "id": 1355,
+    "deviceCode": "1229",
+    "ipAddress": "10.254.210.50",
+    "serialNumber": "2147smp0000127"
+  },
+  {
+    "id": 1356,
+    "deviceCode": "1230",
+    "ipAddress": "10.254.210.22",
+    "serialNumber": "2125smp0000747"
+  },
+  {
+    "id": 1357,
+    "deviceCode": "1231",
+    "ipAddress": "10.254.210.49",
+    "serialNumber": "2142smp0001530"
+  },
+  {
+    "id": 1358,
+    "deviceCode": "1232",
+    "ipAddress": "10.254.210.16",
+    "serialNumber": "2124smp0001095"
+  },
+  {
+    "id": 1359,
+    "deviceCode": "1233",
+    "ipAddress": "10.254.210.185",
+    "serialNumber": "2147smp0001122"
+  },
+  {
+    "id": 1360,
+    "deviceCode": "1234",
+    "ipAddress": "10.254.210.186",
+    "serialNumber": "2136smp0001012"
+  },
+  {
+    "id": 1361,
+    "deviceCode": "1235",
+    "ipAddress": "10.254.210.187",
+    "serialNumber": "2136smp0001646"
+  },
+  {
+    "id": 1362,
+    "deviceCode": "1236",
+    "ipAddress": "10.254.210.188",
+    "serialNumber": "2136smp0001487"
+  },
+  {
+    "id": 1363,
+    "deviceCode": "1237",
+    "ipAddress": "10.254.210.189",
+    "serialNumber": "2143smp0001447"
+  },
+  {
+    "id": 1364,
+    "deviceCode": "1238",
+    "ipAddress": "10.254.210.190",
+    "serialNumber": "2143smp0000893"
+  },
+  {
+    "id": 1365,
+    "deviceCode": "1239",
+    "ipAddress": "10.254.210.191",
+    "serialNumber": "2147smp0000813"
+  },
+  {
+    "id": 1366,
+    "deviceCode": "1240",
+    "ipAddress": "10.254.210.192",
+    "serialNumber": "2147smp0000806"
+  },
+  {
+    "id": 1367,
+    "deviceCode": "1241",
+    "ipAddress": "10.254.214.38",
+    "serialNumber": "2125smp0000037"
+  },
+  {
+    "id": 1368,
+    "deviceCode": "1242",
+    "ipAddress": "10.254.214.39",
+    "serialNumber": "2142smp0002351"
+  },
+  {
+    "id": 1369,
+    "deviceCode": "1243",
+    "ipAddress": "10.254.214.40",
+    "serialNumber": "2142smp0000153"
+  },
+  {
+    "id": 1370,
+    "deviceCode": "1244",
+    "ipAddress": "10.254.214.41",
+    "serialNumber": "2125smp0000143"
+  },
+  {
+    "id": 1371,
+    "deviceCode": "1245",
+    "ipAddress": "10.254.214.42",
+    "serialNumber": "2120smp00000063"
+  },
+  {
+    "id": 1372,
+    "deviceCode": "1246",
+    "ipAddress": "10.254.214.43",
+    "serialNumber": "2124smp0000427"
+  },
+  {
+    "id": 1373,
+    "deviceCode": "1247",
+    "ipAddress": "10.254.214.44",
+    "serialNumber": "2141smp0001944"
+  },
+  {
+    "id": 1374,
+    "deviceCode": "1248",
+    "ipAddress": "10.254.214.45",
+    "serialNumber": "2124smp0000328"
+  },
+  {
+    "id": 1375,
+    "deviceCode": "1249",
+    "ipAddress": "10.254.214.54",
+    "serialNumber": "2143smp0001874"
+  },
+  {
+    "id": 1376,
+    "deviceCode": "1250",
+    "ipAddress": "10.254.214.55",
+    "serialNumber": "2142smp0001479"
+  },
+  {
+    "id": 1377,
+    "deviceCode": "1251",
+    "ipAddress": "10.254.214.56",
+    "serialNumber": "2147smp0000028"
+  },
+  {
+    "id": 1378,
+    "deviceCode": "1252",
+    "ipAddress": "10.254.214.57",
+    "serialNumber": "2143smp0001683"
+  },
+  {
+    "id": 1379,
+    "deviceCode": "1253",
+    "ipAddress": "10.254.214.58",
+    "serialNumber": "2143smp0001638"
+  },
+  {
+    "id": 1380,
+    "deviceCode": "1254",
+    "ipAddress": "10.254.214.59",
+    "serialNumber": "2143smp0000244"
+  },
+  {
+    "id": 1381,
+    "deviceCode": "1255",
+    "ipAddress": "10.254.214.60",
+    "serialNumber": "2143smp0001522"
+  },
+  {
+    "id": 1382,
+    "deviceCode": "1256",
+    "ipAddress": "10.254.214.61",
+    "serialNumber": "2142smp0002764"
+  },
+  {
+    "id": 1383,
+    "deviceCode": "1257",
+    "ipAddress": "10.254.214.6",
+    "serialNumber": "2125smp0000556"
+  },
+  {
+    "id": 1384,
+    "deviceCode": "1258",
+    "ipAddress": "10.254.214.7",
+    "serialNumber": "214smp0000429"
+  },
+  {
+    "id": 1385,
+    "deviceCode": "1259",
+    "ipAddress": "10.254.214.8",
+    "serialNumber": "2237smp0000347"
+  },
+  {
+    "id": 1386,
+    "deviceCode": "1260",
+    "ipAddress": "10.254.214.9",
+    "serialNumber": "2136smp0000321"
+  },
+  {
+    "id": 1387,
+    "deviceCode": "1261",
+    "ipAddress": "10.254.214.10",
+    "serialNumber": "2143smp0000923"
+  },
+  {
+    "id": 1388,
+    "deviceCode": "1262",
+    "ipAddress": "10.254.214.11",
+    "serialNumber": "2125smp0002310"
+  },
+  {
+    "id": 1389,
+    "deviceCode": "1263",
+    "ipAddress": "10.254.214.12",
+    "serialNumber": "2142smp0001899"
+  },
+  {
+    "id": 1390,
+    "deviceCode": "1264",
+    "ipAddress": "10.254.214.13",
+    "serialNumber": "2136smp0000833"
+  },
+  {
+    "id": 1391,
+    "deviceCode": "1265",
+    "ipAddress": "10.254.198.121",
+    "serialNumber": "21425smp0001059"
+  },
+  {
+    "id": 1392,
+    "deviceCode": "1266",
+    "ipAddress": "10.254.198.123",
+    "serialNumber": "21435smp0000046"
+  },
+  {
+    "id": 1393,
+    "deviceCode": "1267",
+    "ipAddress": "10.254.198.125",
+    "serialNumber": "21425smp0002665"
+  },
+  {
+    "id": 1394,
+    "deviceCode": "1268",
+    "ipAddress": "10.254.198.127",
+    "serialNumber": "2143smp0000114"
+  },
+  {
+    "id": 1395,
+    "deviceCode": "1269",
+    "ipAddress": "10.254.198.129",
+    "serialNumber": "2142smp0002801"
+  },
+  {
+    "id": 1396,
+    "deviceCode": "1270",
+    "ipAddress": "10.254.198.131",
+    "serialNumber": "2143smp0001690"
+  },
+  {
+    "id": 1397,
+    "deviceCode": "1271",
+    "ipAddress": "10.254.198.133",
+    "serialNumber": "2125smp0001384"
+  },
+  {
+    "id": 1398,
+    "deviceCode": "1272",
+    "ipAddress": "10.254.198.135",
+    "serialNumber": "2125smp000945"
+  },
+  {
+    "id": 1399,
+    "deviceCode": "1273",
+    "ipAddress": "10.254.198.106",
+    "serialNumber": "2143smp0001126"
+  },
+  {
+    "id": 1400,
+    "deviceCode": "1274",
+    "ipAddress": "10.254.198.108",
+    "serialNumber": "2142smp0000061"
+  },
+  {
+    "id": 1401,
+    "deviceCode": "1275",
+    "ipAddress": "10.254.198.110",
+    "serialNumber": "2143smp0001249"
+  },
+  {
+    "id": 1402,
+    "deviceCode": "1276",
+    "ipAddress": "10.254.198.112",
+    "serialNumber": "2143smp0000985"
+  },
+  {
+    "id": 1403,
+    "deviceCode": "1277",
+    "ipAddress": "10.254.198.114",
+    "serialNumber": "2142smp0000634"
+  },
+  {
+    "id": 1404,
+    "deviceCode": "1278",
+    "ipAddress": "10.254.198.116",
+    "serialNumber": "2136smp0001630"
+  },
+  {
+    "id": 1405,
+    "deviceCode": "1279",
+    "ipAddress": "10.254.198.118",
+    "serialNumber": "2142smp0000535"
+  },
+  {
+    "id": 1406,
+    "deviceCode": "1280",
+    "ipAddress": "10.254.198.120",
+    "serialNumber": "2142smp0000931"
+  },
+  {
+    "id": 1407,
+    "deviceCode": "1281",
+    "ipAddress": "10.254.198.37",
+    "serialNumber": "2136smp0001531"
+  },
+  {
+    "id": 1408,
+    "deviceCode": "1282",
+    "ipAddress": "10.254.198.35",
+    "serialNumber": "2125smp0002006"
+  },
+  {
+    "id": 1409,
+    "deviceCode": "1283",
+    "ipAddress": "10.254.198.33",
+    "serialNumber": "2124smp0001477"
+  },
+  {
+    "id": 1410,
+    "deviceCode": "1284",
+    "ipAddress": "10.254.198.31",
+    "serialNumber": "2142smp0000764"
+  },
+  {
+    "id": 1411,
+    "deviceCode": "1285",
+    "ipAddress": "10.254.198.29",
+    "serialNumber": "2142smp0001998"
+  },
+  {
+    "id": 1412,
+    "deviceCode": "1286",
+    "ipAddress": "10.254.198.27",
+    "serialNumber": "2147smp0001344"
+  },
+  {
+    "id": 1413,
+    "deviceCode": "1287",
+    "ipAddress": "10.254.198.25",
+    "serialNumber": "2124smp0001286"
+  },
+  {
+    "id": 1415,
+    "deviceCode": "1290",
+    "ipAddress": "10.254.198.55",
+    "serialNumber": "2142smp0001233"
+  },
+  {
+    "id": 1416,
+    "deviceCode": "1291",
+    "ipAddress": "10.254.198.57",
+    "serialNumber": "2125smp0001933"
+  },
+  {
+    "id": 1417,
+    "deviceCode": "1292",
+    "ipAddress": "10.254.198.59",
+    "serialNumber": "2125smp0001506"
+  },
+  {
+    "id": 1418,
+    "deviceCode": "1293",
+    "ipAddress": "10.254.198.61",
+    "serialNumber": "2136smp0000758"
+  },
+  {
+    "id": 1419,
+    "deviceCode": "1294",
+    "ipAddress": "10.254.198.63",
+    "serialNumber": "2142smp000219"
+  },
+  {
+    "id": 1420,
+    "deviceCode": "1295",
+    "ipAddress": "10.254.198.65",
+    "serialNumber": "2125smp0002181"
+  },
+  {
+    "id": 1421,
+    "deviceCode": "1296",
+    "ipAddress": "10.254.198.67",
+    "serialNumber": "2147smp0000660"
+  },
+  {
+    "id": 1422,
+    "deviceCode": "1297",
+    "ipAddress": "10.254.198.69",
+    "serialNumber": "2125smp0002273"
+  },
+  {
+    "id": 1423,
+    "deviceCode": "1298",
+    "ipAddress": "10.254.198.146",
+    "serialNumber": "2142smp0001790"
+  },
+  {
+    "id": 1424,
+    "deviceCode": "1299",
+    "ipAddress": "10.254.198.147",
+    "serialNumber": "2143smp0000831"
+  },
+  {
+    "id": 1425,
+    "deviceCode": "1300",
+    "ipAddress": "10.254.198.148",
+    "serialNumber": "2142smp0001936"
+  },
+  {
+    "id": 1426,
+    "deviceCode": "1301",
+    "ipAddress": "10.254.198.149",
+    "serialNumber": "2136smp0000567"
+  },
+  {
+    "id": 1427,
+    "deviceCode": "1302",
+    "ipAddress": "10.254.198.150",
+    "serialNumber": "2142smp0000436"
+  },
+  {
+    "id": 1428,
+    "deviceCode": "1303",
+    "ipAddress": "10.254.198.151",
+    "serialNumber": "2125smp0002563"
+  },
+  {
+    "id": 1429,
+    "deviceCode": "1304",
+    "ipAddress": "10.254.198.152",
+    "serialNumber": "2124smp0000755"
+  },
+  {
+    "id": 1430,
+    "deviceCode": "1305",
+    "ipAddress": "10.254.198.153",
+    "serialNumber": "2147smp0000349"
+  },
+  {
+    "id": 1431,
+    "deviceCode": "1306",
+    "ipAddress": "10.254.198.85",
+    "serialNumber": "2125smp0000600"
+  },
+  {
+    "id": 1432,
+    "deviceCode": "1307",
+    "ipAddress": "10.254.198.83",
+    "serialNumber": "2142smp000511"
+  },
+  {
+    "id": 1433,
+    "deviceCode": "1308",
+    "ipAddress": "10.254.198.81",
+    "serialNumber": "2124smp0000984"
+  },
+  {
+    "id": 1434,
+    "deviceCode": "1309",
+    "ipAddress": "10.254.198.79",
+    "serialNumber": "2143smp0000077"
+  },
+  {
+    "id": 1435,
+    "deviceCode": "1310",
+    "ipAddress": "10.254.198.77",
+    "serialNumber": "2111smp0002371"
+  },
+  {
+    "id": 1436,
+    "deviceCode": "1311",
+    "ipAddress": "10.254.198.75",
+    "serialNumber": "2237smp0001335"
+  },
+  {
+    "id": 1437,
+    "deviceCode": "1312",
+    "ipAddress": "10.254.198.73",
+    "serialNumber": "2142smp0001462"
+  },
+  {
+    "id": 1438,
+    "deviceCode": "1313",
+    "ipAddress": "10.254.198.71",
+    "serialNumber": "2125smp0000570"
+  },
+  {
+    "id": 1439,
+    "deviceCode": "1314",
+    "ipAddress": "10.254.198.91",
+    "serialNumber": "2142smp0001615"
+  },
+  {
+    "id": 1440,
+    "deviceCode": "1315",
+    "ipAddress": "10.254.198.93",
+    "serialNumber": "2144smp0000038"
+  },
+  {
+    "id": 1441,
+    "deviceCode": "1316",
+    "ipAddress": "10.254.198.95",
+    "serialNumber": "2125smp0001224"
+  },
+  {
+    "id": 1442,
+    "deviceCode": "1317",
+    "ipAddress": "10.254.198.97",
+    "serialNumber": "2124smp0001224"
+  },
+  {
+    "id": 1443,
+    "deviceCode": "1318",
+    "ipAddress": "10.254.198.99",
+    "serialNumber": "113smp0000808"
+  },
+  {
+    "id": 1444,
+    "deviceCode": "1319",
+    "ipAddress": "10.254.198.101",
+    "serialNumber": "2143smp0001843"
+  },
+  {
+    "id": 1445,
+    "deviceCode": "1320",
+    "ipAddress": "10.254.198.103",
+    "serialNumber": "2120smp0000285"
+  },
+  {
+    "id": 1446,
+    "deviceCode": "1321",
+    "ipAddress": "10.254.198.105",
+    "serialNumber": "2125smp1018"
+  },
+  {
+    "id": 1447,
+    "deviceCode": "1322",
+    "ipAddress": "10.254.198.162",
+    "serialNumber": "2142smp0001080"
+  },
+  {
+    "id": 1448,
+    "deviceCode": "1323",
+    "ipAddress": "10.254.198.163",
+    "serialNumber": "2143smp0001423"
+  },
+  {
+    "id": 1449,
+    "deviceCode": "1324",
+    "ipAddress": "10.254.198.164",
+    "serialNumber": "2237smp0001083"
+  },
+  {
+    "id": 1450,
+    "deviceCode": "1325",
+    "ipAddress": "10.254.198.165",
+    "serialNumber": "2136smp0001370"
+  },
+  {
+    "id": 1451,
+    "deviceCode": "1326",
+    "ipAddress": "10.254.198.166",
+    "serialNumber": "2142smp0001370"
+  },
+  {
+    "id": 1452,
+    "deviceCode": "1327",
+    "ipAddress": "10.254.198.167",
+    "serialNumber": "2125smp0001889"
+  },
+  {
+    "id": 1453,
+    "deviceCode": "1328",
+    "ipAddress": "10.254.198.168",
+    "serialNumber": "2111smp0002432"
+  },
+  {
+    "id": 1454,
+    "deviceCode": "1329",
+    "ipAddress": "10.254.198.169",
+    "serialNumber": "2147smp0000875"
+  },
+  {
+    "id": 1455,
+    "deviceCode": "1330",
+    "ipAddress": "10.254.198.178",
+    "serialNumber": "2143smp0000855"
+  },
+  {
+    "id": 1456,
+    "deviceCode": "1331",
+    "ipAddress": "10.254.198.179",
+    "serialNumber": "2136smp0000895"
+  },
+  {
+    "id": 1457,
+    "deviceCode": "1332",
+    "ipAddress": "10.254.198.180",
+    "serialNumber": "2147smp0000639"
+  },
+  {
+    "id": 1458,
+    "deviceCode": "1333",
+    "ipAddress": "10.254.198.181",
+    "serialNumber": "2142smp0000092"
+  },
+  {
+    "id": 1459,
+    "deviceCode": "1334",
+    "ipAddress": "10.254.198.182",
+    "serialNumber": "2136smp0001593"
+  },
+  {
+    "id": 1460,
+    "deviceCode": "1335",
+    "ipAddress": "10.254.198.183",
+    "serialNumber": "2147smp0000912"
+  },
+  {
+    "id": 1461,
+    "deviceCode": "1336",
+    "ipAddress": "10.254.198.184",
+    "serialNumber": "2142smp0000313"
+  },
+  {
+    "id": 1462,
+    "deviceCode": "1337",
+    "ipAddress": "10.254.198.185",
+    "serialNumber": "2143smp0001393"
+  },
+  {
+    "id": 1463,
+    "deviceCode": "1338",
+    "ipAddress": "10.254.198.39",
+    "serialNumber": "2111smp000239"
+  },
+  {
+    "id": 1464,
+    "deviceCode": "1339",
+    "ipAddress": "10.254.198.41",
+    "serialNumber": "2125smp0000990"
+  },
+  {
+    "id": 1465,
+    "deviceCode": "1340",
+    "ipAddress": "10.254.198.43",
+    "serialNumber": "2125smp0001926"
+  },
+  {
+    "id": 1466,
+    "deviceCode": "1341",
+    "ipAddress": "10.254.198.45",
+    "serialNumber": "2125smp0001957"
+  },
+  {
+    "id": 1467,
+    "deviceCode": "1342",
+    "ipAddress": "10.254.198.47",
+    "serialNumber": "2142smp0000689"
+  },
+  {
+    "id": 1468,
+    "deviceCode": "1343",
+    "ipAddress": "10.254.198.49",
+    "serialNumber": "2124smp0000465"
+  },
+  {
+    "id": 1469,
+    "deviceCode": "1344",
+    "ipAddress": "10.254.198.51",
+    "serialNumber": "2125smp0001803"
+  },
+  {
+    "id": 1470,
+    "deviceCode": "1345",
+    "ipAddress": "10.254.198.53",
+    "serialNumber": "2125smp0001575"
+  },
+  {
+    "id": 1471,
+    "deviceCode": "1346",
+    "ipAddress": "10.254.193.58",
+    "serialNumber": "2142smp0001554"
+  },
+  {
+    "id": 1472,
+    "deviceCode": "1347",
+    "ipAddress": "10.254.193.59",
+    "serialNumber": "2142smp0000597"
+  },
+  {
+    "id": 1473,
+    "deviceCode": "1348",
+    "ipAddress": "10.254.193.60",
+    "serialNumber": "2125smp0000358"
+  },
+  {
+    "id": 1474,
+    "deviceCode": "1349",
+    "ipAddress": "10.254.193.110",
+    "serialNumber": "2142smp0001813"
+  },
+  {
+    "id": 1475,
+    "deviceCode": "1350",
+    "ipAddress": "10.254.193.61",
+    "serialNumber": "2120smp0000100"
+  },
+  {
+    "id": 1476,
+    "deviceCode": "1351",
+    "ipAddress": null,
+    "serialNumber": "2223smp0000759"
+  },
+  {
+    "id": 1477,
+    "deviceCode": "1352",
+    "ipAddress": "مرجعه",
+    "serialNumber": "مرجعه"
+  },
+  {
+    "id": 1478,
+    "deviceCode": "1353",
+    "ipAddress": "10.254.193.63",
+    "serialNumber": "21366smp0001548"
+  },
+  {
+    "id": 1479,
+    "deviceCode": "1354",
+    "ipAddress": "10.254.193.101",
+    "serialNumber": "2142smp0001110"
+  },
+  {
+    "id": 1480,
+    "deviceCode": "1355",
+    "ipAddress": "10.254.193.102",
+    "serialNumber": "2124smp0001040"
+  },
+  {
+    "id": 1481,
+    "deviceCode": "1356",
+    "ipAddress": "10.254.193.103",
+    "serialNumber": "2143smp0686"
+  },
+  {
+    "id": 1482,
+    "deviceCode": "1357",
+    "ipAddress": "10.254.193.104",
+    "serialNumber": "2125smp0001087"
+  },
+  {
+    "id": 1483,
+    "deviceCode": "1358",
+    "ipAddress": "10.254.193.105",
+    "serialNumber": "2125smp00000434"
+  },
+  {
+    "id": 1484,
+    "deviceCode": "1359",
+    "ipAddress": "10.254.193.106",
+    "serialNumber": "2124smp0000434"
+  },
+  {
+    "id": 1485,
+    "deviceCode": "1360",
+    "ipAddress": "10.254.193.107",
+    "serialNumber": "2142smp0002669"
+  },
+  {
+    "id": 1486,
+    "deviceCode": "1361",
+    "ipAddress": "10.254.193.108",
+    "serialNumber": "2143smp0000404"
+  },
+  {
+    "id": 1488,
+    "deviceCode": "1363",
+    "ipAddress": "10.254.193.118",
+    "serialNumber": "2234smp0001277"
+  },
+  {
+    "id": 1489,
+    "deviceCode": "1364",
+    "ipAddress": "10.254.193.119",
+    "serialNumber": "2234smp0002029"
+  },
+  {
+    "id": 1490,
+    "deviceCode": "1365",
+    "ipAddress": "10.254.193.120",
+    "serialNumber": "2237smp0001656"
+  },
+  {
+    "id": 1491,
+    "deviceCode": "1366",
+    "ipAddress": "10.254.193.121",
+    "serialNumber": "2237smp0001502"
+  },
+  {
+    "id": 1492,
+    "deviceCode": "1367",
+    "ipAddress": "10.254.193.122",
+    "serialNumber": "2223smp0000452"
+  },
+  {
+    "id": 1493,
+    "deviceCode": "1368",
+    "ipAddress": "10.254.193.123",
+    "serialNumber": "2234smp0001840"
+  },
+  {
+    "id": 1494,
+    "deviceCode": "1369",
+    "ipAddress": "10.254.193.77",
+    "serialNumber": "2223smp000896"
+  },
+  {
+    "id": 1495,
+    "deviceCode": "1370",
+    "ipAddress": "10.254.193.76",
+    "serialNumber": "2223smp0000445"
+  },
+  {
+    "id": 1496,
+    "deviceCode": "1371",
+    "ipAddress": "10.254.193.75",
+    "serialNumber": "2234smp0001154"
+  },
+  {
+    "id": 1497,
+    "deviceCode": "1372",
+    "ipAddress": "10.254.193.74",
+    "serialNumber": "2234smp0002210"
+  },
+  {
+    "id": 1498,
+    "deviceCode": "1373",
+    "ipAddress": "10.254.193.73",
+    "serialNumber": "2234smp0001697"
+  },
+  {
+    "id": 1499,
+    "deviceCode": "1374",
+    "ipAddress": "10.254.193.72",
+    "serialNumber": "2237smp0000309"
+  },
+  {
+    "id": 1500,
+    "deviceCode": "1375",
+    "ipAddress": "10.254.193.71",
+    "serialNumber": "2234smp0001499"
+  },
+  {
+    "id": 1501,
+    "deviceCode": "1376",
+    "ipAddress": "10.254.193.37",
+    "serialNumber": "2143smp0000039"
+  },
+  {
+    "id": 1502,
+    "deviceCode": "1377",
+    "ipAddress": "10.254.193.36",
+    "serialNumber": "2142smp0000412"
+  },
+  {
+    "id": 1503,
+    "deviceCode": "1378",
+    "ipAddress": "10.254.193.35",
+    "serialNumber": "2142smp0001738"
+  },
+  {
+    "id": 1504,
+    "deviceCode": "1379",
+    "ipAddress": "10.254.193.34",
+    "serialNumber": "2143smp0000480"
+  },
+  {
+    "id": 1505,
+    "deviceCode": "1380",
+    "ipAddress": "10.254.193.33",
+    "serialNumber": "2142smp0002719"
+  },
+  {
+    "id": 1506,
+    "deviceCode": "1381",
+    "ipAddress": "10.254.193.32",
+    "serialNumber": "2143smp0000220"
+  },
+  {
+    "id": 1507,
+    "deviceCode": "1383",
+    "ipAddress": "10.254.193.30",
+    "serialNumber": "2143smp0001652"
+  },
+  {
+    "id": 1508,
+    "deviceCode": "1384",
+    "ipAddress": "10.254.193.85",
+    "serialNumber": "2234smp0002722"
+  },
+  {
+    "id": 1509,
+    "deviceCode": "1385",
+    "ipAddress": "10.254.193.86",
+    "serialNumber": "2234smp0002630"
+  },
+  {
+    "id": 1510,
+    "deviceCode": "1386",
+    "ipAddress": "10.254.193.87",
+    "serialNumber": "2238smp0000728"
+  },
+  {
+    "id": 1511,
+    "deviceCode": "1387",
+    "ipAddress": "10.254.193.88",
+    "serialNumber": "2234smp0003000"
+  },
+  {
+    "id": 1512,
+    "deviceCode": "1388",
+    "ipAddress": "10.254.193.89",
+    "serialNumber": "2237smp0001397"
+  },
+  {
+    "id": 1513,
+    "deviceCode": "1389",
+    "ipAddress": "10.254.193.90",
+    "serialNumber": "2234smp0002685"
+  },
+  {
+    "id": 1514,
+    "deviceCode": "1390",
+    "ipAddress": "10.254.193.91",
+    "serialNumber": "2238smp0000490"
+  },
+  {
+    "id": 1515,
+    "deviceCode": "1391",
+    "ipAddress": "10.254.193.14",
+    "serialNumber": "2143smp0000268"
+  },
+  {
+    "id": 1516,
+    "deviceCode": "1392",
+    "ipAddress": "10.254.193..15",
+    "serialNumber": "2120smp0000476"
+  },
+  {
+    "id": 1517,
+    "deviceCode": "1393",
+    "ipAddress": "10.254.193.16",
+    "serialNumber": "2124smp0000922"
+  },
+  {
+    "id": 1518,
+    "deviceCode": "1394",
+    "ipAddress": "10.254.193.17",
+    "serialNumber": "2124smp0001591"
+  },
+  {
+    "id": 1519,
+    "deviceCode": "1395",
+    "ipAddress": "10.254.193.18",
+    "serialNumber": "2124smp000093"
+  },
+  {
+    "id": 1520,
+    "deviceCode": "1396",
+    "ipAddress": "10.254.193.19",
+    "serialNumber": "2125smp0000501"
+  },
+  {
+    "id": 1521,
+    "deviceCode": "1397",
+    "ipAddress": "10.254.193.20",
+    "serialNumber": "2125smp0001148"
+  },
+  {
+    "id": 1522,
+    "deviceCode": "1398",
+    "ipAddress": "10.254.193.21",
+    "serialNumber": "2143smp0001560"
+  },
+  {
+    "id": 1523,
+    "deviceCode": "1399",
+    "ipAddress": "10.254.210.254",
+    "serialNumber": "2237smp0000477"
+  },
+  {
+    "id": 1524,
+    "deviceCode": "1400",
+    "ipAddress": "10.254.210.253",
+    "serialNumber": "2124smp0000731"
+  },
+  {
+    "id": 1525,
+    "deviceCode": "1401",
+    "ipAddress": "10.254.210.252",
+    "serialNumber": "2125smp0001025"
+  },
+  {
+    "id": 1526,
+    "deviceCode": "1402",
+    "ipAddress": "10.254.210.251",
+    "serialNumber": "2125smp0001650"
+  },
+  {
+    "id": 1527,
+    "deviceCode": "1403",
+    "ipAddress": "10.254.210.250",
+    "serialNumber": "2124smp0000298"
+  },
+  {
+    "id": 1528,
+    "deviceCode": "1404",
+    "ipAddress": "10.254.210.249",
+    "serialNumber": "2124smp0000403"
+  },
+  {
+    "id": 1529,
+    "deviceCode": "1405",
+    "ipAddress": "10.254.210.248",
+    "serialNumber": "2142smp0001417"
+  },
+  {
+    "id": 1530,
+    "deviceCode": "1406",
+    "ipAddress": "10.254.210.247",
+    "serialNumber": "2142smp0001301"
+  },
+  {
+    "id": 1531,
+    "deviceCode": "1407",
+    "ipAddress": "10.254.210.75",
+    "serialNumber": "21205smp0000575"
+  },
+  {
+    "id": 1532,
+    "deviceCode": "1408",
+    "ipAddress": "10.254.210.73",
+    "serialNumber": "2143smp0000190"
+  },
+  {
+    "id": 1533,
+    "deviceCode": "1409",
+    "ipAddress": "10.254.210.40",
+    "serialNumber": "2111smp0002418"
+  },
+  {
+    "id": 1534,
+    "deviceCode": "1410",
+    "ipAddress": "10.254.210.51",
+    "serialNumber": "2111smp0002234"
+  },
+  {
+    "id": 1535,
+    "deviceCode": "1411",
+    "ipAddress": "10.254.210.43",
+    "serialNumber": "2238smp0000636"
+  },
+  {
+    "id": 1536,
+    "deviceCode": "1412",
+    "ipAddress": "10.254.210.9",
+    "serialNumber": "2111smp0002159"
+  },
+  {
+    "id": 1537,
+    "deviceCode": "1413",
+    "ipAddress": "10.254.210.7",
+    "serialNumber": "2125smp0000327"
+  },
+  {
+    "id": 1538,
+    "deviceCode": "1414",
+    "ipAddress": "10.254.210.5",
+    "serialNumber": "2143smp0000022"
+  },
+  {
+    "id": 1539,
+    "deviceCode": "1415",
+    "ipAddress": "10.254.210.207",
+    "serialNumber": "2125smp0000938"
+  },
+  {
+    "id": 1540,
+    "deviceCode": "1416",
+    "ipAddress": "10.254.210.206",
+    "serialNumber": "2111smp0001086"
+  },
+  {
+    "id": 1541,
+    "deviceCode": "1417",
+    "ipAddress": "10.254.210.205",
+    "serialNumber": "2125smp0001070"
+  },
+  {
+    "id": 1542,
+    "deviceCode": "1418",
+    "ipAddress": "10.254.210.204",
+    "serialNumber": "2125smp0000112"
+  },
+  {
+    "id": 1543,
+    "deviceCode": "1419",
+    "ipAddress": "10.254.210.203",
+    "serialNumber": "2120smp0000155"
+  },
+  {
+    "id": 1544,
+    "deviceCode": "1420",
+    "ipAddress": "10.254.210.202",
+    "serialNumber": "2125smp0000280"
+  },
+  {
+    "id": 1545,
+    "deviceCode": "1421",
+    "ipAddress": "10.254.210.85",
+    "serialNumber": "2238smp0000155"
+  },
+  {
+    "id": 1546,
+    "deviceCode": "1422",
+    "ipAddress": "10.254.210.84",
+    "serialNumber": "2124smp0001019"
+  },
+  {
+    "id": 1547,
+    "deviceCode": "1423",
+    "ipAddress": "10.254.210.232",
+    "serialNumber": "2120smp0000391"
+  },
+  {
+    "id": 1548,
+    "deviceCode": "1424",
+    "ipAddress": "10.254.210.233",
+    "serialNumber": "2120smp0000452"
+  },
+  {
+    "id": 1549,
+    "deviceCode": "1425",
+    "ipAddress": "10.254.210.234",
+    "serialNumber": "2143smp0001720"
+  },
+  {
+    "id": 1550,
+    "deviceCode": "1426",
+    "ipAddress": "10.254.210.235",
+    "serialNumber": "2237smp0001120"
+  },
+  {
+    "id": 1551,
+    "deviceCode": "1427",
+    "ipAddress": "10.254.210.236",
+    "serialNumber": "2143smp0000282"
+  },
+  {
+    "id": 1552,
+    "deviceCode": "1428",
+    "ipAddress": "10.254.210.237",
+    "serialNumber": "2143smp0000275"
+  },
+  {
+    "id": 1553,
+    "deviceCode": "1429",
+    "ipAddress": "10.254.210.10",
+    "serialNumber": "2234smp0002791"
+  },
+  {
+    "id": 1554,
+    "deviceCode": "1430",
+    "ipAddress": "10.254.210.238",
+    "serialNumber": "2111smp0002227"
+  },
+  {
+    "id": 1555,
+    "deviceCode": "1431",
+    "ipAddress": "10.254.210.18",
+    "serialNumber": "2147smp0000080"
+  },
+  {
+    "id": 1556,
+    "deviceCode": "1432",
+    "ipAddress": "10.254.210.54",
+    "serialNumber": "2124smp0000786"
+  },
+  {
+    "id": 1557,
+    "deviceCode": "1433",
+    "ipAddress": "10.254.210.23",
+    "serialNumber": "2142smp0000658"
+  },
+  {
+    "id": 1558,
+    "deviceCode": "1434",
+    "ipAddress": "10.254.210.46",
+    "serialNumber": "2125smp0000679"
+  },
+  {
+    "id": 1559,
+    "deviceCode": "1435",
+    "ipAddress": "10.254.210.52",
+    "serialNumber": "2143smp0000398"
+  },
+  {
+    "id": 1560,
+    "deviceCode": "1436",
+    "ipAddress": "10.254.210.15",
+    "serialNumber": "2120smp0000438"
+  },
+  {
+    "id": 1561,
+    "deviceCode": "1437",
+    "ipAddress": "10.254.210.11",
+    "serialNumber": "2142smp0001424"
+  },
+  {
+    "id": 1562,
+    "deviceCode": "1438",
+    "ipAddress": "10.254.210.14",
+    "serialNumber": "2238smp0000667"
+  },
+  {
+    "id": 1563,
+    "deviceCode": "1439",
+    "ipAddress": "10.254.210.193",
+    "serialNumber": "2238smp0000995"
+  },
+  {
+    "id": 1564,
+    "deviceCode": "1440",
+    "ipAddress": "10.254.210.194",
+    "serialNumber": "2142smp0000696"
+  },
+  {
+    "id": 1565,
+    "deviceCode": "1441",
+    "ipAddress": "10.254.210.195",
+    "serialNumber": "2136smp0001111"
+  },
+  {
+    "id": 1566,
+    "deviceCode": "1442",
+    "ipAddress": "10.254.210.196",
+    "serialNumber": "2143smp0000787"
+  },
+  {
+    "id": 1567,
+    "deviceCode": "1444",
+    "ipAddress": "10.254.210.198",
+    "serialNumber": "2125smp0001971"
+  },
+  {
+    "id": 1568,
+    "deviceCode": "1446",
+    "ipAddress": "10.254.210.200",
+    "serialNumber": "2147smp0000479"
+  },
+  {
+    "id": 1569,
+    "deviceCode": "1447",
+    "ipAddress": "10.254.202.78",
+    "serialNumber": "2136smp0000765"
+  },
+  {
+    "id": 1570,
+    "deviceCode": "1448",
+    "ipAddress": "10.254.202.79",
+    "serialNumber": "2143smp0001485"
+  },
+  {
+    "id": 1571,
+    "deviceCode": "1449",
+    "ipAddress": "10.254.202.80",
+    "serialNumber": "2142smp0000368"
+  },
+  {
+    "id": 1572,
+    "deviceCode": "1450",
+    "ipAddress": "10.254.202.81",
+    "serialNumber": "2142smp0001288"
+  },
+  {
+    "id": 1573,
+    "deviceCode": "1451",
+    "ipAddress": "10.254.202.82",
+    "serialNumber": "2142smp0001202"
+  },
+  {
+    "id": 1574,
+    "deviceCode": "1452",
+    "ipAddress": "10.254.202.83",
+    "serialNumber": "2142smp0000344"
+  },
+  {
+    "id": 1575,
+    "deviceCode": "1453",
+    "ipAddress": "10.254.202.84",
+    "serialNumber": "2234smp0001048"
+  },
+  {
+    "id": 1576,
+    "deviceCode": "1454",
+    "ipAddress": "10.254.202.85",
+    "serialNumber": "2124smp0001156"
+  },
+  {
+    "id": 1577,
+    "deviceCode": "1455",
+    "ipAddress": "10.254.214.78",
+    "serialNumber": "2124smp0000472"
+  },
+  {
+    "id": 1578,
+    "deviceCode": "1456",
+    "ipAddress": "10.254.214.79",
+    "serialNumber": "2136smp0000604"
+  },
+  {
+    "id": 1579,
+    "deviceCode": "1457",
+    "ipAddress": "10.254.214.80",
+    "serialNumber": "2125smp0002297"
+  },
+  {
+    "id": 1580,
+    "deviceCode": "1458",
+    "ipAddress": "10.254.214.81",
+    "serialNumber": "2143smp0000756"
+  },
+  {
+    "id": 1581,
+    "deviceCode": "1459",
+    "ipAddress": "10.254.214.82",
+    "serialNumber": "2142smp0000238"
+  },
+  {
+    "id": 1582,
+    "deviceCode": "1460",
+    "ipAddress": "10.254.214.83",
+    "serialNumber": "2142smp0000979"
+  },
+  {
+    "id": 1583,
+    "deviceCode": "1461",
+    "ipAddress": "10.254.214.99",
+    "serialNumber": "2234smp0002005"
+  },
+  {
+    "id": 1584,
+    "deviceCode": "1462",
+    "ipAddress": "10.254.214.84",
+    "serialNumber": "2124smp0000977"
+  },
+  {
+    "id": 1585,
+    "deviceCode": "1464",
+    "ipAddress": "10.254.214.93",
+    "serialNumber": "2237smp0000279"
+  },
+  {
+    "id": 1586,
+    "deviceCode": "1466",
+    "ipAddress": "10.254.214.95",
+    "serialNumber": "2237smp0001533"
+  },
+  {
+    "id": 1588,
+    "deviceCode": "1467",
+    "ipAddress": "10.254.214.96",
+    "serialNumber": "2234smp0002456"
+  },
+  {
+    "id": 1589,
+    "deviceCode": "1468",
+    "ipAddress": "10.254.214.97",
+    "serialNumber": "2234smp0003222"
+  },
+  {
+    "id": 1590,
+    "deviceCode": "1469",
+    "ipAddress": "10.254.214.98",
+    "serialNumber": "2223smp0000926"
+  },
+  {
+    "id": 1591,
+    "deviceCode": "1470",
+    "ipAddress": "10.254.218.126",
+    "serialNumber": "2143smp0001102"
+  },
+  {
+    "id": 1592,
+    "deviceCode": "1471",
+    "ipAddress": "10.254.218.127",
+    "serialNumber": "2111smp0002326"
+  },
+  {
+    "id": 1593,
+    "deviceCode": "1472",
+    "ipAddress": "10.254.218.128",
+    "serialNumber": "2147smp0000783"
+  },
+  {
+    "id": 1594,
+    "deviceCode": "1473",
+    "ipAddress": "10.254.218.129",
+    "serialNumber": "2143smp0000091"
+  },
+  {
+    "id": 1595,
+    "deviceCode": "1474",
+    "ipAddress": "10.254.218.130",
+    "serialNumber": "2147smp0000073"
+  },
+  {
+    "id": 1596,
+    "deviceCode": "1476",
+    "ipAddress": "10.254.218.132",
+    "serialNumber": "2143smp0000329"
+  },
+  {
+    "id": 1598,
+    "deviceCode": "1477",
+    "ipAddress": "10.254.218.133",
+    "serialNumber": "2142smp0000276"
+  },
+  {
+    "id": 1599,
+    "deviceCode": "1478",
+    "ipAddress": "10.254.217.110",
+    "serialNumber": "2142smp0002726"
+  },
+  {
+    "id": 1600,
+    "deviceCode": "1479",
+    "ipAddress": "10.254.217.112",
+    "serialNumber": "2147smp0000837"
+  },
+  {
+    "id": 1601,
+    "deviceCode": "1480",
+    "ipAddress": "10.254.217.114",
+    "serialNumber": "2125smp0000488"
+  },
+  {
+    "id": 1602,
+    "deviceCode": "1481",
+    "ipAddress": "10.254.217.116",
+    "serialNumber": "2111smp0002029"
+  },
+  {
+    "id": 1603,
+    "deviceCode": "1482",
+    "ipAddress": "10.254.217.118",
+    "serialNumber": "2124smp0000991"
+  },
+  {
+    "id": 1604,
+    "deviceCode": "1483",
+    "ipAddress": "10.254.217.120",
+    "serialNumber": "2125smp0000464"
+  },
+  {
+    "id": 1605,
+    "deviceCode": "1484",
+    "ipAddress": "10.254.217.122",
+    "serialNumber": "2142smp0001455"
+  },
+  {
+    "id": 1606,
+    "deviceCode": "1485",
+    "ipAddress": "10.254.217.124",
+    "serialNumber": "2125smp0002211"
+  },
+  {
+    "id": 1607,
+    "deviceCode": "1486",
+    "ipAddress": "10.254.218.78",
+    "serialNumber": "2237smp0001250"
+  },
+  {
+    "id": 1608,
+    "deviceCode": "1487",
+    "ipAddress": "10.254.218.79",
+    "serialNumber": "2234smp0001550"
+  },
+  {
+    "id": 1609,
+    "deviceCode": "1488",
+    "ipAddress": "10.254.218.80",
+    "serialNumber": "2234smp0001529"
+  },
+  {
+    "id": 1610,
+    "deviceCode": "1489",
+    "ipAddress": "10.254.218.81",
+    "serialNumber": "2223smp0000599"
+  },
+  {
+    "id": 1611,
+    "deviceCode": "1490",
+    "ipAddress": "10.254.218.82",
+    "serialNumber": "2238smp0000360"
+  },
+  {
+    "id": 1612,
+    "deviceCode": "1491",
+    "ipAddress": "10.254.218.83",
+    "serialNumber": "2234smp0002982"
+  },
+  {
+    "id": 1613,
+    "deviceCode": "1492",
+    "ipAddress": "10.254.218.84",
+    "serialNumber": "2237smp0001496"
+  },
+  {
+    "id": 1614,
+    "deviceCode": "1493",
+    "ipAddress": "10.254.218.85",
+    "serialNumber": "2234smp0001802"
+  },
+  {
+    "id": 1615,
+    "deviceCode": "1494",
+    "ipAddress": "10.254.218.7",
+    "serialNumber": "2141smp0001951"
+  },
+  {
+    "id": 1616,
+    "deviceCode": "1495",
+    "ipAddress": "10.254.218.9",
+    "serialNumber": "2142smp0001851"
+  },
+  {
+    "id": 1617,
+    "deviceCode": "1496",
+    "ipAddress": "10.254.218.11",
+    "serialNumber": "2130smp0001391"
+  },
+  {
+    "id": 1618,
+    "deviceCode": "1497",
+    "ipAddress": "10.254.218.13",
+    "serialNumber": "2142smp0000665"
+  },
+  {
+    "id": 1619,
+    "deviceCode": "1498",
+    "ipAddress": "10.254.218.15",
+    "serialNumber": "2142smp0000269"
+  },
+  {
+    "id": 1620,
+    "deviceCode": "1499",
+    "ipAddress": "10.254.218.17",
+    "serialNumber": "2136smp0001654"
+  },
+  {
+    "id": 1621,
+    "deviceCode": "1500",
+    "ipAddress": "10.254.218.19",
+    "serialNumber": "2136smp0000413"
+  },
+  {
+    "id": 1622,
+    "deviceCode": "1501",
+    "ipAddress": "10.254.218.21",
+    "serialNumber": "2142smp0001691"
+  },
+  {
+    "id": 1623,
+    "deviceCode": "1502",
+    "ipAddress": "10.254.218.46",
+    "serialNumber": "2136smp0001388"
+  },
+  {
+    "id": 1624,
+    "deviceCode": "1503",
+    "ipAddress": "10.254.218.47",
+    "serialNumber": "2142smp0000115"
+  },
+  {
+    "id": 1625,
+    "deviceCode": "1504",
+    "ipAddress": "10.254.218.48",
+    "serialNumber": "2142smp0001721"
+  },
+  {
+    "id": 1626,
+    "deviceCode": "1505",
+    "ipAddress": "10.254.218.49",
+    "serialNumber": "2147smp0000950"
+  },
+  {
+    "id": 1627,
+    "deviceCode": "1506",
+    "ipAddress": "10.254.218.50",
+    "serialNumber": "2143smp0001058"
+  },
+  {
+    "id": 1628,
+    "deviceCode": "1507",
+    "ipAddress": "10.254.218.51",
+    "serialNumber": "2136smp0001562"
+  },
+  {
+    "id": 1629,
+    "deviceCode": "1508",
+    "ipAddress": "10.254.218.52",
+    "serialNumber": "2147smp0000707"
+  },
+  {
+    "id": 1630,
+    "deviceCode": "1509",
+    "ipAddress": "10.254.218.53",
+    "serialNumber": "2147smp0000899"
+  },
+  {
+    "id": 1631,
+    "deviceCode": "1510",
+    "ipAddress": "10.254.218.142",
+    "serialNumber": "2238smp0000766"
+  },
+  {
+    "id": 1632,
+    "deviceCode": "1511",
+    "ipAddress": "10.254.218.143",
+    "serialNumber": "2234smp0002548"
+  },
+  {
+    "id": 1633,
+    "deviceCode": "1512",
+    "ipAddress": "10.254.218.144",
+    "serialNumber": "2223smp0000667"
+  },
+  {
+    "id": 1634,
+    "deviceCode": "1513",
+    "ipAddress": "10.254.218.145",
+    "serialNumber": "2234smp0002050"
+  },
+  {
+    "id": 1635,
+    "deviceCode": "1514",
+    "ipAddress": "10.254.218.146",
+    "serialNumber": "2234smp0001765"
+  },
+  {
+    "id": 1636,
+    "deviceCode": "1515",
+    "ipAddress": "10.254.218.147",
+    "serialNumber": "2234smp0003307"
+  },
+  {
+    "id": 1637,
+    "deviceCode": "1516",
+    "ipAddress": "10.254.218.148",
+    "serialNumber": "2234smp0002203"
+  },
+  {
+    "id": 1638,
+    "deviceCode": "1517",
+    "ipAddress": "10.254.218.149",
+    "serialNumber": "2237smp0001564"
+  },
+  {
+    "id": 1639,
+    "deviceCode": "1518",
+    "ipAddress": "10.254.218.94",
+    "serialNumber": "2223smp0000698"
+  },
+  {
+    "id": 1640,
+    "deviceCode": "1519",
+    "ipAddress": "10.254.218.95",
+    "serialNumber": "2238smp0000070"
+  },
+  {
+    "id": 1641,
+    "deviceCode": "1520",
+    "ipAddress": "10.254.218.96",
+    "serialNumber": "2234smp0001680"
+  },
+  {
+    "id": 1642,
+    "deviceCode": "1521",
+    "ipAddress": "10.254.218.97",
+    "serialNumber": "2223smp0000933"
+  },
+  {
+    "id": 1643,
+    "deviceCode": "1522",
+    "ipAddress": "10.254.218.98",
+    "serialNumber": "2234smp0002326"
+  },
+  {
+    "id": 1644,
+    "deviceCode": "1523",
+    "ipAddress": "10.254.218.99",
+    "serialNumber": "2234smp0000883"
+  },
+  {
+    "id": 1645,
+    "deviceCode": "1524",
+    "ipAddress": "10.254.218.100",
+    "serialNumber": "2234smp0003123"
+  },
+  {
+    "id": 1646,
+    "deviceCode": "1525",
+    "ipAddress": "10.254.218.101",
+    "serialNumber": "2223smp0000506"
+  },
+  {
+    "id": 1647,
+    "deviceCode": "1526",
+    "ipAddress": "10.254.222.108",
+    "serialNumber": "2124smp0001354"
+  },
+  {
+    "id": 1648,
+    "deviceCode": "1527",
+    "ipAddress": "10.254.222.109",
+    "serialNumber": "2136smp0001401"
+  },
+  {
+    "id": 1649,
+    "deviceCode": "1528",
+    "ipAddress": "10.254.222.110",
+    "serialNumber": "2120smp0000185"
+  },
+  {
+    "id": 1650,
+    "deviceCode": "1529",
+    "ipAddress": "10.254.222.111",
+    "serialNumber": "2142smp0000856"
+  },
+  {
+    "id": 1651,
+    "deviceCode": "1530",
+    "ipAddress": "10.254.222.112",
+    "serialNumber": "2125smp0000136"
+  },
+  {
+    "id": 1652,
+    "deviceCode": "1531",
+    "ipAddress": "10.254.222.113",
+    "serialNumber": "2143smp0000534"
+  },
+  {
+    "id": 1653,
+    "deviceCode": "1532",
+    "ipAddress": "10.254.222.114",
+    "serialNumber": "2125smp0000839"
+  },
+  {
+    "id": 1654,
+    "deviceCode": "1533",
+    "ipAddress": "10.254.222.115",
+    "serialNumber": "2125smp0000983"
+  },
+  {
+    "id": 1655,
+    "deviceCode": "1534",
+    "ipAddress": "10.254.222.141",
+    "serialNumber": "2125smp0000075"
+  },
+  {
+    "id": 1656,
+    "deviceCode": "1535",
+    "ipAddress": "10.254.222.142",
+    "serialNumber": "2237smp0001045"
+  },
+  {
+    "id": 1657,
+    "deviceCode": "1536",
+    "ipAddress": "10.254.222.143",
+    "serialNumber": "2125smp0001773"
+  },
+  {
+    "id": 1658,
+    "deviceCode": "1537",
+    "ipAddress": "10.254.222.144",
+    "serialNumber": "2111smp0001789"
+  },
+  {
+    "id": 1659,
+    "deviceCode": "1538",
+    "ipAddress": "10.254.222.145",
+    "serialNumber": "2125smp0000846"
+  },
+  {
+    "id": 1660,
+    "deviceCode": "1539",
+    "ipAddress": "10.254.222.146",
+    "serialNumber": "2125smp0000068"
+  },
+  {
+    "id": 1661,
+    "deviceCode": "1540",
+    "ipAddress": "10.254.222.147",
+    "serialNumber": "2125smp0002136"
+  },
+  {
+    "id": 1662,
+    "deviceCode": "1541",
+    "ipAddress": "10.254.222.148",
+    "serialNumber": "2147smp0001023"
+  },
+  {
+    "id": 1663,
+    "deviceCode": "1542",
+    "ipAddress": "10.254.222.157",
+    "serialNumber": "2147smp0001092"
+  },
+  {
+    "id": 1665,
+    "deviceCode": "1544",
+    "ipAddress": "10.254.222.159",
+    "serialNumber": "2143smp0000848"
+  },
+  {
+    "id": 1666,
+    "deviceCode": "1545",
+    "ipAddress": "10.254.222.160",
+    "serialNumber": "2125smp0001827"
+  },
+  {
+    "id": 1667,
+    "deviceCode": "1546",
+    "ipAddress": "10.254.222.161",
+    "serialNumber": "2125smp0000228"
+  },
+  {
+    "id": 1668,
+    "deviceCode": "1547",
+    "ipAddress": "10.254.222.162",
+    "serialNumber": "2125smp0002112"
+  },
+  {
+    "id": 1669,
+    "deviceCode": "1548",
+    "ipAddress": "10.254.222.163",
+    "serialNumber": "2124smp0001408"
+  },
+  {
+    "id": 1670,
+    "deviceCode": "1549",
+    "ipAddress": "10.254.222.164",
+    "serialNumber": "2125smp0002174"
+  },
+  {
+    "id": 1671,
+    "deviceCode": "1550",
+    "ipAddress": "10.254.222.124",
+    "serialNumber": "2125smp0000471"
+  },
+  {
+    "id": 1672,
+    "deviceCode": "1551",
+    "ipAddress": "10.254.222.125",
+    "serialNumber": "2136smp0000529"
+  },
+  {
+    "id": 1673,
+    "deviceCode": "1552",
+    "ipAddress": "10.254.222.126",
+    "serialNumber": "2147smp0000646"
+  },
+  {
+    "id": 1674,
+    "deviceCode": "1553",
+    "ipAddress": "10.254.222.127",
+    "serialNumber": "2136smp0000383"
+  },
+  {
+    "id": 1675,
+    "deviceCode": "1554",
+    "ipAddress": "10.254.222.128",
+    "serialNumber": "2147smp000.1351"
+  },
+  {
+    "id": 1676,
+    "deviceCode": "1555",
+    "ipAddress": "10.254.222.129",
+    "serialNumber": "2142smp0000320"
+  },
+  {
+    "id": 1677,
+    "deviceCode": "1556",
+    "ipAddress": "10.254.222.130",
+    "serialNumber": "2238smp0000445"
+  },
+  {
+    "id": 1678,
+    "deviceCode": "1557",
+    "ipAddress": "10.254.222.131",
+    "serialNumber": "2237smp0001342"
+  },
+  {
+    "id": 1691,
+    "deviceCode": "1570",
+    "ipAddress": "10.254.222.62",
+    "serialNumber": "2238smp00000181"
+  },
+  {
+    "id": 1702,
+    "deviceCode": "1581",
+    "ipAddress": "10.254.222.84",
+    "serialNumber": "2124smp0000526"
+  }
+]

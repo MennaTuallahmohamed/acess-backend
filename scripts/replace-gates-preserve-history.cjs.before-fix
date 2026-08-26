@@ -1,0 +1,853 @@
+/* eslint-disable no-console */
+
+/**
+ * استبدال جدول Gate بالكامل من Excel مع الحفاظ على السجلات التاريخية المرتبطة.
+ *
+ * Preview (بدون تعديل):
+ *   node scripts/replace-gates-preserve-history.cjs --file "C:\\backend\\imports\\Gates_Only_With_Secret_Codes.xlsx"
+ *
+ * Apply (بعد نجاح الـ Preview فقط):
+ *   node scripts/replace-gates-preserve-history.cjs --file "C:\\backend\\imports\\Gates_Only_With_Secret_Codes.xlsx" --apply
+ */
+
+require('dotenv').config();
+
+const fs = require('node:fs');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const XLSX = require('xlsx');
+const { PrismaClient, Prisma } = require('@prisma/client');
+
+const prisma = new PrismaClient();
+
+function clean(value) {
+  return String(value ?? '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalized(value) {
+  return clean(value).toLocaleLowerCase('en-US');
+}
+
+function compact(value) {
+  return normalized(value).replace(/[^\p{L}\p{N}]+/gu, '');
+}
+
+function buildKey(...parts) {
+  return parts.map(normalized).join('||');
+}
+
+function buildCompactKey(...parts) {
+  return parts.map(compact).join('||');
+}
+
+function stableId(prefix, value) {
+  const digest = crypto
+    .createHash('sha256')
+    .update(String(value), 'utf8')
+    .digest('hex')
+    .slice(0, 28)
+    .toUpperCase();
+
+  return `${prefix}-${digest}`;
+}
+
+function readArg(name) {
+  const index = process.argv.indexOf(name);
+  if (index === -1) return null;
+  return process.argv[index + 1] || null;
+}
+
+function hasFlag(name) {
+  return process.argv.includes(name);
+}
+
+function parseGateNumber(gateNo) {
+  const value = clean(gateNo).toUpperCase();
+  const match = value.match(/^(\d+)\s*(IN|OUT)$/i);
+
+  if (!match) {
+    throw new Error(
+      `Gate Number غير صحيح: "${gateNo}". المطلوب مثل 1 IN أو 8 OUT.`,
+    );
+  }
+
+  const laneNumber = Number(match[1]);
+  const direction = match[2].toUpperCase();
+
+  if (!Number.isInteger(laneNumber) || laneNumber < 1 || laneNumber > 8) {
+    throw new Error(`رقم البوابة يجب أن يكون من 1 إلى 8: "${gateNo}".`);
+  }
+
+  return {
+    gateNo: `${laneNumber} ${direction}`,
+    lane: String(laneNumber),
+    direction,
+  };
+}
+
+function tryNormalizeGateNumber(value) {
+  try {
+    return parseGateNumber(value).gateNo;
+  } catch {
+    return clean(value).toUpperCase().replace(/\s+/g, ' ');
+  }
+}
+
+function parseExcel(filePath) {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`ملف Excel غير موجود: ${filePath}`);
+  }
+
+  const workbook = XLSX.readFile(filePath, {
+    cellDates: false,
+    raw: false,
+  });
+
+  const sheetName = workbook.SheetNames.includes('Gate_Codes')
+    ? 'Gate_Codes'
+    : workbook.SheetNames[0];
+
+  if (!sheetName) throw new Error('ملف Excel لا يحتوي على أي Sheet.');
+
+  const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+    defval: '',
+    raw: false,
+  });
+
+  if (rows.length === 0) throw new Error(`Sheet ${sheetName} فارغ.`);
+
+  const parsed = rows.map((row, index) => {
+    const excelRow = index + 2;
+    const cluster = clean(row.Cluster);
+    const building = clean(row['Ministry / Building']);
+    const zone = clean(row.Zone);
+    const rawGateNo = clean(row['Gate Number']);
+    const secretCode = clean(row['Secret Code']).toUpperCase();
+
+    const missing = [];
+    if (!cluster) missing.push('Cluster');
+    if (!building) missing.push('Ministry / Building');
+    if (!zone) missing.push('Zone');
+    if (!rawGateNo) missing.push('Gate Number');
+    if (!secretCode) missing.push('Secret Code');
+
+    if (missing.length > 0) {
+      throw new Error(`صف Excel رقم ${excelRow} ناقص: ${missing.join(', ')}`);
+    }
+
+    if (!/^GSC-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(secretCode)) {
+      throw new Error(`Secret Code غير صحيح في صف ${excelRow}: ${secretCode}`);
+    }
+
+    const parsedGateNo = parseGateNumber(rawGateNo);
+    const groupKey = buildKey(cluster, building, zone);
+    const gateKey = buildKey(cluster, building, zone, parsedGateNo.gateNo);
+
+    return {
+      excelRow,
+      cluster,
+      building,
+      zone,
+      gateNo: parsedGateNo.gateNo,
+      lane: parsedGateNo.lane,
+      direction: parsedGateNo.direction,
+      secretCode,
+      groupKey,
+      gateKey,
+      fullCompactKey: buildCompactKey(cluster, building, zone, parsedGateNo.gateNo),
+      clusterBuildingGateKey: buildCompactKey(cluster, building, parsedGateNo.gateNo),
+      buildingZoneGateKey: buildCompactKey(building, zone, parsedGateNo.gateNo),
+      buildingGateKey: buildCompactKey(building, parsedGateNo.gateNo),
+      locationExcelId: stableId('GATELOC', groupKey),
+      gateExcelId: stableId('GATE', gateKey),
+    };
+  });
+
+  const secretCodes = new Set();
+  const gateKeys = new Set();
+
+  for (const row of parsed) {
+    if (secretCodes.has(row.secretCode)) {
+      throw new Error(`Secret Code مكرر داخل Excel: ${row.secretCode}`);
+    }
+    secretCodes.add(row.secretCode);
+
+    if (gateKeys.has(row.gateKey)) {
+      throw new Error(
+        `بوابة مكررة داخل Excel: ${row.building} / ${row.zone} / ${row.gateNo}`,
+      );
+    }
+    gateKeys.add(row.gateKey);
+  }
+
+  const groups = new Map();
+  for (const row of parsed) {
+    if (!groups.has(row.groupKey)) groups.set(row.groupKey, []);
+    groups.get(row.groupKey).push(row);
+  }
+
+  const invalidGroups = [];
+  const expected = new Set([
+    '1 IN', '2 IN', '3 IN', '4 IN',
+    '5 IN', '6 IN', '7 IN', '8 IN',
+  ]);
+
+  for (const groupRows of groups.values()) {
+    const actual = new Set(groupRows.map((row) => row.gateNo));
+    const missing = [...expected].filter((value) => !actual.has(value));
+    const extra = [...actual].filter((value) => !expected.has(value));
+
+    if (groupRows.length !== 8 || missing.length > 0 || extra.length > 0) {
+      invalidGroups.push({
+        building: groupRows[0]?.building,
+        cluster: groupRows[0]?.cluster,
+        zone: groupRows[0]?.zone,
+        count: groupRows.length,
+        missing,
+        extra,
+      });
+    }
+  }
+
+  if (invalidGroups.length > 0) {
+    console.error('\n❌ جهات لا تحتوي على 8 بوابات صحيحة:');
+    console.table(invalidGroups.slice(0, 30));
+    throw new Error('فشل التحقق من عدد البوابات لكل جهة.');
+  }
+
+  return {
+    sheetName,
+    rows: parsed,
+    groupCount: groups.size,
+  };
+}
+
+function addToMultiMap(map, key, row) {
+  if (!key) return;
+  if (!map.has(key)) map.set(key, []);
+  map.get(key).push(row);
+}
+
+function getUnique(map, key) {
+  const rows = map.get(key) || [];
+  return rows.length === 1 ? rows[0] : null;
+}
+
+function makeNewIndexes(excelRows) {
+  const indexes = {
+    bySecretCode: new Map(),
+    byExcelId: new Map(),
+    byExact: new Map(),
+    byFullCompact: new Map(),
+    byClusterBuildingGate: new Map(),
+    byBuildingZoneGate: new Map(),
+    byBuildingGate: new Map(),
+  };
+
+  for (const row of excelRows) {
+    addToMultiMap(indexes.bySecretCode, row.secretCode, row);
+    addToMultiMap(indexes.byExcelId, row.gateExcelId, row);
+    addToMultiMap(indexes.byExact, row.gateKey, row);
+    addToMultiMap(indexes.byFullCompact, row.fullCompactKey, row);
+    addToMultiMap(indexes.byClusterBuildingGate, row.clusterBuildingGateKey, row);
+    addToMultiMap(indexes.byBuildingZoneGate, row.buildingZoneGateKey, row);
+    addToMultiMap(indexes.byBuildingGate, row.buildingGateKey, row);
+  }
+
+  return indexes;
+}
+
+function mapOldGateToNew(oldGate, indexes) {
+  const gateNo = tryNormalizeGateNumber(oldGate.gateNo);
+  const candidates = [
+    ['SECRET_CODE', getUnique(indexes.bySecretCode, clean(oldGate.secretCode).toUpperCase())],
+    ['EXCEL_ID', getUnique(indexes.byExcelId, clean(oldGate.excelId))],
+    [
+      'EXACT_FIELDS',
+      getUnique(
+        indexes.byExact,
+        buildKey(oldGate.cluster, oldGate.building, oldGate.zone, gateNo),
+      ),
+    ],
+    [
+      'COMPACT_FIELDS',
+      getUnique(
+        indexes.byFullCompact,
+        buildCompactKey(oldGate.cluster, oldGate.building, oldGate.zone, gateNo),
+      ),
+    ],
+    [
+      'UNIQUE_CLUSTER_BUILDING_GATE',
+      getUnique(
+        indexes.byClusterBuildingGate,
+        buildCompactKey(oldGate.cluster, oldGate.building, gateNo),
+      ),
+    ],
+    [
+      'UNIQUE_BUILDING_ZONE_GATE',
+      getUnique(
+        indexes.byBuildingZoneGate,
+        buildCompactKey(oldGate.building, oldGate.zone, gateNo),
+      ),
+    ],
+    [
+      'UNIQUE_BUILDING_GATE',
+      getUnique(
+        indexes.byBuildingGate,
+        buildCompactKey(oldGate.building, gateNo),
+      ),
+    ],
+  ];
+
+  for (const [strategy, row] of candidates) {
+    if (row) return { row, strategy };
+  }
+
+  return null;
+}
+
+async function loadState(client = prisma) {
+  const [oldGates, inspections, tasks, taskItems, activityLogs, locations] =
+    await Promise.all([
+      client.gate.findMany({ orderBy: { id: 'asc' } }),
+      client.inspection.findMany({
+        where: { gateId: { not: null } },
+        select: { id: true, gateId: true },
+        orderBy: { id: 'asc' },
+      }),
+      client.inspectionTask.findMany({
+        where: { gateId: { not: null } },
+        select: { id: true, gateId: true },
+        orderBy: { id: 'asc' },
+      }),
+      client.inspectionTaskItem.findMany({
+        where: { gateId: { not: null } },
+        select: { id: true, gateId: true },
+        orderBy: { id: 'asc' },
+      }),
+      client.technicianActivityLog.findMany({
+        where: { gateId: { not: null } },
+        select: { id: true, gateId: true },
+        orderBy: { id: 'asc' },
+      }),
+      client.location.findMany({
+        select: {
+          id: true,
+          building: true,
+          cluster: true,
+          zone: true,
+          excelId: true,
+        },
+        orderBy: { id: 'asc' },
+      }),
+    ]);
+
+  return { oldGates, inspections, tasks, taskItems, activityLogs, locations };
+}
+
+function buildPlan(excel, state) {
+  const oldGateById = new Map(state.oldGates.map((gate) => [gate.id, gate]));
+  const indexes = makeNewIndexes(excel.rows);
+
+  const refs = [
+    ...state.inspections.map((row) => ({ table: 'Inspection', ...row })),
+    ...state.tasks.map((row) => ({ table: 'InspectionTask', ...row })),
+    ...state.taskItems.map((row) => ({ table: 'InspectionTaskItem', ...row })),
+    ...state.activityLogs.map((row) => ({ table: 'TechnicianActivityLog', ...row })),
+  ];
+
+  const dependencyGateIds = [...new Set(refs.map((row) => row.gateId))];
+  const mappings = [];
+  const unresolved = [];
+
+  for (const oldGateId of dependencyGateIds) {
+    const oldGate = oldGateById.get(oldGateId);
+    if (!oldGate) {
+      unresolved.push({
+        oldGateId,
+        reason: 'OLD_GATE_NOT_FOUND',
+        refs: refs.filter((row) => row.gateId === oldGateId).length,
+      });
+      continue;
+    }
+
+    const match = mapOldGateToNew(oldGate, indexes);
+    if (!match) {
+      unresolved.push({
+        oldGateId,
+        gateNo: oldGate.gateNo,
+        cluster: oldGate.cluster,
+        building: oldGate.building,
+        zone: oldGate.zone,
+        secretCode: oldGate.secretCode,
+        reason: 'NO_UNIQUE_NEW_MATCH',
+        refs: refs.filter((row) => row.gateId === oldGateId).length,
+      });
+      continue;
+    }
+
+    mappings.push({
+      oldGateId,
+      newGateKey: match.row.gateKey,
+      newGateExcelId: match.row.gateExcelId,
+      newSecretCode: match.row.secretCode,
+      strategy: match.strategy,
+      refs: refs.filter((row) => row.gateId === oldGateId).length,
+      old: {
+        gateNo: oldGate.gateNo,
+        cluster: oldGate.cluster,
+        building: oldGate.building,
+        zone: oldGate.zone,
+        secretCode: oldGate.secretCode,
+      },
+      next: {
+        gateNo: match.row.gateNo,
+        cluster: match.row.cluster,
+        building: match.row.building,
+        zone: match.row.zone,
+        secretCode: match.row.secretCode,
+      },
+    });
+  }
+
+  const locationMap = new Map();
+  const duplicateLocationKeys = new Set();
+
+  for (const location of state.locations) {
+    const key = buildKey(location.cluster, location.building, location.zone);
+    if (!locationMap.has(key)) locationMap.set(key, location);
+    else duplicateLocationKeys.add(key);
+  }
+
+  const uniqueGroups = new Map();
+  for (const row of excel.rows) {
+    if (!uniqueGroups.has(row.groupKey)) uniqueGroups.set(row.groupKey, row);
+  }
+
+  const missingLocationRows = [...uniqueGroups.values()].filter(
+    (row) => !locationMap.has(row.groupKey),
+  );
+
+  const strategyCounts = {};
+  for (const mapping of mappings) {
+    strategyCounts[mapping.strategy] = (strategyCounts[mapping.strategy] || 0) + 1;
+  }
+
+  return {
+    refs,
+    dependencyGateIds,
+    mappings,
+    unresolved,
+    strategyCounts,
+    locationMap,
+    duplicateLocationKeys,
+    uniqueGroups,
+    missingLocationRows,
+  };
+}
+
+function dependencyCounts(state) {
+  return {
+    inspections: state.inspections.length,
+    tasks: state.tasks.length,
+    taskItems: state.taskItems.length,
+    activityLogs: state.activityLogs.length,
+    total:
+      state.inspections.length +
+      state.tasks.length +
+      state.taskItems.length +
+      state.activityLogs.length,
+  };
+}
+
+async function createBackup(excel, state, plan) {
+  const backupDir = path.resolve(process.cwd(), 'backups');
+  fs.mkdirSync(backupDir, { recursive: true });
+
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const backupPath = path.join(
+    backupDir,
+    `gates-full-backup-before-replace-${stamp}.json`,
+  );
+
+  fs.writeFileSync(
+    backupPath,
+    JSON.stringify(
+      {
+        createdAt: new Date().toISOString(),
+        excelRowsExpected: excel.rows.length,
+        dependencyCounts: dependencyCounts(state),
+        mappings: plan.mappings,
+        unresolved: plan.unresolved,
+        oldGates: state.oldGates,
+        dependentRows: {
+          inspections: state.inspections,
+          tasks: state.tasks,
+          taskItems: state.taskItems,
+          activityLogs: state.activityLogs,
+        },
+      },
+      null,
+      2,
+    ),
+    'utf8',
+  );
+
+  return backupPath;
+}
+
+async function main() {
+  const fileArg = readArg('--file');
+  const apply = hasFlag('--apply');
+
+  if (!fileArg) {
+    throw new Error(
+      'اكتبي مسار الملف بعد --file، مثال:\n' +
+        'node scripts/replace-gates-preserve-history.cjs --file "C:\\backend\\imports\\Gates_Only_With_Secret_Codes.xlsx"',
+    );
+  }
+
+  const filePath = path.resolve(fileArg);
+  const excel = parseExcel(filePath);
+  const state = await loadState();
+  const plan = buildPlan(excel, state);
+  const deps = dependencyCounts(state);
+
+  console.log('\n============= SAFE GATES REPLACE PREVIEW =============');
+  console.log(`Excel file                  : ${filePath}`);
+  console.log(`Excel sheet                 : ${excel.sheetName}`);
+  console.log(`Excel gate rows             : ${excel.rows.length}`);
+  console.log(`Ministry/location groups    : ${excel.groupCount}`);
+  console.log(`Expected 8 per group        : OK`);
+  console.log(`Current Gate rows           : ${state.oldGates.length}`);
+  console.log(`Missing Locations           : ${plan.missingLocationRows.length}`);
+  console.log(`Duplicate location keys     : ${plan.duplicateLocationKeys.size}`);
+  console.log('Gate dependencies           :', deps);
+  console.log(`Dependent old Gate IDs      : ${plan.dependencyGateIds.length}`);
+  console.log(`Mapped dependent Gate IDs   : ${plan.mappings.length}`);
+  console.log(`Unresolved dependent Gates  : ${plan.unresolved.length}`);
+  console.log('Mapping strategies          :', plan.strategyCounts);
+  console.log(`Mode                        : ${apply ? 'APPLY' : 'PREVIEW ONLY'}`);
+  console.log('=======================================================\n');
+
+  if (plan.mappings.length > 0) {
+    console.log('نماذج نقل التاريخ من Gate قديم إلى Gate جديد:');
+    console.table(
+      plan.mappings.slice(0, 20).map((item) => ({
+        oldGateId: item.oldGateId,
+        refs: item.refs,
+        strategy: item.strategy,
+        oldGate: `${item.old.building} | ${item.old.zone} | ${item.old.gateNo}`,
+        newGate: `${item.next.building} | ${item.next.zone} | ${item.next.gateNo}`,
+      })),
+    );
+  }
+
+  if (plan.unresolved.length > 0) {
+    console.error('\n❌ بوابات مرتبطة بتاريخ ولم نجد لها بوابة جديدة مطابقة بشكل آمن:');
+    console.table(plan.unresolved.slice(0, 50));
+  }
+
+  if (!apply) {
+    console.log('\n✅ Preview فقط: لم يتم حذف أو إضافة أو تعديل أي شيء.');
+    if (plan.unresolved.length === 0) {
+      console.log('✅ كل السجلات التاريخية يمكن نقلها إلى البوابات الجديدة.');
+      console.log('بعد مراجعة الجدول، أعيدي نفس الأمر مع --apply.');
+    } else {
+      console.log('⛔ لا تشغّلي --apply قبل معالجة البوابات غير المطابقة.');
+    }
+    return;
+  }
+
+  if (plan.unresolved.length > 0) {
+    throw new Error(
+      `تم إلغاء التنفيذ: يوجد ${plan.unresolved.length} Gate مرتبط بسجلات قديمة ولم تتم مطابقته مع الملف الجديد.`,
+    );
+  }
+
+  const backupPath = await createBackup(excel, state, plan);
+  console.log(`✅ Full backup created: ${backupPath}`);
+
+  const runToken = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}`;
+
+  const result = await prisma.$transaction(
+    async (tx) => {
+      const txState = await loadState(tx);
+      const txPlan = buildPlan(excel, txState);
+      const beforeDeps = dependencyCounts(txState);
+
+      if (txPlan.unresolved.length > 0) {
+        throw new Error(
+          `تغيّرت البيانات قبل التنفيذ: يوجد ${txPlan.unresolved.length} Gate غير مطابق. تم عمل Rollback.`,
+        );
+      }
+
+      const oldGateIds = txState.oldGates.map((gate) => gate.id);
+
+      // تحرير القيم الفريدة القديمة مؤقتًا داخل نفس الـ Transaction.
+      await tx.$executeRawUnsafe(
+        `UPDATE "Gate"
+         SET "secretCode" = CONCAT('__OLD_GATE_CODE__', $1::text, '__', "id"::text),
+             "excelId" = CASE
+               WHEN "excelId" IS NULL THEN NULL
+               ELSE CONCAT('__OLD_GATE_EXCEL__', $1::text, '__', "id"::text)
+             END`,
+        runToken,
+      );
+
+      const txLocations = await tx.location.findMany({
+        select: {
+          id: true,
+          building: true,
+          cluster: true,
+          zone: true,
+          excelId: true,
+        },
+        orderBy: { id: 'asc' },
+      });
+
+      const txLocationMap = new Map();
+      for (const location of txLocations) {
+        const key = buildKey(location.cluster, location.building, location.zone);
+        if (!txLocationMap.has(key)) txLocationMap.set(key, location);
+      }
+
+      let createdLocations = 0;
+      for (const groupRow of txPlan.uniqueGroups.values()) {
+        if (txLocationMap.has(groupRow.groupKey)) continue;
+
+        const created = await tx.location.upsert({
+          where: { excelId: groupRow.locationExcelId },
+          update: {
+            building: groupRow.building,
+            cluster: groupRow.cluster,
+            zone: groupRow.zone,
+            type: 'GATE',
+          },
+          create: {
+            excelId: groupRow.locationExcelId,
+            building: groupRow.building,
+            cluster: groupRow.cluster,
+            zone: groupRow.zone,
+            type: 'GATE',
+          },
+          select: {
+            id: true,
+            building: true,
+            cluster: true,
+            zone: true,
+            excelId: true,
+          },
+        });
+
+        txLocationMap.set(groupRow.groupKey, created);
+        createdLocations += 1;
+      }
+
+      const gateData = excel.rows.map((row) => {
+        const location = txLocationMap.get(row.groupKey);
+        if (!location) {
+          throw new Error(
+            `تعذر إيجاد/إنشاء Location للجهة: ${row.building} / ${row.zone}`,
+          );
+        }
+
+        return {
+          gateNo: row.gateNo,
+          secretCode: row.secretCode,
+          cluster: row.cluster,
+          building: row.building,
+          zone: row.zone,
+          direction: row.direction,
+          lane: row.lane,
+          type: 'GATE',
+          excelId: row.gateExcelId,
+          locationId: location.id,
+          notes: `Imported from ${path.basename(filePath)}`,
+        };
+      });
+
+      const inserted = await tx.gate.createMany({ data: gateData });
+
+      const newGates = await tx.gate.findMany({
+        where: { excelId: { in: excel.rows.map((row) => row.gateExcelId) } },
+        select: {
+          id: true,
+          excelId: true,
+          secretCode: true,
+          cluster: true,
+          building: true,
+          zone: true,
+          gateNo: true,
+        },
+      });
+
+      const newGateByExcelId = new Map(
+        newGates.map((gate) => [gate.excelId, gate]),
+      );
+
+      let movedInspections = 0;
+      let movedTasks = 0;
+      let movedTaskItems = 0;
+      let movedActivityLogs = 0;
+
+      for (const mapping of txPlan.mappings) {
+        const newGate = newGateByExcelId.get(mapping.newGateExcelId);
+        if (!newGate) {
+          throw new Error(
+            `لم يتم العثور على Gate الجديد بعد الإدخال: ${mapping.newGateExcelId}`,
+          );
+        }
+
+        const [a, b, c, d] = await Promise.all([
+          tx.inspection.updateMany({
+            where: { gateId: mapping.oldGateId },
+            data: { gateId: newGate.id },
+          }),
+          tx.inspectionTask.updateMany({
+            where: { gateId: mapping.oldGateId },
+            data: { gateId: newGate.id },
+          }),
+          tx.inspectionTaskItem.updateMany({
+            where: { gateId: mapping.oldGateId },
+            data: { gateId: newGate.id },
+          }),
+          tx.technicianActivityLog.updateMany({
+            where: { gateId: mapping.oldGateId },
+            data: { gateId: newGate.id },
+          }),
+        ]);
+
+        movedInspections += a.count;
+        movedTasks += b.count;
+        movedTaskItems += c.count;
+        movedActivityLogs += d.count;
+      }
+
+      const deleted = await tx.gate.deleteMany({
+        where: { id: { in: oldGateIds } },
+      });
+
+      const [finalGateCount, afterInspections, afterTasks, afterTaskItems, afterLogs, oldRefs] =
+        await Promise.all([
+          tx.gate.count(),
+          tx.inspection.count({ where: { gateId: { not: null } } }),
+          tx.inspectionTask.count({ where: { gateId: { not: null } } }),
+          tx.inspectionTaskItem.count({ where: { gateId: { not: null } } }),
+          tx.technicianActivityLog.count({ where: { gateId: { not: null } } }),
+          Promise.all([
+            tx.inspection.count({ where: { gateId: { in: oldGateIds } } }),
+            tx.inspectionTask.count({ where: { gateId: { in: oldGateIds } } }),
+            tx.inspectionTaskItem.count({ where: { gateId: { in: oldGateIds } } }),
+            tx.technicianActivityLog.count({ where: { gateId: { in: oldGateIds } } }),
+          ]),
+        ]);
+
+      const afterDeps = {
+        inspections: afterInspections,
+        tasks: afterTasks,
+        taskItems: afterTaskItems,
+        activityLogs: afterLogs,
+        total: afterInspections + afterTasks + afterTaskItems + afterLogs,
+      };
+
+      if (finalGateCount !== excel.rows.length) {
+        throw new Error(
+          `عدد Gate النهائي غير صحيح: Expected=${excel.rows.length}, Actual=${finalGateCount}`,
+        );
+      }
+
+      if (
+        beforeDeps.inspections !== afterDeps.inspections ||
+        beforeDeps.tasks !== afterDeps.tasks ||
+        beforeDeps.taskItems !== afterDeps.taskItems ||
+        beforeDeps.activityLogs !== afterDeps.activityLogs
+      ) {
+        throw new Error(
+          `عدد السجلات التاريخية تغير. Before=${JSON.stringify(beforeDeps)} After=${JSON.stringify(afterDeps)}`,
+        );
+      }
+
+      if (oldRefs.some((count) => count !== 0)) {
+        throw new Error(
+          `ما زالت مراجع تشير إلى Gate IDs القديمة: ${JSON.stringify(oldRefs)}`,
+        );
+      }
+
+      return {
+        deleted: deleted.count,
+        inserted: inserted.count,
+        createdLocations,
+        movedInspections,
+        movedTasks,
+        movedTaskItems,
+        movedActivityLogs,
+        beforeDeps,
+        afterDeps,
+      };
+    },
+    {
+      maxWait: 20_000,
+      timeout: 180_000,
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+    },
+  );
+
+  const [finalCount, finalGroups, firstRows] = await Promise.all([
+    prisma.gate.count(),
+    prisma.gate.groupBy({
+      by: ['cluster', 'building', 'zone'],
+      _count: { id: true },
+    }),
+    prisma.gate.findMany({
+      orderBy: [{ building: 'asc' }, { zone: 'asc' }, { gateNo: 'asc' }],
+      take: 8,
+      select: {
+        id: true,
+        cluster: true,
+        building: true,
+        zone: true,
+        gateNo: true,
+        secretCode: true,
+        locationId: true,
+      },
+    }),
+  ]);
+
+  const invalidFinalGroups = finalGroups.filter((group) => group._count.id !== 8);
+
+  if (finalCount !== excel.rows.length || invalidFinalGroups.length > 0) {
+    throw new Error(
+      `فشل التحقق النهائي بعد Commit: finalCount=${finalCount}, invalidGroups=${invalidFinalGroups.length}`,
+    );
+  }
+
+  console.log('\n==================== SUCCESS ====================');
+  console.log(`Deleted old gates       : ${result.deleted}`);
+  console.log(`Inserted new gates      : ${result.inserted}`);
+  console.log(`Created locations       : ${result.createdLocations}`);
+  console.log(`Moved inspections       : ${result.movedInspections}`);
+  console.log(`Moved tasks             : ${result.movedTasks}`);
+  console.log(`Moved task items        : ${result.movedTaskItems}`);
+  console.log(`Moved activity logs     : ${result.movedActivityLogs}`);
+  console.log(`Historical rows before  : ${JSON.stringify(result.beforeDeps)}`);
+  console.log(`Historical rows after   : ${JSON.stringify(result.afterDeps)}`);
+  console.log(`Final Gate count        : ${finalCount}`);
+  console.log(`Groups with exactly 8   : ${finalGroups.length}`);
+  console.log(`Backup                  : ${backupPath}`);
+  console.log('=================================================\n');
+  console.table(firstRows);
+}
+
+main()
+  .catch((error) => {
+    console.error('\n❌ ERROR:', error?.message || error);
+    console.error('لم يتم تنفيذ أي تعديل جزئي؛ الـ Transaction تعمل Rollback عند أي خطأ.');
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

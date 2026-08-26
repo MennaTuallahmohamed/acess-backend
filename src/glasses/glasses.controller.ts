@@ -43,6 +43,14 @@ import {
 } from './dto/get-glass-inspections-query.dto';
 
 import {
+  GetGlassInspectionHistoryQueryDto,
+} from './dto/get-glass-inspection-history-query.dto';
+
+import {
+  UpdateGlassInspectionCommentDto,
+} from './dto/update-glass-inspection-comment.dto';
+
+import {
   GetGlassesQueryDto,
 } from './dto/get-glasses-query.dto';
 
@@ -222,6 +230,48 @@ export class GlassesController {
   ) {
     return this.glassesService
       .findAll(query);
+  }
+
+  /*
+  =========================================================
+  Fast Glass Inspection History
+  Request واحد فقط - الأحدث أولاً
+  =========================================================
+  */
+
+  @Get('inspection-history')
+  getInspectionHistory(
+    @Query()
+    query:
+      GetGlassInspectionHistoryQueryDto,
+  ) {
+    return this.glassesService
+      .getInspectionHistory(query);
+  }
+
+  /*
+  =========================================================
+  Edit Glass Inspection Comment
+  =========================================================
+  */
+
+  @Patch('inspections/:inspectionId/comment')
+  updateInspectionComment(
+    @Param(
+      'inspectionId',
+      ParseIntPipe,
+    )
+    inspectionId: number,
+
+    @Body()
+    dto:
+      UpdateGlassInspectionCommentDto,
+  ) {
+    return this.glassesService
+      .updateInspectionComment(
+        inspectionId,
+        dto.notes,
+      );
   }
 
   /*

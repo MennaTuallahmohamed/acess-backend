@@ -1,0 +1,134 @@
+[
+  {
+    "id": 313,
+    "deviceCode": "172",
+    "deviceName": "Morpho md",
+    "serialNumber": "2238SMP0000186",
+    "ipAddress": "10.254.234.103",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "172",
+    "createdAt": "2026-04-23T13:10:55.182Z",
+    "updatedAt": "2026-08-20T09:13:54.186Z"
+  },
+  {
+    "id": 500,
+    "deviceCode": "362",
+    "deviceName": "Morpho md",
+    "serialNumber": "2143SMP0001331",
+    "ipAddress": "10.254.234.118",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "362",
+    "createdAt": "2026-04-23T13:10:56.723Z",
+    "updatedAt": "2026-08-20T09:13:55.041Z"
+  },
+  {
+    "id": 864,
+    "deviceCode": "726",
+    "deviceName": "Morpho md",
+    "serialNumber": "2136smp0000529",
+    "ipAddress": "10.254.222.125",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "726",
+    "createdAt": "2026-04-23T13:10:59.985Z",
+    "updatedAt": "2026-08-20T09:14:31.903Z"
+  },
+  {
+    "id": 866,
+    "deviceCode": "728",
+    "deviceName": "Morpho md",
+    "serialNumber": "2136smp0000383",
+    "ipAddress": "10.254.222.127",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "728",
+    "createdAt": "2026-04-23T13:11:00.004Z",
+    "updatedAt": "2026-08-20T09:14:32.332Z"
+  },
+  {
+    "id": 867,
+    "deviceCode": "729",
+    "deviceName": "Morpho md",
+    "serialNumber": "2147smp0001351",
+    "ipAddress": "10.254.222.128",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "729",
+    "createdAt": "2026-04-23T13:11:00.012Z",
+    "updatedAt": "2026-08-20T09:14:32.546Z"
+  },
+  {
+    "id": 868,
+    "deviceCode": "730",
+    "deviceName": "Morpho md",
+    "serialNumber": "2142smp0000320",
+    "ipAddress": "10.254.222.129",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "730",
+    "createdAt": "2026-04-23T13:11:00.023Z",
+    "updatedAt": "2026-08-20T09:14:32.762Z"
+  },
+  {
+    "id": 870,
+    "deviceCode": "732",
+    "deviceName": "Morpho md",
+    "serialNumber": "2237smp0001342",
+    "ipAddress": "10.254.222.131",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "732",
+    "createdAt": "2026-04-23T13:11:00.040Z",
+    "updatedAt": "2026-08-20T09:14:33.417Z"
+  },
+  {
+    "id": 863,
+    "deviceCode": "725",
+    "deviceName": "Morpho md",
+    "serialNumber": "2125smp0000471",
+    "ipAddress": "10.254.222.124",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "725",
+    "createdAt": "2026-04-23T13:10:59.977Z",
+    "updatedAt": "2026-08-20T09:14:31.690Z"
+  },
+  {
+    "id": 869,
+    "deviceCode": "731",
+    "deviceName": "Morpho md",
+    "serialNumber": "2238smp0000445",
+    "ipAddress": "10.254.222.130",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "731",
+    "createdAt": "2026-04-23T13:11:00.031Z",
+    "updatedAt": "2026-08-20T09:14:32.982Z"
+  },
+  {
+    "id": 846,
+    "deviceCode": "708",
+    "deviceName": "Morpho md",
+    "serialNumber": "2238SMP0000056",
+    "ipAddress": "10.254.222.19",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "708",
+    "createdAt": "2026-04-23T13:10:59.828Z",
+    "updatedAt": "2026-08-20T09:15:49.531Z"
+  },
+  {
+    "id": 1100,
+    "deviceCode": "1134",
+    "deviceName": "Morpho md",
+    "serialNumber": "2124smp0000519",
+    "ipAddress": "10.254.202.49",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "1134",
+    "createdAt": "2026-04-23T13:11:01.950Z",
+    "updatedAt": "2026-08-20T09:14:50.969Z"
+  },
+  {
+    "id": 865,
+    "deviceCode": "727",
+    "deviceName": "Morpho md",
+    "serialNumber": "2147smp0000646",
+    "ipAddress": "10.254.222.126",
+    "lifecycleStatus": "ACTIVE",
+    "barcode": "727",
+    "createdAt": "2026-04-23T13:10:59.994Z",
+    "updatedAt": "2026-08-20T09:14:32.115Z"
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "deviceId": 10,
+    "movedById": 19,
+    "movementType": "RELOCATED",
+    "fromLocationId": 157,
+    "toLocationId": 1710,
+    "fromText": "17A/18A - وزارة الصحة والسكان - Zone 2 left - IN - 8",
+    "toText": "17A/18A - البرلمان - Zone 2 left - IN - 8",
+    "reason": null,
+    "movedAt": "2026-06-28T10:32:07.681Z",
+    "createdAt": "2026-06-28T10:32:07.681Z"
+  }
+]
