@@ -860,25 +860,6 @@ export class InspectionTasksService {
         });
       }
 
-      if (assignedToId) {
-        await this.createActivityLog(tx, {
-          userId: assignedToId,
-          action: 'TASK_STARTED',
-          taskId: createdTask.id,
-          title: 'New task assigned',
-          message: `${mode} task assigned with ${totalItems} item(s)`,
-          afterStatus: 'PENDING',
-          metadata: {
-            mode,
-            assetType,
-            taskKind,
-            totalItems,
-            createdById,
-            assignedToId,
-          },
-        });
-      }
-
       return this.recalculateTaskProgress(createdTask.id, tx);
     });
 
@@ -1148,6 +1129,8 @@ export class InspectionTasksService {
         ? null
         : Number(dto.longitude);
 
+    const now = new Date();
+
     const completionMetadata = {
       taskId,
       itemId: item.id,
@@ -1173,7 +1156,7 @@ export class InspectionTasksService {
       morphoStatus: dto.morphoStatus || null,
       firmwareNote: dto.firmwareNote || null,
       ipNote: dto.ipNote || null,
-      savedAt: new Date().toISOString(),
+      savedAt: now.toISOString(),
       source: 'SOFTWARE_TASK_COMPLETE_ITEM',
     };
 
@@ -1190,6 +1173,7 @@ export class InspectionTasksService {
           latitude,
           longitude,
           locationText: dto.locationText || null,
+          inspectedAt: now,
         },
       });
 
@@ -1201,8 +1185,8 @@ export class InspectionTasksService {
           status: itemStatus,
           completedById: technicianId,
           inspectionId: inspection.id,
-          inspectedAt: new Date(),
-          startedAt: item.startedAt || new Date(),
+          inspectedAt: now,
+          startedAt: item.startedAt || now,
           issueFound: itemStatus === 'ISSUE_FOUND',
           notes,
           completionNote: notes,
@@ -1219,7 +1203,7 @@ export class InspectionTasksService {
             id: item.deviceId,
           },
           data: {
-            lastInspectionAt: new Date(),
+            lastInspectionAt: now,
             currentStatus:
               itemStatus === 'ISSUE_FOUND' &&
               String(task.assetType).toUpperCase() === 'DEVICE'
@@ -1235,7 +1219,7 @@ export class InspectionTasksService {
             id: item.gateId,
           },
           data: {
-            lastInspectionAt: new Date(),
+            lastInspectionAt: now,
             currentStatus:
               itemStatus === 'ISSUE_FOUND' &&
               String(task.assetType).toUpperCase() === 'GATE'

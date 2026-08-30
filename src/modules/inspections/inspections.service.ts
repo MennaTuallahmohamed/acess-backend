@@ -746,12 +746,20 @@ export class InspectionsService {
         });
 
         if (taskId) {
-          await tx.inspectionTask.update({
-            where: { id: taskId },
-            data: {
-              status: TaskStatus.COMPLETED,
-            },
+          const taskItemsCount = await tx.inspectionTaskItem.count({
+            where: { taskId },
           });
+
+          // Multi-item tasks are completed by InspectionTasksService only
+          // after all task items are finished.
+          if (taskItemsCount === 0) {
+            await tx.inspectionTask.update({
+              where: { id: taskId },
+              data: {
+                status: TaskStatus.COMPLETED,
+              },
+            });
+          }
         }
 
         return created;
@@ -825,12 +833,20 @@ export class InspectionsService {
       });
 
       if (taskId) {
-        await tx.inspectionTask.update({
-          where: { id: taskId },
-          data: {
-            status: TaskStatus.COMPLETED,
-          },
+        const taskItemsCount = await tx.inspectionTaskItem.count({
+          where: { taskId },
         });
+
+        // Multi-item tasks are completed by InspectionTasksService only
+        // after all task items are finished.
+        if (taskItemsCount === 0) {
+          await tx.inspectionTask.update({
+            where: { id: taskId },
+            data: {
+              status: TaskStatus.COMPLETED,
+            },
+          });
+        }
       }
 
       return created;
